@@ -32,11 +32,3 @@ export async function ensureUploadSizeIsNotExceeded(
     throw new ConvexError("Upload size exceeded");
   }
 }
-
-export async function ensureHasPositiveCredits(ctx: QueryCtx) {
-  const currentUser = await ctx.runQuery(api.users.getCurrentUser, {});
-  console.log("currentUser", currentUser);
-  if (currentUser!.credits <= 0) {
-    throw new Error("Not enough credits to perform the action");
-  }
-}

@@ -1,24 +1,6 @@
 import { internal } from "../_generated/api";
 import { ActionCtx } from "../_generated/server";
 
-export const stripeRouteHandler = async (ctx: ActionCtx, req: Request) => {
-  const signature = req.headers.get("stripe-signature") as string;
-  const result = await ctx.runAction(internal.stripe.webhook, {
-    payload: await req.text(),
-    signature,
-  });
-
-  if (result.success) {
-    return new Response(null, {
-      status: 200,
-    });
-  } else {
-    return new Response("Stripe webhook error", {
-      status: 400,
-    });
-  }
-};
-
 export const clerkRouteHandler = async (ctx: ActionCtx, req: Request) => {
   console.log("Processing clerk webhook");
   const payloadString = await req.text();

@@ -4,20 +4,17 @@ import { rateLimitTables } from "convex-helpers/server/rateLimit";
 
 export default defineSchema({
   ...rateLimitTables,
-  images: defineTable({
-    title: v.string(),
-    uploaderUserId: v.string(),
-    fileId: v.string(),
-  }).index("uploader_user_id", ["uploaderUserId"]),
-  userPurchases: defineTable({
-    userId: v.string(),
-    stripeItemId: v.string(),
-    stripeCheckoutSessionId: v.string(),
-  }),
   users: defineTable({
     userId: v.string(),
     email: v.string(),
-    credits: v.number(),
-    isAnonymous: v.boolean(),
   }).index("user_id", ["userId"]),
+  auctions: defineTable({
+    name: v.string(),
+    status: v.union(v.literal("active"), v.literal("completed")),
+  }).index("status", ["status"]),
+  items: defineTable({
+    name: v.string(),
+    topBidder: v.string(),
+    topBid: v.number(),
+  }),
 });

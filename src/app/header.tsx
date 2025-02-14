@@ -13,28 +13,10 @@ import { Routes } from "@/lib/routes";
 
 export function Header() {
   const { user } = useUser();
-  const creditsAvailable = useQuery(api.users.getAvailableCredits);
   const clerk = useClerk();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
-
-  // const signInWithGoogle = async () => {
-  //   return signIn?.authenticateWithRedirect({
-  //     strategy: "oauth_google",
-  //     redirectUrl: "/sign-up/sso-callback",
-  //     redirectUrlComplete: "/",
-  //     continueSignUp: true,
-  //   });
-  // };
-
-  const creditsButton = () => {
-    return (
-      <Button variant="outline" className="w-full justify-center">
-        {creditsAvailable} Credits
-      </Button>
-    );
-  };
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 shadow-md bg-secondary">
@@ -78,7 +60,6 @@ export function Header() {
         </Button>
         <div className="hidden md:flex md:items-center gap-4 text-foreground">
           <Authenticated>
-            {creditsButton()}
             <AvatarDropdown
               fullName={user?.fullName}
               imageUrl={user?.imageUrl}
@@ -115,8 +96,6 @@ export function Header() {
               </Link>
             </Button>
             <Authenticated>
-              {creditsButton()}
-
               <Button
                 variant="ghost"
                 className="hover:bg-transparent/20 justify-center w-full"

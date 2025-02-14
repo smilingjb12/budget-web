@@ -14,22 +14,15 @@ import type {
   FunctionReference,
 } from "convex/server";
 import type * as clerk from "../clerk.js";
-import type * as crons from "../crons.js";
-import type * as files from "../files.js";
 import type * as handlers_clerk from "../handlers/clerk.js";
-import type * as handlers_files from "../handlers/files.js";
 import type * as handlers_http from "../handlers/http.js";
-import type * as handlers_images from "../handlers/images.js";
-import type * as handlers_stripe from "../handlers/stripe.js";
 import type * as handlers_users from "../handlers/users.js";
 import type * as http from "../http.js";
-import type * as images from "../images.js";
 import type * as lib_convexEnv from "../lib/convexEnv.js";
 import type * as lib_env from "../lib/env.js";
 import type * as lib_helpers from "../lib/helpers.js";
 import type * as lib_rateLimits from "../lib/rateLimits.js";
 import type * as lib_session from "../lib/session.js";
-import type * as stripe from "../stripe.js";
 import type * as users from "../users.js";
 
 /**
@@ -42,22 +35,15 @@ import type * as users from "../users.js";
  */
 declare const fullApi: ApiFromModules<{
   clerk: typeof clerk;
-  crons: typeof crons;
-  files: typeof files;
   "handlers/clerk": typeof handlers_clerk;
-  "handlers/files": typeof handlers_files;
   "handlers/http": typeof handlers_http;
-  "handlers/images": typeof handlers_images;
-  "handlers/stripe": typeof handlers_stripe;
   "handlers/users": typeof handlers_users;
   http: typeof http;
-  images: typeof images;
   "lib/convexEnv": typeof lib_convexEnv;
   "lib/env": typeof lib_env;
   "lib/helpers": typeof lib_helpers;
   "lib/rateLimits": typeof lib_rateLimits;
   "lib/session": typeof lib_session;
-  stripe: typeof stripe;
   users: typeof users;
 }>;
 export declare const api: FilterApi<
