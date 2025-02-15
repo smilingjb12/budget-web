@@ -4,6 +4,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { formatEuro } from "@/lib/utils";
 import {
   Gavel,
   Handshake,
@@ -74,13 +75,7 @@ export const AuctionDetailsPopover = memo(function AuctionDetailsPopover({
             <Gavel className="size-4" />
             <span className="text-gray-600">Sales</span>
           </div>
-          <span className="font-medium">
-            €{" "}
-            {auctionData.sales.toLocaleString("en-US", {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}
-          </span>
+          <span className="font-medium">{formatEuro(auctionData.sales)}</span>
         </div>
         <div className="py-2 flex justify-between items-center">
           <div className="flex items-center gap-2">
@@ -88,11 +83,7 @@ export const AuctionDetailsPopover = memo(function AuctionDetailsPopover({
             <span className="text-gray-600">Auction fee (20%)</span>
           </div>
           <span className="font-medium">
-            €{" "}
-            {auctionData.auctionFee.toLocaleString("en-US", {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}
+            {formatEuro(auctionData.auctionFee)}
           </span>
         </div>
         <div className="py-2 flex justify-between items-center">
@@ -101,11 +92,7 @@ export const AuctionDetailsPopover = memo(function AuctionDetailsPopover({
             <span className="text-gray-600">Commissions</span>
           </div>
           <span className="font-medium">
-            - €{" "}
-            {Math.abs(auctionData.commissions).toLocaleString("en-US", {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}
+            {formatEuro(Math.abs(auctionData.commissions))}
           </span>
         </div>
         <div className="py-2 flex justify-between items-center">
@@ -114,11 +101,7 @@ export const AuctionDetailsPopover = memo(function AuctionDetailsPopover({
             <span className="text-gray-600">Net receipts</span>
           </div>
           <span className="font-medium">
-            €{" "}
-            {auctionData.netReceipts.toLocaleString("en-US", {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}
+            {formatEuro(auctionData.netReceipts)}
           </span>
         </div>
       </div>

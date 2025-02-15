@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "convex/react";
-import { api } from "../../../../convex/_generated/api";
+import { api } from "../../../../../convex/_generated/api";
 import { CalendarDays, List, SquarePlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SIDEBAR_WIDTH_PX } from "@/lib/constants";
@@ -10,6 +10,21 @@ import { SummaryPanel } from "./summary-panel";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { AuctionsTable } from "./auctions-table";
 import { AuctionsCalendar } from "./auctions-calendar";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+} from "@/components/ui/alert-dialog";
+import { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
+import { DatePicker } from "@/components/date-picker";
+import { CreateAuctionDialog } from "./create-auction-dialog";
 
 interface AuctionTabsTriggerProps {
   value: string;
@@ -28,13 +43,15 @@ function AuctionTabsTrigger({ value, children }: AuctionTabsTriggerProps) {
 }
 
 export default function Auctions() {
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+
   return (
     <div className="min-h-screen flex">
       <div className="flex-1" style={{ paddingLeft: SIDEBAR_WIDTH_PX }}>
         <div className="p-2 mx-auto">
           <div className="flex justify-between items-center mb-4">
             <YearSelector />
-            <Button>
+            <Button onClick={() => setIsCreateDialogOpen(true)}>
               <SquarePlus className="size-5 mr-2" />
               Create auction
             </Button>
@@ -62,6 +79,11 @@ export default function Auctions() {
               <AuctionsCalendar />
             </TabsContent>
           </Tabs>
+
+          <CreateAuctionDialog
+            open={isCreateDialogOpen}
+            onOpenChange={setIsCreateDialogOpen}
+          />
         </div>
       </div>
     </div>

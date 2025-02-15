@@ -13,20 +13,35 @@ import {
 } from "@/components/ui/select";
 import { ChevronDown } from "lucide-react";
 import { useState } from "react";
+import { useParams, useRouter } from "next/navigation";
 
 export function YearSelector() {
-  const [selectedYear, setSelectedYear] = useState(2025);
+  const params = useParams<{ year: string }>();
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
+  const [optimisticYear, setOptimisticYear] = useState<number | null>(null);
 
-  const years = [
-    [2025, 2024, 2023, 2022, 2021],
-    [2020, 2019, 2018, 2017, 2016],
-    [2015, 2014, 2013, 2012, 2011],
-  ];
+  const selectedYear = optimisticYear ?? Number(params.year);
+  const currentYear = new Date().getFullYear();
+  const allYears = Array.from({ length: 15 }, (_, i) => currentYear - i);
+
+  const yearChunks = Array.from(
+    { length: Math.ceil(allYears.length / 5) },
+    (_, i) => allYears.slice(i * 5, (i + 1) * 5)
+  );
 
   return (
     <div className="w-full max-w-md p-4 pl-0">
-      <Popover open={isOpen} onOpenChange={setIsOpen}>
+      <Popover
+        open={isOpen}
+        onOpenChange={(open) => {
+          setIsOpen(open);
+          if (!open) {
+            // Reset optimistic year when popover closes
+            setOptimisticYear(null);
+          }
+        }}
+      >
         <PopoverTrigger asChild>
           <button
             className="cursor-pointer flex items-center text-3xl font-bold text-foreground hover:text-foreground/80 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
@@ -39,7 +54,7 @@ export function YearSelector() {
           </button>
         </PopoverTrigger>
         <PopoverContent className="w-full p-6" align="start">
-          {years.map((row, rowIndex) => (
+          {yearChunks.map((row, rowIndex) => (
             <div
               key={rowIndex}
               className="grid grid-cols-5 gap-2 mb-2 last:mb-0"
@@ -48,7 +63,8 @@ export function YearSelector() {
                 <button
                   key={year}
                   onClick={() => {
-                    setSelectedYear(year);
+                    setOptimisticYear(year);
+                    router.push(`/auctions/${year}`);
                     setIsOpen(false);
                   }}
                   className={`p-2 px-4 rounded-full text-center transition-colors cursor-pointer

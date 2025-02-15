@@ -7,14 +7,18 @@ export default defineSchema({
   ...rateLimitTables,
   ...authTables,
   auctions: defineTable({
-    name: v.string(),
+    dateTimestamp: v.number(),
     status: v.union(v.literal("active"), v.literal("completed")),
     soldItems: v.number(),
+    sales: v.number(),
     unsoldItems: v.number(),
     auctionFee: v.number(),
     commissions: v.number(),
     netReceipts: v.number(),
-  }).index("status", ["status"]),
+    year: v.number(),
+  })
+    .index("status", ["status"])
+    .index("year", ["year"]),
   items: defineTable({
     name: v.string(),
     topBidder: v.string(),

@@ -159,3 +159,24 @@
     @apply bg-background text-foreground;
   }
 }
+
+.react-calendar {
+  width: 100%;
+  max-width: 350px;
+  background: white;
+  border: 1px solid #a0a096;
+  font-family: Arial, Helvetica, sans-serif;
+  line-height: 1.125em;
+}
+
+[data-sonner-toaster][data-theme='dark'] {
+  --normal-bg: hsl(var(--background));
+  --normal-border: hsl(var(--border));
+  --normal-text: hsl(var(--foreground));
+}
+
+[data-sonner-toaster][data-theme='light'] {
+  --normal-bg: hsl(var(--background));
+  --normal-border: hsl(var(--border));
+  --normal-text: hsl(var(--foreground));
+}

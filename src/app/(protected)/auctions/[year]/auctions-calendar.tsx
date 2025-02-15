@@ -8,10 +8,10 @@ import { cn } from "@/lib/utils";
 import { Plus } from "lucide-react";
 import React, { useState, memo } from "react";
 import { AuctionDetailsPopover } from "./auction-details-popover";
+import { DayContent } from "./calendar-day-content";
 
 const CALENDAR_CELL_SIZE = "size-10";
 
-// Move auctions data outside component to prevent recreating on each render
 const auctions = [
   {
     date: new Date(2025, 0, 14),
@@ -79,66 +79,6 @@ const getAuctionForDate = (date: Date) =>
     (auction) => auction.date.toDateString() === date.toDateString()
   );
 
-const DayContent = memo(function DayContent({
-  date,
-  calendarMonth,
-  isPopoverOpen,
-  selectedDate,
-  setIsPopoverOpen,
-  handleDayClick,
-}: {
-  date: Date;
-  calendarMonth: Date;
-  isPopoverOpen: boolean;
-  selectedDate: string | null;
-  setIsPopoverOpen: (open: boolean) => void;
-  handleDayClick: (date: Date) => void;
-}) {
-  const isCurrentMonth = date.getMonth() === calendarMonth.getMonth();
-  const hasAuction = isAuctionDate(date);
-  const isWeekend = date.getDay() === 0 || date.getDay() === 6;
-
-  const dayContent = (
-    <div
-      className={cn(
-        `${CALENDAR_CELL_SIZE} p-0 font-normal flex items-center justify-center relative cursor-pointer`,
-        isWeekend && "text-muted-foreground ",
-        hasAuction && "bg-primary text-primary-foreground rounded-full",
-        !hasAuction && "hover:bg-transparent group"
-      )}
-      onClick={() => handleDayClick(date)}
-    >
-      {date.getDate()}
-      {!hasAuction && (
-        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100">
-          <div
-            className={`bg-primary-foreground border-2 border-primary rounded-full ${CALENDAR_CELL_SIZE} flex items-center justify-center`}
-          >
-            <Plus className="size-5 text-primary" />
-          </div>
-        </div>
-      )}
-    </div>
-  );
-
-  if (!isCurrentMonth || !hasAuction) {
-    return dayContent;
-  }
-
-  const auctionData = getAuctionForDate(date);
-  if (!auctionData) return dayContent;
-
-  return (
-    <AuctionDetailsPopover
-      isOpen={isPopoverOpen && selectedDate === date.toDateString()}
-      onOpenChange={(open) => setIsPopoverOpen(open)}
-      auctionData={auctionData}
-    >
-      {dayContent}
-    </AuctionDetailsPopover>
-  );
-});
-
 export function AuctionsCalendar() {
   const [isPopoverOpen, setIsPopoverOpen] = React.useState(false);
   const [selectedDate, setSelectedDate] = React.useState<string | null>(null);
@@ -163,7 +103,7 @@ export function AuctionsCalendar() {
 
   return (
     <div className="">
-      <div className="w-full max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl">
+      <div className="mx-auto max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1">
           {months.map(({ calendarMonth, key }, index) => (
             <div key={key} className="flex justify-start">
@@ -209,6 +149,8 @@ export function AuctionsCalendar() {
                         selectedDate={selectedDate}
                         setIsPopoverOpen={setIsPopoverOpen}
                         handleDayClick={handleDayClick}
+                        isAuctionDate={isAuctionDate}
+                        getAuctionForDate={getAuctionForDate}
                       />
                     );
                   },

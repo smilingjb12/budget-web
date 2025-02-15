@@ -16,7 +16,5 @@ export const getMeHandler = async (ctx: QueryCtx) => {
     .withIndex("by_id", (q) => q.eq("_id", userId as Id<"users">))
     .first();
 
-  console.log("user", user);
-
   return user;
 };
