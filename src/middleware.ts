@@ -23,7 +23,7 @@ export default convexAuthNextjsMiddleware(async (request, { convexAuth }) => {
   if (request.nextUrl.pathname === Routes.auctions()) {
     return nextjsMiddlewareRedirect(
       request,
-      Routes.auctionsWithYear(new Date().getFullYear())
+      Routes.auctionsList(new Date().getFullYear())
     );
   }
 });

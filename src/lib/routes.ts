@@ -2,8 +2,11 @@ export const Routes = {
   auctions() {
     return "/auctions";
   },
-  auctionsWithYear(year: number) {
-    return `/auctions/${year}`;
+  auctionsList(year: number) {
+    return `/auctions/${year}/list`;
+  },
+  auctionsCalendar(year: number) {
+    return `/auctions/${year}/calendar`;
   },
   signIn() {
     return "/sign-in";

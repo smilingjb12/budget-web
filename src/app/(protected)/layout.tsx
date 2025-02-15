@@ -1,7 +1,7 @@
 import { Header } from "../header";
 import { Sidebar } from "./sidebar";
 
-export default function ProtectedLayout({
+export default function LoggedInLayout({
   children,
 }: {
   children: React.ReactNode;

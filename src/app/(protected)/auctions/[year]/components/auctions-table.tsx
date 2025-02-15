@@ -6,15 +6,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { formatEuro } from "@/lib/utils";
 import { useQuery } from "convex/react";
 import { api } from "../../../../../../convex/_generated/api";
-import LoadingIndicator from "@/components/loading-indicator";
-import { formatEuro } from "@/lib/utils";
 
 export function AuctionsTable() {
   const auctions = useQuery(api.auctions.getAuctions);
   if (auctions === undefined) {
-    return <LoadingIndicator className="w-20" />;
+    return null;
   }
   return (
     <Table className="mt-6">

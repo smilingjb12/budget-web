@@ -1,4 +1,3 @@
-import LoadingIndicator from "@/components/loading-indicator";
 import { Calendar } from "@/components/ui/calendar";
 import { unixToDate } from "@/lib/utils";
 import { useQuery } from "convex/react";
@@ -39,7 +38,7 @@ export function AuctionsCalendar() {
   );
 
   if (auctions === undefined) {
-    return <LoadingIndicator />;
+    return null;
   }
 
   return (
