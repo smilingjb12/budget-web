@@ -1,0 +1,63 @@
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { formatEuro } from "@/lib/utils";
+import { api } from "../../../../../../convex/_generated/api";
+import { useParams } from "next/navigation";
+import { useQuery } from "convex/react";
+
+export function AuctionsTable() {
+  const params = useParams<{ year: string }>();
+  const auctions = useQuery(api.auctions.getAuctions, {
+    year: Number(params.year),
+  });
+  if (auctions === undefined) {
+    return null;
+  }
+  return (
+    <>
+      <Table className="mt-6">
+        <TableHeader className="bg-muted">
+          <TableRow>
+            <TableHead className="w-12">#</TableHead>
+            <TableHead className="">AUCTION</TableHead>
+            <TableHead>SOLD ITEMS</TableHead>
+            <TableHead>SALES</TableHead>
+            <TableHead>AUCTION FEE</TableHead>
+            <TableHead>COMMISSIONS</TableHead>
+            <TableHead>NET RECEIPTS</TableHead>
+            <TableHead>DATE</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {auctions.map((row, index) => (
+            <TableRow key={row._id}>
+              <TableCell>{auctions.length - index}</TableCell>
+              <TableCell>
+                {new Date(row.dateTimestamp).toLocaleDateString()}
+              </TableCell>
+              <TableCell>{row.soldItems}</TableCell>
+              <TableCell>{formatEuro(row.sales)}</TableCell>
+              <TableCell>{formatEuro(row.auctionFee)}</TableCell>
+              <TableCell>- {formatEuro(row.commissions)}</TableCell>
+              <TableCell>{formatEuro(row.netReceipts)}</TableCell>
+              <TableCell>
+                {new Date(row.dateTimestamp).toLocaleDateString()}
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+      {!auctions.length && (
+        <div className="flex justify-center mt-3 text-muted-foreground">
+          No auctions available
+        </div>
+      )}
+    </>
+  );
+}

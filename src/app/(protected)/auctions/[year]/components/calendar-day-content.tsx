@@ -39,7 +39,7 @@ export const DayContent = memo(function DayContent({
         hasAuction && "bg-primary text-primary-foreground rounded-full",
         !hasAuction && "hover:bg-transparent group"
       )}
-      onClick={() => handleDayClick(date)}
+      onClick={() => !isWeekend && handleDayClick(date)}
     >
       {date.getDate()}
       {!hasAuction && !isWeekend && (

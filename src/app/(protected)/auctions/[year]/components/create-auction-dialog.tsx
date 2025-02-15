@@ -12,7 +12,7 @@ import { useMutationErrorHandler } from "@/hooks/use-mutation-error-handler";
 import { toast } from "@/hooks/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "convex/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { api } from "../../../../../../convex/_generated/api";
@@ -26,11 +26,13 @@ const formSchema = z.object({
 interface CreateAuctionDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  defaultDate?: Date;
 }
 
 export function CreateAuctionDialog({
   open,
   onOpenChange,
+  defaultDate,
 }: CreateAuctionDialogProps) {
   const [isLoading, setIsLoading] = useState(false);
   const { handleError } = useMutationErrorHandler();
@@ -39,9 +41,21 @@ export function CreateAuctionDialog({
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      date: undefined,
+      date: defaultDate,
     },
   });
+
+  useEffect(() => {
+    if (defaultDate) {
+      form.setValue("date", defaultDate);
+    }
+  }, [defaultDate, form]);
+
+  useEffect(() => {
+    if (!open) {
+      form.reset();
+    }
+  }, [open, form]);
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     setIsLoading(true);

@@ -15,10 +15,12 @@ import {
 import { requireAuthentication } from "./lib/helpers";
 
 export const getAuctions = query({
-  args: {},
-  handler: async (ctx) => {
+  args: {
+    year: v.number(),
+  },
+  handler: async (ctx, args) => {
     await requireAuthentication(ctx);
-    return await getAuctionsHandler(ctx);
+    return await getAuctionsHandler(ctx, args);
   },
 });
 

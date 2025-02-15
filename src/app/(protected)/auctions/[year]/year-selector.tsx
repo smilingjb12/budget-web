@@ -3,13 +3,16 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { Routes } from "@/lib/routes";
+import { LIST_SEGMENT } from "@/lib/routes";
 import { ChevronDown } from "lucide-react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, usePathname } from "next/navigation";
 import { useState } from "react";
 
 export function YearSelector() {
   const params = useParams<{ year: string }>();
   const router = useRouter();
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [optimisticYear, setOptimisticYear] = useState<number | null>(null);
 
@@ -56,8 +59,12 @@ export function YearSelector() {
                   key={year}
                   onClick={() => {
                     setOptimisticYear(year);
-                    router.push(`/auctions/${year}`);
                     setIsOpen(false);
+                    const isCalendarView = pathname.endsWith(LIST_SEGMENT);
+                    const newPath = isCalendarView
+                      ? Routes.auctionsList(year)
+                      : Routes.auctionsCalendar(year);
+                    router.push(newPath);
                   }}
                   className={`p-2 px-4 rounded-full text-center transition-colors cursor-pointer
                     hover:text-primary hover:outline-none hover:ring-2 hover:ring-primary

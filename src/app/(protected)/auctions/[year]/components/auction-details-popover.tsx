@@ -5,6 +5,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { formatEuro, unixToDate } from "@/lib/utils";
+import { format } from "date-fns";
 import {
   Gavel,
   Handshake,
@@ -33,8 +34,7 @@ export const AuctionDetailsPopover = memo(function AuctionDetailsPopover({
     <div className="p-5 py-3 space-y-3">
       <div className="flex items-center justify-between mb-2">
         <h3 className="font-medium text-md">
-          Auction #
-          {unixToDate(auction.dateTimestamp).toISOString().split("T")[0]}
+          Auction #{format(unixToDate(auction.dateTimestamp), "yyyy-MM-dd")}
         </h3>
         <Button
           variant="ghost"

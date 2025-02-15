@@ -1,6 +1,6 @@
 "use client";
 
-import { AuctionsCalendar } from "../components/auctions-calendar";
+import { AuctionsCalendar } from "./auctions-calendar";
 
 export default function Calendar() {
   return (

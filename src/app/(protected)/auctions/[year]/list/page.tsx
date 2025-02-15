@@ -1,6 +1,6 @@
 "use client";
 
-import { AuctionsTable } from "../components/auctions-table";
+import { AuctionsTable } from "./auctions-table";
 
 export default function List() {
   return (

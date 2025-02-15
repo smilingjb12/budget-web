@@ -10,6 +10,7 @@ import { api } from "../../../../../convex/_generated/api";
 import { useQuery } from "convex/react";
 import LoadingIndicator from "@/components/loading-indicator";
 import { formatEuro } from "@/lib/utils";
+import { useParams } from "next/navigation";
 
 function SummaryItem({
   icon: Icon,
@@ -38,8 +39,9 @@ function SummaryItem({
 }
 
 export function SummaryPanel() {
+  const params = useParams<{ year: string }>();
   const stats = useQuery(api.auctions.getAuctionsSummary, {
-    year: new Date().getFullYear(),
+    year: Number(params.year),
   });
   if (stats === undefined) {
     return (

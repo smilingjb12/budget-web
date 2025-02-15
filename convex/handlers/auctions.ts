@@ -3,8 +3,15 @@ import { api, internal } from "../_generated/api";
 import { MutationCtx, QueryCtx } from "../_generated/server";
 import { convexEnv } from "../lib/convexEnv";
 
-export const getAuctionsHandler = async (ctx: QueryCtx) => {
-  return await ctx.db.query("auctions").withIndex("by_creation_time").collect();
+export const getAuctionsHandler = async (
+  ctx: QueryCtx,
+  args: { year: number }
+) => {
+  return await ctx.db
+    .query("auctions")
+    .withIndex("year", (q) => q.eq("year", args.year))
+    .order("desc")
+    .collect();
 };
 
 export const createAuctionHandler = async (
@@ -36,6 +43,7 @@ export const getAuctionsSummaryHandler = async (
     .collect();
 
   const stats = {
+    year: args.year,
     soldItems: auctions.reduce((acc, auction) => acc + auction.soldItems, 0),
     unsoldItems: auctions.reduce(
       (acc, auction) => acc + auction.unsoldItems,

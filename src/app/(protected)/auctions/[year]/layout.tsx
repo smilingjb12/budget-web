@@ -4,7 +4,7 @@ import LoadingIndicator from "@/components/loading-indicator";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SIDEBAR_WIDTH_PX } from "@/lib/constants";
-import { Routes } from "@/lib/routes";
+import { Routes, CALENDAR_SEGMENT, LIST_SEGMENT } from "@/lib/routes";
 import { CalendarDays, List, SquarePlus } from "lucide-react";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import React, { useState } from "react";
@@ -41,19 +41,27 @@ export default function AuctionsLayout({
 }) {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isNavigating, setIsNavigating] = useState(false);
+  const [optimisticSegment, setOptimisticSegment] = useState<string | null>(
+    null
+  );
   const router = useRouter();
   const params = useParams<{ year: string }>();
   const pathname = usePathname();
 
-  const handleTabChange = (route: string) => {
+  const handleTabChange = (route: string, segment: string) => {
+    setOptimisticSegment(segment);
     setIsNavigating(true);
     router.push(route);
   };
 
-  // Reset navigation state when pathname changes
   React.useEffect(() => {
     setIsNavigating(false);
+    setOptimisticSegment(null);
   }, [pathname]);
+
+  const currentSegment =
+    optimisticSegment ??
+    (pathname.endsWith(CALENDAR_SEGMENT) ? CALENDAR_SEGMENT : LIST_SEGMENT);
 
   return (
     <div className="min-h-screen flex">
@@ -69,21 +77,27 @@ export default function AuctionsLayout({
 
           <SummaryPanel />
 
-          <Tabs defaultValue="list" className="mb-6">
+          <Tabs value={currentSegment} className="mb-1">
             <TabsList className="border rounded-md">
               <AuctionTabsTrigger
-                value="list"
+                value={LIST_SEGMENT}
                 onClick={() =>
-                  handleTabChange(Routes.auctionsList(Number(params.year)))
+                  handleTabChange(
+                    Routes.auctionsList(Number(params.year)),
+                    LIST_SEGMENT
+                  )
                 }
               >
                 <List className="w-4 h-4 mr-2" />
                 List
               </AuctionTabsTrigger>
               <AuctionTabsTrigger
-                value="calendar"
+                value={CALENDAR_SEGMENT}
                 onClick={() =>
-                  handleTabChange(Routes.auctionsCalendar(Number(params.year)))
+                  handleTabChange(
+                    Routes.auctionsCalendar(Number(params.year)),
+                    CALENDAR_SEGMENT
+                  )
                 }
               >
                 <CalendarDays className="w-4 h-4 mr-2" />
