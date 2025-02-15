@@ -3,24 +3,26 @@ import {
   createRouteMatcher,
   nextjsMiddlewareRedirect,
 } from "@convex-dev/auth/nextjs/server";
-import { Routes } from "./lib/routes";
+import { AUCTIONS_SEGMENT, Routes } from "./lib/routes";
 
 const SIGNIN_ROUTE = Routes.signIn();
-const AUCTIONS_ROUTE = Routes.auctions();
-const AUCTIONS_WILDCARD = `${AUCTIONS_ROUTE}(.*)`;
+const AUCTIONS_WILDCARD = `/${AUCTIONS_SEGMENT}(.*)`;
 
 const isSignInPage = createRouteMatcher([SIGNIN_ROUTE]);
 const isProtectedRoute = createRouteMatcher([AUCTIONS_WILDCARD]);
 
 export default convexAuthNextjsMiddleware(async (request, { convexAuth }) => {
   if (isSignInPage(request) && (await convexAuth.isAuthenticated())) {
-    return nextjsMiddlewareRedirect(request, AUCTIONS_ROUTE);
+    return nextjsMiddlewareRedirect(
+      request,
+      Routes.auctionsList(new Date().getFullYear())
+    );
   }
   if (isProtectedRoute(request) && !(await convexAuth.isAuthenticated())) {
     return nextjsMiddlewareRedirect(request, SIGNIN_ROUTE);
   }
 
-  if (request.nextUrl.pathname === Routes.auctions()) {
+  if (request.nextUrl.pathname === `/${AUCTIONS_SEGMENT}`) {
     return nextjsMiddlewareRedirect(
       request,
       Routes.auctionsList(new Date().getFullYear())

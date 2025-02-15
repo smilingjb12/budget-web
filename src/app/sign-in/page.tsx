@@ -34,9 +34,8 @@ export default function SSOCallback() {
     setError("");
     setIsLoading(true);
     signIn("password", formData)
-      .then((x) => {
-        console.log("signIn", x);
-        router.push(Routes.auctions());
+      .then(() => {
+        router.push(Routes.auctionsList(new Date().getFullYear()));
       })
       .catch((error) => {
         console.error(error);

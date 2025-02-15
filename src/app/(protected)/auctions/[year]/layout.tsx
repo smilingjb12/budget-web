@@ -49,6 +49,9 @@ export default function AuctionsLayout({
   const pathname = usePathname();
 
   const handleTabChange = (route: string, segment: string) => {
+    if (window.location.pathname.includes(segment)) {
+      return;
+    }
     setOptimisticSegment(segment);
     setIsNavigating(true);
     router.push(route);
