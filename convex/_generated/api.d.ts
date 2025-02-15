@@ -13,9 +13,9 @@ import type {
   FilterApi,
   FunctionReference,
 } from "convex/server";
-import type * as clerk from "../clerk.js";
-import type * as handlers_clerk from "../handlers/clerk.js";
-import type * as handlers_http from "../handlers/http.js";
+import type * as auctions from "../auctions.js";
+import type * as auth from "../auth.js";
+import type * as handlers_auctions from "../handlers/auctions.js";
 import type * as handlers_users from "../handlers/users.js";
 import type * as http from "../http.js";
 import type * as lib_convexEnv from "../lib/convexEnv.js";
@@ -34,9 +34,9 @@ import type * as users from "../users.js";
  * ```
  */
 declare const fullApi: ApiFromModules<{
-  clerk: typeof clerk;
-  "handlers/clerk": typeof handlers_clerk;
-  "handlers/http": typeof handlers_http;
+  auctions: typeof auctions;
+  auth: typeof auth;
+  "handlers/auctions": typeof handlers_auctions;
   "handlers/users": typeof handlers_users;
   http: typeof http;
   "lib/convexEnv": typeof lib_convexEnv;

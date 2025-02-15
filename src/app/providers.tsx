@@ -2,37 +2,22 @@
 
 import { ThemeProvider } from "@/components/theme-provider";
 import { nextEnv } from "@/nextEnv";
-import { ClerkProvider, useAuth } from "@clerk/nextjs";
-import { dark } from "@clerk/themes";
 import { ConvexReactClient } from "convex/react";
-import { ConvexProviderWithClerk } from "convex/react-clerk";
+import { ConvexAuthNextjsProvider } from "@convex-dev/auth/nextjs";
+import { ConvexAuthProvider } from "@convex-dev/auth/react";
 
 const convex = new ConvexReactClient(nextEnv.NEXT_PUBLIC_CONVEX_URL);
 
-const ThemedClerkProvider = ({ children }: { children: React.ReactNode }) => {
-  return (
-    <ClerkProvider
-      appearance={{ baseTheme: dark }}
-      publishableKey={nextEnv.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY!}
-    >
-      {children}
-    </ClerkProvider>
-  );
-};
-
 export const Providers = ({ children }: { children: React.ReactNode }) => {
   return (
-    <ThemedClerkProvider>
+    <ConvexAuthNextjsProvider client={convex}>
       <ThemeProvider
         attribute="class"
-        defaultTheme="system"
-        enableSystem
+        defaultTheme="light"
         disableTransitionOnChange
       >
-        <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
-          {children}
-        </ConvexProviderWithClerk>
+        {children}
       </ThemeProvider>
-    </ThemedClerkProvider>
+    </ConvexAuthNextjsProvider>
   );
 };

@@ -1,17 +1,8 @@
 export const Routes = {
-  imagePage(imageId: string) {
-    return `/images/${imageId}`;
+  auctions() {
+    return "/auctions";
   },
-  collectionPage() {
-    return "/collection";
-  },
-  createPage() {
-    return "/create";
-  },
-  upgradePage() {
-    return "/upgrade";
-  },
-  refundPolicyPage() {
-    return "/legal/refund-policy";
+  signIn() {
+    return "/sign-in";
   },
 };

@@ -1,6 +1,0 @@
-- NextJS
-- Clerk
-- Stripe
-- Convex
-
-

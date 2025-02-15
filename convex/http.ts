@@ -1,15 +1,9 @@
 import { httpRouter } from "convex/server";
 import { httpAction } from "./_generated/server";
-import { clerkRouteHandler } from "./handlers/http";
+import { auth } from "./auth";
 
 const http = httpRouter();
 
-http.route({
-  path: "/clerk",
-  method: "POST",
-  handler: httpAction(async (ctx, req) => {
-    return await clerkRouteHandler(ctx, req);
-  }),
-});
+auth.addHttpRoutes(http);
 
 export default http;

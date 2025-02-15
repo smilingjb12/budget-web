@@ -2,32 +2,21 @@ import { ConvexError } from "convex/values";
 import { api, internal } from "../_generated/api";
 import { MutationCtx, QueryCtx } from "../_generated/server";
 import { convexEnv } from "../lib/convexEnv";
+import { Id } from "../_generated/dataModel";
 
-export const getCurrentUserHandler = async (ctx: QueryCtx) => {
-  const userIdentity = await ctx.auth.getUserIdentity();
-  return await ctx.runQuery(internal.users.getByUserId, {
-    userId: userIdentity!.subject,
-  });
-};
+export const getMeHandler = async (ctx: QueryCtx) => {
+  const identity = await ctx.auth.getUserIdentity();
+  if (!identity) {
+    return null;
+  }
 
-export const createSignedInUserHandler = async (
-  ctx: MutationCtx,
-  args: { userId: string; email: string }
-) => {
-  return await ctx.db.insert("users", {
-    userId: args.userId,
-    email: args.email,
-  });
-};
-
-export const getByUserIdHandler = async (
-  ctx: QueryCtx,
-  args: { userId: string }
-) => {
+  const userId = identity.subject.split("|")[0];
   const user = await ctx.db
     .query("users")
-    .withIndex("user_id", (q) => q.eq("userId", args.userId))
+    .withIndex("by_id", (q) => q.eq("_id", userId as Id<"users">))
     .first();
+
+  console.log("user", user);
 
   return user;
 };

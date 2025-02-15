@@ -14,21 +14,3 @@ export async function requireAuthentication(
 
   return userIdentity;
 }
-
-export async function ensureUploadSizeIsNotExceeded(
-  ctx: QueryCtx,
-  fileId: string
-) {
-  const uploadedFiles = await ctx.db.system
-    .query("_storage")
-    .filter((q) => q.eq(q.field("_id"), fileId))
-    .collect();
-
-  if (
-    uploadedFiles.some(
-      (f) => f.size > Number(convexEnv.NEXT_PUBLIC_UPLOAD_SIZE_LIMIT)
-    )
-  ) {
-    throw new ConvexError("Upload size exceeded");
-  }
-}

@@ -2,10 +2,11 @@ import { v } from "convex/values";
 import { Doc } from "./_generated/dataModel";
 import { internalMutation, internalQuery, query } from "./_generated/server";
 import { getMeHandler } from "./handlers/users";
+import { getAuctionsHandler } from "./handlers/auctions";
 
-export const getMe = query({
+export const getAuctions = query({
   args: {},
   handler: async (ctx) => {
-    return await getMeHandler(ctx);
+    return await getAuctionsHandler(ctx);
   },
 });
