@@ -1,19 +1,11 @@
-import { Button } from "@/components/ui/button";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { ChevronDown } from "lucide-react";
-import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { useState } from "react";
 
 export function YearSelector() {
   const params = useParams<{ year: string }>();

@@ -3,8 +3,6 @@ import {
   createRouteMatcher,
   nextjsMiddlewareRedirect,
 } from "@convex-dev/auth/nextjs/server";
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
 import { Routes } from "./lib/routes";
 
 const SIGNIN_ROUTE = Routes.signIn();

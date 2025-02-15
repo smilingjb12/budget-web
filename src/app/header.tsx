@@ -1,28 +1,12 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Constants } from "@/constants";
-import {
-  Authenticated,
-  Unauthenticated,
-  useQuery,
-  useConvexAuth,
-} from "convex/react";
-import { LogOut, LogOutIcon, Menu, PackageIcon, X } from "lucide-react";
-import Link from "next/link";
-import { useState } from "react";
-import { api } from "../../convex/_generated/api";
-import { AvatarDropdown } from "./avatar-dropdown";
-import { Routes } from "@/lib/routes";
-import { useAuthActions } from "@convex-dev/auth/react";
 import { SIDEBAR_WIDTH_PX } from "@/lib/constants";
+import { useAuthActions } from "@convex-dev/auth/react";
+import { LogOut } from "lucide-react";
 
 export function Header() {
-  const { isAuthenticated } = useConvexAuth();
-  const user = useQuery(api.users.getMe);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { signOut } = useAuthActions();
-  const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
 
   return (
     <div

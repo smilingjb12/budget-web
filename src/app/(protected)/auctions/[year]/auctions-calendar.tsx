@@ -1,13 +1,5 @@
 import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
-import { Plus } from "lucide-react";
-import React, { useState, memo } from "react";
-import { AuctionDetailsPopover } from "./auction-details-popover";
+import React from "react";
 import { DayContent } from "./calendar-day-content";
 
 const CALENDAR_CELL_SIZE = "size-10";
@@ -105,7 +97,7 @@ export function AuctionsCalendar() {
     <div className="">
       <div className="mx-auto max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1">
-          {months.map(({ calendarMonth, key }, index) => (
+          {months.map(({ calendarMonth, key }) => (
             <div key={key} className="flex justify-start">
               <Calendar
                 mode="single"

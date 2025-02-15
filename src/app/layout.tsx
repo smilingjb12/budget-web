@@ -1,15 +1,12 @@
+import ScrollToTop from "@/components/scroll-to-top";
 import { Toaster } from "@/components/ui/toaster";
+import { Constants } from "@/constants";
+import { ConvexAuthNextjsServerProvider } from "@convex-dev/auth/nextjs/server";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import { Footer } from "./footer";
-import "./globals.css";
-import { Header } from "./header";
-import { Providers } from "./providers";
-import ScrollToTop from "@/components/scroll-to-top";
-import { Constants } from "@/constants";
 import NextTopLoader from "nextjs-toploader";
-import { Authenticated } from "convex/react";
-import { ConvexAuthNextjsServerProvider } from "@convex-dev/auth/nextjs/server";
+import "./globals.css";
+import { Providers } from "./providers";
 
 export const metadata: Metadata = {
   title: Constants.APP_NAME,

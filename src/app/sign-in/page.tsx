@@ -1,26 +1,24 @@
 "use client";
 
-import type React from "react";
-import { useState } from "react";
-import Image from "next/image";
-import { useAuthActions } from "@convex-dev/auth/react";
+import { ActionButton } from "@/components/action-button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { ConvexError } from "convex/values";
-import { Routes } from "@/lib/routes";
-import { useRouter } from "next/navigation";
-import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { ActionButton } from "@/components/action-button";
+import { Routes } from "@/lib/routes";
+import { useAuthActions } from "@convex-dev/auth/react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import type React from "react";
+import { useState } from "react";
 
 export default function SSOCallback() {
   const { signIn } = useAuthActions();

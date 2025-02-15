@@ -1,30 +1,15 @@
 "use client";
 
-import { useQuery } from "convex/react";
-import { api } from "../../../../../convex/_generated/api";
-import { CalendarDays, List, SquarePlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SIDEBAR_WIDTH_PX } from "@/lib/constants";
-import { YearSelector } from "./year-selector";
-import { SummaryPanel } from "./summary-panel";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { AuctionsTable } from "./auctions-table";
-import { AuctionsCalendar } from "./auctions-calendar";
-import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogCancel,
-} from "@/components/ui/alert-dialog";
+import { CalendarDays, List, SquarePlus } from "lucide-react";
 import { useState } from "react";
-import { Input } from "@/components/ui/input";
-import { Calendar } from "@/components/ui/calendar";
-import { format } from "date-fns";
-import { DatePicker } from "@/components/date-picker";
+import { AuctionsCalendar } from "./auctions-calendar";
+import { AuctionsTable } from "./auctions-table";
 import { CreateAuctionDialog } from "./create-auction-dialog";
+import { SummaryPanel } from "./summary-panel";
+import { YearSelector } from "./year-selector";
 
 interface AuctionTabsTriggerProps {
   value: string;

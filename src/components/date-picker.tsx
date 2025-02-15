@@ -33,7 +33,6 @@ export function DatePicker({
   disabled = false,
   side,
   align,
-  required,
 }: DatePickerProps) {
   const [open, setOpen] = React.useState(false);
 

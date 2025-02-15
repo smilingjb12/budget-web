@@ -5,9 +5,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useConfirm } from "@/hooks/use-confirm";
 import { useAuthActions } from "@convex-dev/auth/react";
-import { LogOut, TriangleAlert } from "lucide-react";
+import { LogOut } from "lucide-react";
 
 interface Props {
   email: string | null | undefined;
@@ -16,11 +15,6 @@ interface Props {
 
 export const AvatarDropdown = ({ email, imageUrl }: Props) => {
   const { signOut } = useAuthActions();
-  const [ConfirmDialog, confirm] = useConfirm(
-    "Delete My Data",
-    "Are you sure you want to delete your data?",
-    "destructive"
-  );
   const nameAcronym =
     email
       ?.split("@")
@@ -40,7 +34,6 @@ export const AvatarDropdown = ({ email, imageUrl }: Props) => {
 
   return (
     <>
-      <ConfirmDialog />
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>{ProfileImage()}</DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="min-w-[340px] pb-4">
