@@ -1,10 +1,9 @@
 "use client";
 
-import LoadingIndicator from "@/components/loading-indicator";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SIDEBAR_WIDTH_PX } from "@/lib/constants";
-import { Routes, CALENDAR_SEGMENT, LIST_SEGMENT } from "@/lib/routes";
+import { CALENDAR_SEGMENT, LIST_SEGMENT, Routes } from "@/lib/routes";
 import { CalendarDays, List, SquarePlus } from "lucide-react";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import React, { useState } from "react";
@@ -40,7 +39,6 @@ export default function AuctionsLayout({
   children: React.ReactNode;
 }) {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const [isNavigating, setIsNavigating] = useState(false);
   const [optimisticSegment, setOptimisticSegment] = useState<string | null>(
     null
   );
@@ -53,12 +51,10 @@ export default function AuctionsLayout({
       return;
     }
     setOptimisticSegment(segment);
-    setIsNavigating(true);
     router.push(route);
   };
 
   React.useEffect(() => {
-    setIsNavigating(false);
     setOptimisticSegment(null);
   }, [pathname]);
 
@@ -109,13 +105,7 @@ export default function AuctionsLayout({
             </TabsList>
           </Tabs>
 
-          {isNavigating ? (
-            <div className="mt-8">
-              <LoadingIndicator />
-            </div>
-          ) : (
-            children
-          )}
+          {children}
 
           <CreateAuctionDialog
             open={isCreateDialogOpen}
