@@ -13,12 +13,11 @@ import { useQuery } from "convex/react";
 
 export function AuctionsTable() {
   const params = useParams<{ year: string }>();
-  const auctions = useQuery(api.auctions.getAuctions, {
-    year: Number(params.year),
-  });
-  if (auctions === undefined) {
-    return null;
-  }
+  const auctions =
+    useQuery(api.auctions.getAuctions, {
+      year: Number(params.year),
+    }) ?? [];
+
   return (
     <>
       <Table className="mt-6">

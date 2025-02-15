@@ -1,16 +1,15 @@
+import { formatEuro } from "@/lib/utils";
+import { useQuery } from "convex/react";
 import {
-  Package,
-  OctagonMinus,
   Gavel,
-  MicVocal,
   Handshake,
   Landmark,
+  MicVocal,
+  OctagonMinus,
+  Package,
 } from "lucide-react";
-import { api } from "../../../../../convex/_generated/api";
-import { useQuery } from "convex/react";
-import LoadingIndicator from "@/components/loading-indicator";
-import { formatEuro } from "@/lib/utils";
 import { useParams } from "next/navigation";
+import { api } from "../../../../../convex/_generated/api";
 
 function SummaryItem({
   icon: Icon,
@@ -43,50 +42,42 @@ export function SummaryPanel() {
   const stats = useQuery(api.auctions.getAuctionsSummary, {
     year: Number(params.year),
   });
-  if (stats === undefined) {
-    return (
-      <div className="bg-muted rounded-xl p-6 mb-6">
-        <div className="flex items-center justify-center">
-          <LoadingIndicator className="w-20" />
-        </div>
-      </div>
-    );
-  }
+
   return (
     <div className="bg-muted rounded-xl p-6 mb-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
         <SummaryItem
           icon={Package}
           title="Sold items"
-          value={stats.soldItems}
+          value={stats?.soldItems ?? 0}
         />
         <SummaryItem
           icon={OctagonMinus}
           title="Unsold items"
-          value={stats.unsoldItems}
+          value={stats?.unsoldItems ?? 0}
         />
         <SummaryItem
           icon={Gavel}
           title="Sales"
-          value={stats.sales}
+          value={stats?.sales ?? 0}
           isCurrency
         />
         <SummaryItem
           icon={MicVocal}
           title="Auction fee (20%)"
-          value={stats.auctionFees}
+          value={stats?.auctionFees ?? 0}
           isCurrency
         />
         <SummaryItem
           icon={Handshake}
           title="Commissions"
-          value={stats.commissions}
+          value={stats?.commissions ?? 0}
           isCurrency
         />
         <SummaryItem
           icon={Landmark}
           title="Net receipts"
-          value={stats.netReceipts}
+          value={stats?.netReceipts ?? 0}
           isCurrency
         />
       </div>
