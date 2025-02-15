@@ -2,18 +2,9 @@ import { cn } from "@/lib/utils";
 import { Plus } from "lucide-react";
 import { memo } from "react";
 import { AuctionDetailsPopover } from "./auction-details-popover";
+import { Doc } from "../../../../../../convex/_generated/dataModel";
 
 const CALENDAR_CELL_SIZE = "size-10";
-
-type Auction = {
-  date: Date;
-  soldItems: number;
-  unsoldItems: number;
-  sales: number;
-  auctionFee: number;
-  commissions: number;
-  netReceipts: number;
-};
 
 interface DayContentProps {
   date: Date;
@@ -23,7 +14,7 @@ interface DayContentProps {
   setIsPopoverOpen: (open: boolean) => void;
   handleDayClick: (date: Date) => void;
   isAuctionDate: (date: Date) => boolean;
-  getAuctionForDate: (date: Date) => Auction | undefined;
+  getAuctionForDate: (date: Date) => Doc<"auctions"> | undefined;
 }
 
 export const DayContent = memo(function DayContent({
@@ -51,7 +42,7 @@ export const DayContent = memo(function DayContent({
       onClick={() => handleDayClick(date)}
     >
       {date.getDate()}
-      {!hasAuction && (
+      {!hasAuction && !isWeekend && (
         <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100">
           <div
             className={`bg-primary-foreground border-2 border-primary rounded-full ${CALENDAR_CELL_SIZE} flex items-center justify-center`}
@@ -74,7 +65,7 @@ export const DayContent = memo(function DayContent({
     <AuctionDetailsPopover
       isOpen={isPopoverOpen && selectedDate === date.toDateString()}
       onOpenChange={(open) => setIsPopoverOpen(open)}
-      auctionData={auctionData}
+      auction={auctionData}
     >
       {dayContent}
     </AuctionDetailsPopover>

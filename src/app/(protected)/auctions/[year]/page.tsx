@@ -5,9 +5,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SIDEBAR_WIDTH_PX } from "@/lib/constants";
 import { CalendarDays, List, SquarePlus } from "lucide-react";
 import { useState } from "react";
-import { AuctionsCalendar } from "./auctions-calendar";
-import { AuctionsTable } from "./auctions-table";
-import { CreateAuctionDialog } from "./create-auction-dialog";
+import { AuctionsCalendar } from "./components/auctions-calendar";
+import { AuctionsTable } from "./components/auctions-table";
+import { CreateAuctionDialog } from "./components/create-auction-dialog";
 import { SummaryPanel } from "./summary-panel";
 import { YearSelector } from "./year-selector";
 

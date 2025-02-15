@@ -4,7 +4,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { formatEuro } from "@/lib/utils";
+import { formatEuro, unixToDate } from "@/lib/utils";
 import {
   Gavel,
   Handshake,
@@ -14,35 +14,27 @@ import {
   Trash2,
 } from "lucide-react";
 import { ReactNode, memo } from "react";
-
-interface AuctionData {
-  date: Date;
-  soldItems: number;
-  unsoldItems: number;
-  sales: number;
-  auctionFee: number;
-  commissions: number;
-  netReceipts: number;
-}
+import { Doc } from "../../../../../../convex/_generated/dataModel";
 
 interface AuctionDetailsPopoverProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  auctionData: AuctionData;
+  auction: Doc<"auctions">;
   children: ReactNode;
 }
 
 export const AuctionDetailsPopover = memo(function AuctionDetailsPopover({
   isOpen,
   onOpenChange,
-  auctionData,
+  auction,
   children,
 }: AuctionDetailsPopoverProps) {
   const popoverContent = (
     <div className="p-5 py-3 space-y-3">
       <div className="flex items-center justify-between mb-2">
         <h3 className="font-medium text-md">
-          Auction #{auctionData.date.toISOString().split("T")[0]}
+          Auction #
+          {unixToDate(auction.dateTimestamp).toISOString().split("T")[0]}
         </h3>
         <Button
           variant="ghost"
@@ -61,30 +53,28 @@ export const AuctionDetailsPopover = memo(function AuctionDetailsPopover({
             <Package className="size-4" />
             <span className="text-gray-600">Sold items</span>
           </div>
-          <span className="font-medium">{auctionData.soldItems}</span>
+          <span className="font-medium">{auction.soldItems}</span>
         </div>
         <div className="py-2 flex justify-between items-center">
           <div className="flex items-center gap-2">
             <OctagonMinus className="size-4" />
             <span className="text-gray-600">Unsold items</span>
           </div>
-          <span className="font-medium">{auctionData.unsoldItems}</span>
+          <span className="font-medium">{auction.unsoldItems}</span>
         </div>
         <div className="py-2 flex justify-between items-center">
           <div className="flex items-center gap-2">
             <Gavel className="size-4" />
             <span className="text-gray-600">Sales</span>
           </div>
-          <span className="font-medium">{formatEuro(auctionData.sales)}</span>
+          <span className="font-medium">{formatEuro(auction.sales)}</span>
         </div>
         <div className="py-2 flex justify-between items-center">
           <div className="flex items-center gap-2">
             <MicVocal className="size-4" />
             <span className="text-gray-600">Auction fee (20%)</span>
           </div>
-          <span className="font-medium">
-            {formatEuro(auctionData.auctionFee)}
-          </span>
+          <span className="font-medium">{formatEuro(auction.auctionFee)}</span>
         </div>
         <div className="py-2 flex justify-between items-center">
           <div className="flex items-center gap-2">
@@ -92,7 +82,7 @@ export const AuctionDetailsPopover = memo(function AuctionDetailsPopover({
             <span className="text-gray-600">Commissions</span>
           </div>
           <span className="font-medium">
-            {formatEuro(Math.abs(auctionData.commissions))}
+            {formatEuro(Math.abs(auction.commissions))}
           </span>
         </div>
         <div className="py-2 flex justify-between items-center">
@@ -100,9 +90,7 @@ export const AuctionDetailsPopover = memo(function AuctionDetailsPopover({
             <Package className="size-4" />
             <span className="text-gray-600">Net receipts</span>
           </div>
-          <span className="font-medium">
-            {formatEuro(auctionData.netReceipts)}
-          </span>
+          <span className="font-medium">{formatEuro(auction.netReceipts)}</span>
         </div>
       </div>
     </div>

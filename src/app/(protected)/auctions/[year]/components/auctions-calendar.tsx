@@ -1,111 +1,62 @@
+import LoadingIndicator from "@/components/loading-indicator";
 import { Calendar } from "@/components/ui/calendar";
+import { unixToDate } from "@/lib/utils";
+import { useQuery } from "convex/react";
+import { useParams } from "next/navigation";
 import React from "react";
+import { api } from "../../../../../../convex/_generated/api";
+import { useCalendar } from "../hooks/use-calendar";
 import { DayContent } from "./calendar-day-content";
 
 const CALENDAR_CELL_SIZE = "size-10";
 
-const auctions = [
-  {
-    date: new Date(2025, 0, 14),
-    soldItems: 645,
-    unsoldItems: 23,
-    sales: 31250.0,
-    auctionFee: 6250.0,
-    commissions: -3890.5,
-    netReceipts: 33609.5,
-  },
-  {
-    date: new Date(2025, 0, 28),
-    soldItems: 702,
-    unsoldItems: 14,
-    sales: 29512.0,
-    auctionFee: 5902.4,
-    commissions: -4211.5,
-    netReceipts: 31202.9,
-  },
-  {
-    date: new Date(2025, 1, 11),
-    soldItems: 589,
-    unsoldItems: 31,
-    sales: 27800.0,
-    auctionFee: 5560.0,
-    commissions: -3450.0,
-    netReceipts: 29910.0,
-  },
-  {
-    date: new Date(2025, 2, 11),
-    soldItems: 634,
-    unsoldItems: 18,
-    sales: 33100.0,
-    auctionFee: 6620.0,
-    commissions: -4120.5,
-    netReceipts: 35599.5,
-  },
-  {
-    date: new Date(2025, 2, 25),
-    soldItems: 678,
-    unsoldItems: 25,
-    sales: 30150.0,
-    auctionFee: 6030.0,
-    commissions: -3768.75,
-    netReceipts: 32411.25,
-  },
-  {
-    date: new Date(2025, 3, 8),
-    soldItems: 612,
-    unsoldItems: 29,
-    sales: 28900.0,
-    auctionFee: 5780.0,
-    commissions: -3612.5,
-    netReceipts: 31067.5,
-  },
-];
-
-const isAuctionDate = (date: Date) =>
-  auctions.some(
-    (auction) => auction.date.toDateString() === date.toDateString()
-  );
-
-const getAuctionForDate = (date: Date) =>
-  auctions.find(
-    (auction) => auction.date.toDateString() === date.toDateString()
-  );
-
 export function AuctionsCalendar() {
   const [isPopoverOpen, setIsPopoverOpen] = React.useState(false);
   const [selectedDate, setSelectedDate] = React.useState<string | null>(null);
+  const auctions = useQuery(api.auctions.getAuctions);
+  const params = useParams<{ year: string }>();
+  const { isAuctionDate, getAuctionForDate } = useCalendar();
 
   const months = React.useMemo(
     () =>
       Array.from({ length: 12 }, (_, i) => ({
-        calendarMonth: new Date(2025, i, 1),
+        calendarMonth: new Date(Number(params.year), i, 1),
         key: i,
       })),
-    []
+    [params.year]
   );
 
-  const handleDayClick = React.useCallback((date: Date) => {
-    if (isAuctionDate(date)) {
-      setSelectedDate(date.toDateString());
-      setIsPopoverOpen(true);
-    } else {
-      alert(`Clicked on ${date.toDateString()}`);
-    }
-  }, []);
+  const handleDayClick = React.useCallback(
+    (date: Date) => {
+      if (isAuctionDate(auctions!, date)) {
+        setSelectedDate(date.toDateString());
+        setIsPopoverOpen(true);
+      } else {
+        alert(`Clicked on ${date.toDateString()}`);
+      }
+    },
+    [isAuctionDate, auctions]
+  );
+
+  if (auctions === undefined) {
+    return <LoadingIndicator />;
+  }
 
   return (
     <div className="">
       <div className="mx-auto max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1">
           {months.map(({ calendarMonth, key }) => (
-            <div key={key} className="flex justify-start">
+            <div key={key} className="flex justify-center">
               <Calendar
                 mode="single"
                 month={calendarMonth}
                 selected={undefined}
                 onSelect={() => {}}
                 modifiers={{
-                  highlighted: auctions.map((auction) => auction.date),
+                  highlighted: auctions.map((auction) =>
+                    unixToDate(auction.dateTimestamp)
+                  ),
                 }}
                 weekStartsOn={1}
                 className=""
@@ -141,8 +92,10 @@ export function AuctionsCalendar() {
                         selectedDate={selectedDate}
                         setIsPopoverOpen={setIsPopoverOpen}
                         handleDayClick={handleDayClick}
-                        isAuctionDate={isAuctionDate}
-                        getAuctionForDate={getAuctionForDate}
+                        isAuctionDate={(date) => isAuctionDate(auctions, date)}
+                        getAuctionForDate={(date) =>
+                          getAuctionForDate(auctions, date)
+                        }
                       />
                     );
                   },

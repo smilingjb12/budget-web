@@ -7,7 +7,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useQuery } from "convex/react";
-import { api } from "../../../../../convex/_generated/api";
+import { api } from "../../../../../../convex/_generated/api";
 import LoadingIndicator from "@/components/loading-indicator";
 import { formatEuro } from "@/lib/utils";
 
