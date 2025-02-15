@@ -49,7 +49,7 @@ export function AuctionsCalendar() {
   return (
     <>
       <div className="">
-        <div className="mx-auto max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl">
+        <div className="mx-auto max-w-screen-sm md:max-w-screen-md lg:max-w-screen-lg xl:max-w-[960px]">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1">
             {months.map(({ calendarMonth, key }) => (
               <div key={key} className="flex justify-center">

@@ -22,6 +22,13 @@ export default convexAuthNextjsMiddleware(async (request, { convexAuth }) => {
     return nextjsMiddlewareRedirect(request, SIGNIN_ROUTE);
   }
 
+  if (request.nextUrl.pathname === "/") {
+    return nextjsMiddlewareRedirect(
+      request,
+      Routes.auctionsList(new Date().getFullYear())
+    );
+  }
+
   if (request.nextUrl.pathname === `/${AUCTIONS_SEGMENT}`) {
     return nextjsMiddlewareRedirect(
       request,

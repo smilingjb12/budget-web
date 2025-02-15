@@ -37,16 +37,26 @@ export function AuctionsTable() {
         <TableBody>
           {auctions.map((row, index) => (
             <TableRow key={row._id}>
-              <TableCell>{auctions.length - index}</TableCell>
-              <TableCell>
+              <TableCell className="text-md">
+                {auctions.length - index}
+              </TableCell>
+              <TableCell className="text-[16px]">
                 {new Date(row.dateTimestamp).toLocaleDateString()}
               </TableCell>
-              <TableCell>{row.soldItems}</TableCell>
-              <TableCell>{formatEuro(row.sales)}</TableCell>
-              <TableCell>{formatEuro(row.auctionFee)}</TableCell>
-              <TableCell>- {formatEuro(row.commissions)}</TableCell>
-              <TableCell>{formatEuro(row.netReceipts)}</TableCell>
-              <TableCell>
+              <TableCell className="text-[16px]">{row.soldItems}</TableCell>
+              <TableCell className="text-[16px]">
+                {formatEuro(row.sales)}
+              </TableCell>
+              <TableCell className="text-[16px]">
+                {formatEuro(row.auctionFee)}
+              </TableCell>
+              <TableCell className="text-[16px]">
+                - {formatEuro(row.commissions)}
+              </TableCell>
+              <TableCell className="text-[16px]">
+                {formatEuro(row.netReceipts)}
+              </TableCell>
+              <TableCell className="text-[16px]">
                 {new Date(row.dateTimestamp).toLocaleDateString()}
               </TableCell>
             </TableRow>
