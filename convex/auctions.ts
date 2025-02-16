@@ -9,6 +9,7 @@ import {
 import { getMeHandler } from "./handlers/users";
 import {
   createAuctionHandler,
+  deleteAuctionHandler,
   getAuctionsHandler,
   getAuctionsSummaryHandler,
 } from "./handlers/auctions";
@@ -34,6 +35,15 @@ export const createAuction = mutation({
   },
 });
 
+export const deleteAuction = mutation({
+  args: {
+    id: v.id("auctions"),
+  },
+  handler: async (ctx, args) => {
+    await requireAuthentication(ctx);
+    return await deleteAuctionHandler(ctx, args);
+  },
+});
 export const getAuctionsSummary = query({
   args: { year: v.number() },
   handler: async (ctx, args) => {

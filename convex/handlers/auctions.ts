@@ -2,6 +2,7 @@ import { ConvexError } from "convex/values";
 import { api, internal } from "../_generated/api";
 import { MutationCtx, QueryCtx } from "../_generated/server";
 import { convexEnv } from "../lib/convexEnv";
+import { Id } from "../_generated/dataModel";
 
 export const getAuctionsHandler = async (
   ctx: QueryCtx,
@@ -62,3 +63,11 @@ export const getAuctionsSummaryHandler = async (
   };
   return stats;
 };
+
+export const deleteAuctionHandler = async (
+  ctx: MutationCtx,
+  args: { id: Id<"auctions"> }
+) => {
+  await ctx.db.delete(args.id);
+};
+

@@ -1,49 +1,109 @@
 import { Calendar } from "@/components/ui/calendar";
 import { unixToDate } from "@/lib/utils";
-import { useQuery } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { useParams } from "next/navigation";
-import React from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { api } from "../../../../../../convex/_generated/api";
 import { useCalendar } from "../hooks/use-calendar";
-import { DayContent } from "../components/calendar-day-content";
-import { CreateAuctionDialog } from "../components/create-auction-dialog";
+import { DayContent } from "./calendar-day-content";
+import { CreateAuctionDialog } from "./create-auction-dialog";
+import { ConfirmDialog } from "@/components/confirm-dialog";
+import { useAtom } from "jotai";
+import { useAtomValue } from "jotai";
+import { useMutationErrorHandler } from "@/hooks/use-mutation-error-handler";
+import {
+  auctionDeleteDialogAtom,
+  auctionDetailsPopoverAtom,
+} from "@/app/global-state";
+import { toast } from "@/hooks/use-toast";
+import { DeleteAuctionDialogContent } from "./delete-auction-dialog-content";
 
 const CALENDAR_CELL_SIZE = "size-10";
 
 export function AuctionsCalendar() {
-  const [isPopoverOpen, setIsPopoverOpen] = React.useState(false);
-  const [selectedDate, setSelectedDate] = React.useState<string | null>(null);
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = React.useState(false);
-  const [createDialogDate, setCreateDialogDate] = React.useState<
-    Date | undefined
-  >();
+  const [auctionDetailsPopover, setAuctionDetailsPopover] = useAtom(
+    auctionDetailsPopoverAtom
+  );
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [createDialogDate, setCreateDialogDate] = useState<Date | undefined>();
+  const [isAuctionDeleteInProgress, setIsAuctionDeleteInProgress] =
+    useState(false);
+  const [auctionDeleteDialog, setAuctionDeleteDialog] = useAtom(
+    auctionDeleteDialogAtom
+  );
+  const deleteAuction = useMutation(api.auctions.deleteAuction);
+  const { handleError } = useMutationErrorHandler();
   const params = useParams<{ year: string }>();
   const auctions =
     useQuery(api.auctions.getAuctions, {
       year: Number(params.year),
     }) ?? [];
-  const { isAuctionDate, getAuctionForDate } = useCalendar();
+  const { isAuctionDate, getAuctionForDate, generateYearMonths } =
+    useCalendar();
+  const months = generateYearMonths(Number(params.year));
 
-  const months = React.useMemo(
-    () =>
-      Array.from({ length: 12 }, (_, i) => ({
-        calendarMonth: new Date(Number(params.year), i, 1),
-        key: i,
-      })),
-    [params.year]
-  );
-
-  const handleDayClick = React.useCallback(
+  const handleDayClick = useCallback(
     (date: Date) => {
       if (isAuctionDate(auctions!, date)) {
         setSelectedDate(date.toDateString());
-        setIsPopoverOpen(true);
+        setAuctionDetailsPopover({
+          visible: true,
+          auction: getAuctionForDate(auctions, date)!,
+        });
       } else {
         setCreateDialogDate(date);
         setIsCreateDialogOpen(true);
       }
     },
     [isAuctionDate, auctions]
+  );
+
+  const onAuctionDeleteConfirmed = (confirmed: boolean) => {
+    if (!confirmed) return;
+    setAuctionDeleteDialog({ visible: false, auction: null });
+    setIsAuctionDeleteInProgress(true);
+    const auction = auctionDeleteDialog.auction!;
+    deleteAuction({ id: auction._id })
+      .then(() => {
+        toast({
+          title: "Auction deleted",
+          variant: "default",
+        });
+        setAuctionDetailsPopover({ visible: false, auction: null });
+      })
+      .catch(handleError)
+      .finally(() => {
+        setIsAuctionDeleteInProgress(false);
+      });
+  };
+
+  const memoizedIsAuctionDate = useCallback(
+    (date: Date) => isAuctionDate(auctions, date),
+    [auctions, isAuctionDate]
+  );
+
+  const memoizedGetAuctionForDate = useCallback(
+    (date: Date) => getAuctionForDate(auctions, date),
+    [auctions, getAuctionForDate]
+  );
+
+  const calendarContent = useCallback(
+    ({ date, calendarMonth }: { date: Date; calendarMonth: Date }) => (
+      <DayContent
+        date={date}
+        calendarMonth={calendarMonth}
+        selectedDate={selectedDate}
+        handleDayClick={handleDayClick}
+        auctions={auctions}
+      />
+    ),
+    [
+      handleDayClick,
+      memoizedGetAuctionForDate,
+      memoizedIsAuctionDate,
+      selectedDate,
+    ]
   );
 
   return (
@@ -88,24 +148,8 @@ export function AuctionsCalendar() {
                     },
                   }}
                   components={{
-                    DayContent: ({ date }) => {
-                      return (
-                        <DayContent
-                          date={date}
-                          calendarMonth={calendarMonth}
-                          isPopoverOpen={isPopoverOpen}
-                          selectedDate={selectedDate}
-                          setIsPopoverOpen={setIsPopoverOpen}
-                          handleDayClick={handleDayClick}
-                          isAuctionDate={(date) =>
-                            isAuctionDate(auctions, date)
-                          }
-                          getAuctionForDate={(date) =>
-                            getAuctionForDate(auctions, date)
-                          }
-                        />
-                      );
-                    },
+                    DayContent: ({ date }) =>
+                      calendarContent({ date, calendarMonth }),
                   }}
                 />
               </div>
@@ -117,6 +161,19 @@ export function AuctionsCalendar() {
         open={isCreateDialogOpen}
         onOpenChange={setIsCreateDialogOpen}
         defaultDate={createDialogDate}
+      />
+      <ConfirmDialog
+        actionButton={{ text: "Delete", variant: "destructive" }}
+        content={
+          <DeleteAuctionDialogContent auction={auctionDetailsPopover.auction} />
+        }
+        isActionInProgress={isAuctionDeleteInProgress}
+        isOpen={auctionDeleteDialog.visible}
+        onConfirm={(confirmed) => {
+          setAuctionDeleteDialog({ visible: false, auction: null });
+          onAuctionDeleteConfirmed(confirmed);
+        }}
+        title="Delete auction"
       />
     </>
   );

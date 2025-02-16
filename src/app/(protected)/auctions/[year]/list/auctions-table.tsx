@@ -7,10 +7,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { formatEuro, unixToDate } from "@/lib/utils";
-import { api } from "../../../../../../convex/_generated/api";
-import { useParams } from "next/navigation";
 import { useQuery } from "convex/react";
 import { format } from "date-fns";
+import { useParams } from "next/navigation";
+import { api } from "../../../../../../convex/_generated/api";
 
 export function AuctionsTable() {
   const params = useParams<{ year: string }>();

@@ -7,7 +7,7 @@ import { CALENDAR_SEGMENT, LIST_SEGMENT, Routes } from "@/lib/routes";
 import { CalendarDays, List, SquarePlus } from "lucide-react";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import React, { useState } from "react";
-import { CreateAuctionDialog } from "./components/create-auction-dialog";
+import { CreateAuctionDialog } from "./calendar/create-auction-dialog";
 import { SummaryPanel } from "./summary-panel";
 import { YearSelector } from "./year-selector";
 

@@ -6,6 +6,7 @@ import {
 } from "@/components/ui/popover";
 import { formatEuro, unixToDate } from "@/lib/utils";
 import { format } from "date-fns";
+import { useAtom, useSetAtom } from "jotai";
 import {
   Gavel,
   Handshake,
@@ -16,20 +17,21 @@ import {
 } from "lucide-react";
 import { ReactNode, memo } from "react";
 import { Doc } from "../../../../../../convex/_generated/dataModel";
+import {
+  auctionDeleteDialogAtom,
+  auctionDetailsPopoverAtom,
+} from "@/app/global-state";
 
 interface AuctionDetailsPopoverProps {
-  isOpen: boolean;
-  onOpenChange: (open: boolean) => void;
   auction: Doc<"auctions">;
   children: ReactNode;
 }
 
-export const AuctionDetailsPopover = memo(function AuctionDetailsPopover({
-  isOpen,
-  onOpenChange,
-  auction,
-  children,
-}: AuctionDetailsPopoverProps) {
+export function popoverContent({ auction }: { auction: Doc<"auctions"> }) {
+  const deleteAuction = () => {
+    setAuctionDeleteDialog({ visible: true, auction });
+  };
+  const setAuctionDeleteDialog = useSetAtom(auctionDeleteDialogAtom);
   const items = [
     { icon: Package, label: "Sold items", value: auction.soldItems },
     {
@@ -54,13 +56,14 @@ export const AuctionDetailsPopover = memo(function AuctionDetailsPopover({
       value: formatEuro(auction.netReceipts),
     },
   ];
-  const popoverContent = (
+  return (
     <div className="p-5 py-3 space-y-3">
       <div className="flex items-center justify-between mb-2">
         <h3 className="font-medium text-md">
           Auction #{format(unixToDate(auction.dateTimestamp), "yyyy-MM-dd")}
         </h3>
         <Button
+          onClick={deleteAuction}
           variant="ghost"
           size="icon"
           className="text-destructive hover:text-destructive/80 cursor-pointer p-0 hover:bg-primary/0"
@@ -87,18 +90,35 @@ export const AuctionDetailsPopover = memo(function AuctionDetailsPopover({
       </div>
     </div>
   );
+}
 
+export const AuctionDetailsPopover = memo(function AuctionDetailsPopover({
+  auction,
+  children,
+}: AuctionDetailsPopoverProps) {
+  const [auctionDetailsPopover, setAuctionDetailsPopover] = useAtom(
+    auctionDetailsPopoverAtom
+  );
   return (
-    <Popover open={isOpen}>
-      <PopoverTrigger asChild>{children}</PopoverTrigger>
-      <PopoverContent
-        className="w-80 p-0"
-        side="right"
-        align="start"
-        onPointerDownOutside={() => onOpenChange(false)}
+    <>
+      <Popover
+        open={
+          auctionDetailsPopover.visible &&
+          auctionDetailsPopover.auction!._id === auction._id
+        }
       >
-        {popoverContent}
-      </PopoverContent>
-    </Popover>
+        <PopoverTrigger asChild>{children}</PopoverTrigger>
+        <PopoverContent
+          className="w-80 p-0"
+          side="right"
+          align="start"
+          onPointerDownOutside={() =>
+            setAuctionDetailsPopover({ visible: false, auction: null })
+          }
+        >
+          {popoverContent({ auction })}
+        </PopoverContent>
+      </Popover>
+    </>
   );
 });

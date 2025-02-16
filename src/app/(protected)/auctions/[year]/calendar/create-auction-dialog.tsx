@@ -16,6 +16,14 @@ import { useState, useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { api } from "../../../../../../convex/_generated/api";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 const formSchema = z.object({
   date: z.date({
@@ -75,11 +83,11 @@ export function CreateAuctionDialog({
   };
 
   return (
-    <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent className="max-w-[95vw] md:max-w-[400px]">
-        <AlertDialogHeader>
-          <AlertDialogTitle>Create auction</AlertDialogTitle>
-        </AlertDialogHeader>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-[95vw] md:max-w-[400px]">
+        <DialogHeader>
+          <DialogTitle>Create auction</DialogTitle>
+        </DialogHeader>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <Controller
             control={form.control}
@@ -94,16 +102,23 @@ export function CreateAuctionDialog({
               />
             )}
           />
-          <AlertDialogFooter className="pt-6">
-            <AlertDialogCancel className="w-25" onClick={() => form.reset()}>
+          <DialogFooter className="pt-6">
+            <Button
+              className="w-25"
+              onClick={() => {
+                onOpenChange(false);
+                form.reset();
+              }}
+              variant="outline"
+            >
               Cancel
-            </AlertDialogCancel>
+            </Button>
             <ActionButton type="submit" className="w-25" isLoading={isLoading}>
               Create
             </ActionButton>
-          </AlertDialogFooter>
+          </DialogFooter>
         </form>
-      </AlertDialogContent>
-    </AlertDialog>
+      </DialogContent>
+    </Dialog>
   );
 }

@@ -55,7 +55,7 @@ export default function SSOCallback() {
 
   return (
     <>
-      <div className="flex justify-center mb-10">
+      <div className="flex justify-center mb-10 h-[130px]">
         <Image
           src="/logo.png"
           alt="Veilinghuis Metropool"
