@@ -3,9 +3,5 @@
 import { AuctionsTable } from "./auctions-table";
 
 export default function List() {
-  return (
-    <div>
-      <AuctionsTable />
-    </div>
-  );
+  return <AuctionsTable />;
 }

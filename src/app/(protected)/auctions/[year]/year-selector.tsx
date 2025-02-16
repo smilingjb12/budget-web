@@ -60,8 +60,8 @@ export function YearSelector() {
                   onClick={() => {
                     setOptimisticYear(year);
                     setIsOpen(false);
-                    const isCalendarView = pathname.endsWith(LIST_SEGMENT);
-                    const newPath = isCalendarView
+                    const isListView = pathname.endsWith(LIST_SEGMENT);
+                    const newPath = isListView
                       ? Routes.auctionsList(year)
                       : Routes.auctionsCalendar(year);
                     router.push(newPath);

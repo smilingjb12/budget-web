@@ -6,10 +6,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { formatEuro } from "@/lib/utils";
+import { formatEuro, unixToDate } from "@/lib/utils";
 import { api } from "../../../../../../convex/_generated/api";
 import { useParams } from "next/navigation";
 import { useQuery } from "convex/react";
+import { format } from "date-fns";
 
 export function AuctionsTable() {
   const params = useParams<{ year: string }>();
@@ -40,7 +41,7 @@ export function AuctionsTable() {
                 {auctions.length - index}
               </TableCell>
               <TableCell className="text-[16px]">
-                {new Date(row.dateTimestamp).toLocaleDateString()}
+                {format(unixToDate(row.dateTimestamp), "yyyy-MM-dd")}
               </TableCell>
               <TableCell className="text-[16px]">{row.soldItems}</TableCell>
               <TableCell className="text-[16px]">
@@ -56,7 +57,7 @@ export function AuctionsTable() {
                 {formatEuro(row.netReceipts)}
               </TableCell>
               <TableCell className="text-[16px]">
-                {new Date(row.dateTimestamp).toLocaleDateString()}
+                {format(unixToDate(row.dateTimestamp), "dd/MM/yy")}
               </TableCell>
             </TableRow>
           ))}

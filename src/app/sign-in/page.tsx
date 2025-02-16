@@ -19,6 +19,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import type React from "react";
 import { useState } from "react";
+import { useSignIn } from "./hooks/use-sign-in";
 
 export default function SSOCallback() {
   const { signIn } = useAuthActions();
@@ -27,6 +28,7 @@ export default function SSOCallback() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
+  const { getErrorTitle } = useSignIn();
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -39,20 +41,7 @@ export default function SSOCallback() {
       })
       .catch((error) => {
         console.error(error);
-        let errorTitle: string = "";
-
-        if (error.message.includes("Invalid password")) {
-          errorTitle = "Password doesn't meed the security requirements";
-        }
-        if (error.message.includes("InvalidSecret")) {
-          errorTitle = "Invalid password";
-        }
-        if (error.message.includes("InvalidAccountId")) {
-          errorTitle = "Account with this email does not exist";
-        }
-        if (error.message.includes("already exists")) {
-          errorTitle = "Account already exists";
-        }
+        const errorTitle = getErrorTitle(error);
         console.error(errorTitle);
         toast({
           title: "Invalid Email or Password",

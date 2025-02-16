@@ -30,6 +30,30 @@ export const AuctionDetailsPopover = memo(function AuctionDetailsPopover({
   auction,
   children,
 }: AuctionDetailsPopoverProps) {
+  const items = [
+    { icon: Package, label: "Sold items", value: auction.soldItems },
+    {
+      icon: OctagonMinus,
+      label: "Unsold items",
+      value: auction.unsoldItems,
+    },
+    { icon: Gavel, label: "Sales", value: formatEuro(auction.sales) },
+    {
+      icon: MicVocal,
+      label: "Auction fee (20%)",
+      value: formatEuro(auction.auctionFee),
+    },
+    {
+      icon: Handshake,
+      label: "Commissions",
+      value: formatEuro(Math.abs(auction.commissions)),
+    },
+    {
+      icon: Package,
+      label: "Net receipts",
+      value: formatEuro(auction.netReceipts),
+    },
+  ];
   const popoverContent = (
     <div className="p-5 py-3 space-y-3">
       <div className="flex items-center justify-between mb-2">
@@ -48,50 +72,18 @@ export const AuctionDetailsPopover = memo(function AuctionDetailsPopover({
         </Button>
       </div>
       <div className="space-y-0 text-sm divide-y divide-gray-200">
-        <div className="py-2 flex justify-between items-center border-t border-gray-200">
-          <div className="flex items-center gap-2">
-            <Package className="size-4" />
-            <span className="text-gray-600">Sold items</span>
+        {items.map(({ icon: Icon, label, value }, index) => (
+          <div
+            key={label}
+            className={`py-2 flex justify-between items-center ${index === 0 ? "border-t border-gray-200" : ""}`}
+          >
+            <div className="flex items-center gap-2">
+              <Icon className="size-4" />
+              <span className="text-gray-600">{label}</span>
+            </div>
+            <span className="font-medium">{value}</span>
           </div>
-          <span className="font-medium">{auction.soldItems}</span>
-        </div>
-        <div className="py-2 flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <OctagonMinus className="size-4" />
-            <span className="text-gray-600">Unsold items</span>
-          </div>
-          <span className="font-medium">{auction.unsoldItems}</span>
-        </div>
-        <div className="py-2 flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <Gavel className="size-4" />
-            <span className="text-gray-600">Sales</span>
-          </div>
-          <span className="font-medium">{formatEuro(auction.sales)}</span>
-        </div>
-        <div className="py-2 flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <MicVocal className="size-4" />
-            <span className="text-gray-600">Auction fee (20%)</span>
-          </div>
-          <span className="font-medium">{formatEuro(auction.auctionFee)}</span>
-        </div>
-        <div className="py-2 flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <Handshake className="size-4" />
-            <span className="text-gray-600">Commissions</span>
-          </div>
-          <span className="font-medium">
-            {formatEuro(Math.abs(auction.commissions))}
-          </span>
-        </div>
-        <div className="py-2 flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <Package className="size-4" />
-            <span className="text-gray-600">Net receipts</span>
-          </div>
-          <span className="font-medium">{formatEuro(auction.netReceipts)}</span>
-        </div>
+        ))}
       </div>
     </div>
   );
