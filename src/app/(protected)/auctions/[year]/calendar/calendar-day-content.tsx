@@ -10,7 +10,6 @@ const CALENDAR_CELL_SIZE = "size-10";
 interface DayContentProps {
   date: Date;
   calendarMonth: Date;
-  selectedDate: string | null;
   handleDayClick: (date: Date) => void;
   auctions: Doc<"auctions">[];
 }
@@ -18,7 +17,6 @@ interface DayContentProps {
 export const DayContent = memo(function DayContent({
   date,
   calendarMonth,
-  selectedDate,
   handleDayClick,
   auctions,
 }: DayContentProps) {
@@ -43,11 +41,6 @@ export const DayContent = memo(function DayContent({
       handleDayClick(date);
     }
   }, [date, isWeekend, handleDayClick]);
-
-  const isThisDateSelected = useMemo(
-    () => selectedDate === date.toDateString(),
-    [selectedDate, date]
-  );
 
   const dayContent = useMemo(
     () => (

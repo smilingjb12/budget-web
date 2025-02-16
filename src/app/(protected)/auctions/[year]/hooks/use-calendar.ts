@@ -1,6 +1,5 @@
 import { unixToDate } from "@/lib/utils";
 import { Doc } from "../../../../../../convex/_generated/dataModel";
-import React from "react";
 
 export function useCalendar() {
   const isAuctionDate = (auctions: Doc<"auctions">[], date: Date) =>
@@ -16,14 +15,10 @@ export function useCalendar() {
     );
 
   const generateYearMonths = (year: number) =>
-    React.useMemo(
-      () =>
-        Array.from({ length: 12 }, (_, i) => ({
-          calendarMonth: new Date(Number(year), i, 1),
-          key: i,
-        })),
-      [year]
-    );
+    Array.from({ length: 12 }, (_, i) => ({
+      calendarMonth: new Date(Number(year), i, 1),
+      key: i,
+    }));
 
   return {
     isAuctionDate,

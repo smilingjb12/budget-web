@@ -1,3 +1,7 @@
+import {
+  auctionDeleteDialogAtom,
+  auctionDetailsPopoverAtom,
+} from "@/app/global-state";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
@@ -17,17 +21,17 @@ import {
 } from "lucide-react";
 import { ReactNode, memo } from "react";
 import { Doc } from "../../../../../../convex/_generated/dataModel";
-import {
-  auctionDeleteDialogAtom,
-  auctionDetailsPopoverAtom,
-} from "@/app/global-state";
 
 interface AuctionDetailsPopoverProps {
   auction: Doc<"auctions">;
   children: ReactNode;
 }
 
-export function popoverContent({ auction }: { auction: Doc<"auctions"> }) {
+function AuctionDetailsPopoverContent({
+  auction,
+}: {
+  auction: Doc<"auctions">;
+}) {
   const deleteAuction = () => {
     setAuctionDeleteDialog({ visible: true, auction });
   };
@@ -116,7 +120,7 @@ export const AuctionDetailsPopover = memo(function AuctionDetailsPopover({
             setAuctionDetailsPopover({ visible: false, auction: null })
           }
         >
-          {popoverContent({ auction })}
+          <AuctionDetailsPopoverContent auction={auction} />
         </PopoverContent>
       </Popover>
     </>

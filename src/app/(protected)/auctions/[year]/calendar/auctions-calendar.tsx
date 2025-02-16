@@ -1,30 +1,45 @@
-import { Calendar } from "@/components/ui/calendar";
-import { unixToDate } from "@/lib/utils";
-import { useMutation, useQuery } from "convex/react";
-import { useParams } from "next/navigation";
-import React, { useCallback, useMemo, useState } from "react";
-import { api } from "../../../../../../convex/_generated/api";
-import { useCalendar } from "../hooks/use-calendar";
-import { DayContent } from "./calendar-day-content";
-import { CreateAuctionDialog } from "./create-auction-dialog";
-import { ConfirmDialog } from "@/components/confirm-dialog";
-import { useAtom } from "jotai";
-import { useAtomValue } from "jotai";
-import { useMutationErrorHandler } from "@/hooks/use-mutation-error-handler";
 import {
   auctionDeleteDialogAtom,
   auctionDetailsPopoverAtom,
 } from "@/app/global-state";
+import { ConfirmDialog } from "@/components/confirm-dialog";
+import { Calendar } from "@/components/ui/calendar";
+import { useMutationErrorHandler } from "@/hooks/use-mutation-error-handler";
 import { toast } from "@/hooks/use-toast";
+import { unixToDate } from "@/lib/utils";
+import { useMutation, useQuery } from "convex/react";
+import { useAtom } from "jotai";
+import { useParams } from "next/navigation";
+import { useCallback, useState } from "react";
+import { api } from "../../../../../../convex/_generated/api";
+import { useCalendar } from "../hooks/use-calendar";
+import { DayContent } from "./calendar-day-content";
+import { CreateAuctionDialog } from "./create-auction-dialog";
 import { DeleteAuctionDialogContent } from "./delete-auction-dialog-content";
 
 const CALENDAR_CELL_SIZE = "size-10";
+const CALENDAR_CLASS_NAMES = {
+  months: "w-full",
+  month: "w-full",
+  table: "w-full border-collapse",
+  head_row: "flex",
+  head_cell: "rounded-md w-10 font-normal text-sm",
+  row: "flex w-full mt-2",
+  cell: `${CALENDAR_CELL_SIZE} text-center text-md p-0 relative focus-within:relative focus-within:z-20`,
+  day: `${CALENDAR_CELL_SIZE} p-0 font-normal text-md`,
+  day_selected: "",
+  day_outside: "opacity-0 pointer-events-none",
+  day_disabled: "text-muted-foreground opacity-50",
+  day_hidden: "invisible",
+  nav: "hidden",
+  caption:
+    "flex justify-start pl-2 relative items-center mb-4 [&>div]:!text-lg ",
+} as const;
 
 export function AuctionsCalendar() {
   const [auctionDetailsPopover, setAuctionDetailsPopover] = useAtom(
     auctionDetailsPopoverAtom
   );
-  const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [createDialogDate, setCreateDialogDate] = useState<Date | undefined>();
   const [isAuctionDeleteInProgress, setIsAuctionDeleteInProgress] =
@@ -46,7 +61,6 @@ export function AuctionsCalendar() {
   const handleDayClick = useCallback(
     (date: Date) => {
       if (isAuctionDate(auctions!, date)) {
-        setSelectedDate(date.toDateString());
         setAuctionDetailsPopover({
           visible: true,
           auction: getAuctionForDate(auctions, date)!,
@@ -56,7 +70,7 @@ export function AuctionsCalendar() {
         setIsCreateDialogOpen(true);
       }
     },
-    [isAuctionDate, auctions]
+    [isAuctionDate, auctions, getAuctionForDate, setAuctionDetailsPopover]
   );
 
   const onAuctionDeleteConfirmed = (confirmed: boolean) => {
@@ -78,32 +92,16 @@ export function AuctionsCalendar() {
       });
   };
 
-  const memoizedIsAuctionDate = useCallback(
-    (date: Date) => isAuctionDate(auctions, date),
-    [auctions, isAuctionDate]
-  );
-
-  const memoizedGetAuctionForDate = useCallback(
-    (date: Date) => getAuctionForDate(auctions, date),
-    [auctions, getAuctionForDate]
-  );
-
   const calendarContent = useCallback(
     ({ date, calendarMonth }: { date: Date; calendarMonth: Date }) => (
       <DayContent
         date={date}
         calendarMonth={calendarMonth}
-        selectedDate={selectedDate}
         handleDayClick={handleDayClick}
         auctions={auctions}
       />
     ),
-    [
-      handleDayClick,
-      memoizedGetAuctionForDate,
-      memoizedIsAuctionDate,
-      selectedDate,
-    ]
+    [handleDayClick, auctions]
   );
 
   return (
@@ -125,23 +123,7 @@ export function AuctionsCalendar() {
                   }}
                   weekStartsOn={1}
                   className=""
-                  classNames={{
-                    months: "w-full",
-                    month: "w-full",
-                    table: "w-full border-collapse",
-                    head_row: "flex",
-                    head_cell: "rounded-md w-10 font-normal text-sm",
-                    row: "flex w-full mt-2",
-                    cell: `${CALENDAR_CELL_SIZE} text-center text-md p-0 relative focus-within:relative focus-within:z-20`,
-                    day: `${CALENDAR_CELL_SIZE} p-0 font-normal text-md`,
-                    day_selected: "",
-                    day_outside: "opacity-0 pointer-events-none",
-                    day_disabled: "text-muted-foreground opacity-50",
-                    day_hidden: "invisible",
-                    nav: "hidden",
-                    caption:
-                      "flex justify-start pl-2 relative items-center mb-4 [&>div]:!text-lg ",
-                  }}
+                  classNames={CALENDAR_CLASS_NAMES}
                   formatters={{
                     formatCaption: (date) => {
                       return date.toLocaleString("default", { month: "long" });
