@@ -10,7 +10,7 @@ import { unixToDate } from "@/lib/utils";
 import { useMutation, useQuery } from "convex/react";
 import { useAtom } from "jotai";
 import { useParams } from "next/navigation";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { api } from "../../../../../../convex/_generated/api";
 import { useCalendar } from "../hooks/use-calendar";
 import { DayContent } from "./calendar-day-content";
@@ -50,10 +50,11 @@ export function AuctionsCalendar() {
   const deleteAuction = useMutation(api.auctions.deleteAuction);
   const { handleError } = useMutationErrorHandler();
   const params = useParams<{ year: string }>();
-  const auctions =
-    useQuery(api.auctions.getAuctions, {
-      year: Number(params.year),
-    }) ?? [];
+  const auctionsQuery = useQuery(api.auctions.getAuctions, {
+    year: Number(params.year),
+  });
+
+  const auctions = useMemo(() => auctionsQuery ?? [], [auctionsQuery]);
   const { isAuctionDate, getAuctionForDate, generateYearMonths } =
     useCalendar();
   const months = generateYearMonths(Number(params.year));

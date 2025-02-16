@@ -8,6 +8,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { Routes } from "@/lib/routes";
 import { formatEuro, unixToDate } from "@/lib/utils";
 import { format } from "date-fns";
 import { useAtom, useSetAtom } from "jotai";
@@ -19,6 +20,7 @@ import {
   Package,
   Trash2,
 } from "lucide-react";
+import Link from "next/link";
 import { ReactNode, memo } from "react";
 import { Doc } from "../../../../../../convex/_generated/dataModel";
 
@@ -64,7 +66,12 @@ function AuctionDetailsPopoverContent({
     <div className="p-5 py-3 space-y-3">
       <div className="flex items-center justify-between mb-2">
         <h3 className="font-medium text-md">
-          Auction #{format(unixToDate(auction.dateTimestamp), "yyyy-MM-dd")}
+          <Link
+            href={Routes.auctionDetailsProgress(auction._id)}
+            className="hover:text-primary"
+          >
+            Auction #{format(unixToDate(auction.dateTimestamp), "yyyy-MM-dd")}
+          </Link>
         </h3>
         <Button
           onClick={deleteAuction}

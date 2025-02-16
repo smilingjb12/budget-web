@@ -1,4 +1,4 @@
-import { Header } from "../header";
+import { Header } from "./header";
 import { Sidebar } from "./sidebar";
 
 export default function LoggedInLayout({
@@ -7,7 +7,7 @@ export default function LoggedInLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="py-1">
+    <div className="py-1 min-h-screen">
       <Header />
       <Sidebar />
       <>{children}</>

@@ -1,8 +1,5 @@
-import { ConvexError } from "convex/values";
-import { api, internal } from "../_generated/api";
-import { MutationCtx, QueryCtx } from "../_generated/server";
-import { convexEnv } from "../lib/convexEnv";
 import { Id } from "../_generated/dataModel";
+import { MutationCtx, QueryCtx } from "../_generated/server";
 
 export const getAuctionsHandler = async (
   ctx: QueryCtx,
@@ -64,6 +61,35 @@ export const getAuctionsSummaryHandler = async (
   return stats;
 };
 
+export const getAuctionSummaryHandler = async (
+  ctx: QueryCtx,
+  args: { auctionId: Id<"auctions"> }
+) => {
+  const auction = await ctx.db.get(args.auctionId);
+  if (!auction) {
+    return {
+      year: 0,
+      soldItems: 0,
+      unsoldItems: 0,
+      sales: 0,
+      auctionFees: 0,
+      commissions: 0,
+      netReceipts: 0,
+    };
+  }
+
+  const stats = {
+    year: auction.year,
+    soldItems: auction.soldItems,
+    unsoldItems: auction.unsoldItems,
+    sales: auction.sales,
+    auctionFees: auction.auctionFee,
+    commissions: auction.commissions,
+    netReceipts: auction.netReceipts,
+  };
+  return stats;
+};
+
 export const deleteAuctionHandler = async (
   ctx: MutationCtx,
   args: { id: Id<"auctions"> }
@@ -71,3 +97,9 @@ export const deleteAuctionHandler = async (
   await ctx.db.delete(args.id);
 };
 
+export const getAuctionByIdHandler = async (
+  ctx: QueryCtx,
+  args: { id: Id<"auctions"> }
+) => {
+  return await ctx.db.get(args.id);
+};

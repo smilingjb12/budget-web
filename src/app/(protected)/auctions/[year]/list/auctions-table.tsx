@@ -6,9 +6,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { TABLE_TEXT_SIZE } from "@/lib/constants";
+import { Routes } from "@/lib/routes";
 import { formatEuro, unixToDate } from "@/lib/utils";
 import { useQuery } from "convex/react";
 import { format } from "date-fns";
+import Link from "next/link";
 import { useParams } from "next/navigation";
 import { api } from "../../../../../../convex/_generated/api";
 
@@ -37,26 +40,31 @@ export function AuctionsTable() {
         <TableBody>
           {auctions.map((row, index) => (
             <TableRow key={row._id}>
-              <TableCell className="text-md">
+              <TableCell className={TABLE_TEXT_SIZE}>
                 {auctions.length - index}
               </TableCell>
-              <TableCell className="text-[16px]">
-                {format(unixToDate(row.dateTimestamp), "yyyy-MM-dd")}
+              <TableCell className={TABLE_TEXT_SIZE}>
+                <Link
+                  href={Routes.auctionDetailsProgress(row._id)}
+                  className="hover:text-primary"
+                >
+                  {format(unixToDate(row.dateTimestamp), "yyyy-MM-dd")}
+                </Link>
               </TableCell>
-              <TableCell className="text-[16px]">{row.soldItems}</TableCell>
-              <TableCell className="text-[16px]">
+              <TableCell className={TABLE_TEXT_SIZE}>{row.soldItems}</TableCell>
+              <TableCell className={TABLE_TEXT_SIZE}>
                 {formatEuro(row.sales)}
               </TableCell>
-              <TableCell className="text-[16px]">
+              <TableCell className={TABLE_TEXT_SIZE}>
                 {formatEuro(row.auctionFee)}
               </TableCell>
-              <TableCell className="text-[16px]">
+              <TableCell className={TABLE_TEXT_SIZE}>
                 - {formatEuro(row.commissions)}
               </TableCell>
-              <TableCell className="text-[16px]">
+              <TableCell className={TABLE_TEXT_SIZE}>
                 {formatEuro(row.netReceipts)}
               </TableCell>
-              <TableCell className="text-[16px]">
+              <TableCell className={TABLE_TEXT_SIZE}>
                 {format(unixToDate(row.dateTimestamp), "dd/MM/yy")}
               </TableCell>
             </TableRow>

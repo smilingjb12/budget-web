@@ -1,4 +1,3 @@
-import { useQuery } from "convex/react";
 import {
   Gavel,
   Handshake,
@@ -7,16 +6,22 @@ import {
   OctagonMinus,
   Package,
 } from "lucide-react";
-import { useParams } from "next/navigation";
-import { api } from "../../../../../convex/_generated/api";
 import { SummaryItem } from "./summary-item";
 
-export function SummaryPanel() {
-  const params = useParams<{ year: string }>();
-  const stats = useQuery(api.auctions.getAuctionsSummary, {
-    year: Number(params.year),
-  });
+interface SummaryPanelProps {
+  stats:
+    | {
+        soldItems: number;
+        unsoldItems: number;
+        sales: number;
+        auctionFees: number;
+        commissions: number;
+        netReceipts: number;
+      }
+    | undefined;
+}
 
+export function SummaryPanel({ stats }: SummaryPanelProps) {
   const summaryItems = [
     {
       icon: Package,

@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -94,9 +93,16 @@ export function CreateAuctionDialog({
               />
             )}
           />
-          <DialogFooter className="pt-6">
+          <div className="pt-6">
+            <ActionButton
+              type="submit"
+              className="w-25 float-right"
+              isLoading={isLoading}
+            >
+              Create
+            </ActionButton>
             <Button
-              className="w-25"
+              className="w-25 float-right mr-2"
               onClick={() => {
                 onOpenChange(false);
                 form.reset();
@@ -105,10 +111,7 @@ export function CreateAuctionDialog({
             >
               Cancel
             </Button>
-            <ActionButton type="submit" className="w-25" isLoading={isLoading}>
-              Create
-            </ActionButton>
-          </DialogFooter>
+          </div>
         </form>
       </DialogContent>
     </Dialog>

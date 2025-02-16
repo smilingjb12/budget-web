@@ -16,8 +16,10 @@ import type {
 import type * as auctions from "../auctions.js";
 import type * as auth from "../auth.js";
 import type * as handlers_auctions from "../handlers/auctions.js";
+import type * as handlers_items from "../handlers/items.js";
 import type * as handlers_users from "../handlers/users.js";
 import type * as http from "../http.js";
+import type * as items from "../items.js";
 import type * as lib_convexEnv from "../lib/convexEnv.js";
 import type * as lib_env from "../lib/env.js";
 import type * as lib_helpers from "../lib/helpers.js";
@@ -37,8 +39,10 @@ declare const fullApi: ApiFromModules<{
   auctions: typeof auctions;
   auth: typeof auth;
   "handlers/auctions": typeof handlers_auctions;
+  "handlers/items": typeof handlers_items;
   "handlers/users": typeof handlers_users;
   http: typeof http;
+  items: typeof items;
   "lib/convexEnv": typeof lib_convexEnv;
   "lib/env": typeof lib_env;
   "lib/helpers": typeof lib_helpers;

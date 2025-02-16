@@ -1,17 +1,12 @@
 import { v } from "convex/values";
-import { Doc } from "./_generated/dataModel";
-import {
-  internalMutation,
-  internalQuery,
-  mutation,
-  query,
-} from "./_generated/server";
-import { getMeHandler } from "./handlers/users";
+import { mutation, query } from "./_generated/server";
 import {
   createAuctionHandler,
   deleteAuctionHandler,
+  getAuctionByIdHandler,
   getAuctionsHandler,
   getAuctionsSummaryHandler,
+  getAuctionSummaryHandler,
 } from "./handlers/auctions";
 import { requireAuthentication } from "./lib/helpers";
 
@@ -44,10 +39,29 @@ export const deleteAuction = mutation({
     return await deleteAuctionHandler(ctx, args);
   },
 });
+
 export const getAuctionsSummary = query({
   args: { year: v.number() },
   handler: async (ctx, args) => {
     await requireAuthentication(ctx);
     return await getAuctionsSummaryHandler(ctx, args);
+  },
+});
+
+export const getAuctionSummary = query({
+  args: { auctionId: v.id("auctions") },
+  handler: async (ctx, args) => {
+    await requireAuthentication(ctx);
+    return await getAuctionSummaryHandler(ctx, args);
+  },
+});
+
+export const getAuctionById = query({
+  args: {
+    id: v.id("auctions"),
+  },
+  handler: async (ctx, args) => {
+    await requireAuthentication(ctx);
+    return await getAuctionByIdHandler(ctx, args);
   },
 });

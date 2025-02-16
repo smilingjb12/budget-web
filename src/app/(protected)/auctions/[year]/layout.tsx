@@ -4,9 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SIDEBAR_WIDTH_PX } from "@/lib/constants";
 import { CALENDAR_SEGMENT, LIST_SEGMENT, Routes } from "@/lib/routes";
+import { useQuery } from "convex/react";
 import { CalendarDays, List, SquarePlus } from "lucide-react";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import React, { useState } from "react";
+import { api } from "../../../../../convex/_generated/api";
 import { CreateAuctionDialog } from "./calendar/create-auction-dialog";
 import { SummaryPanel } from "./summary-panel";
 import { YearSelector } from "./year-selector";
@@ -45,6 +47,9 @@ export default function AuctionsLayout({
   const router = useRouter();
   const params = useParams<{ year: string }>();
   const pathname = usePathname();
+  const stats = useQuery(api.auctions.getAuctionsSummary, {
+    year: Number(params.year),
+  });
 
   const handleTabChange = (route: string, segment: string) => {
     if (window.location.pathname.includes(segment)) {
@@ -63,7 +68,7 @@ export default function AuctionsLayout({
     (pathname.endsWith(CALENDAR_SEGMENT) ? CALENDAR_SEGMENT : LIST_SEGMENT);
 
   return (
-    <div className="min-h-screen flex">
+    <div className="flex">
       <div className="flex-1" style={{ paddingLeft: SIDEBAR_WIDTH_PX }}>
         <div className="p-2 mx-auto">
           <div className="flex justify-between items-center mb-4">
@@ -74,7 +79,7 @@ export default function AuctionsLayout({
             </Button>
           </div>
 
-          <SummaryPanel />
+          <SummaryPanel stats={stats} />
 
           <Tabs value={currentSegment} className="mb-1">
             <TabsList className="border rounded-md">

@@ -1,7 +1,7 @@
+import { authTables } from "@convex-dev/auth/server";
+import { rateLimitTables } from "convex-helpers/server/rateLimit";
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
-import { rateLimitTables } from "convex-helpers/server/rateLimit";
-import { authTables } from "@convex-dev/auth/server";
 
 export default defineSchema({
   ...rateLimitTables,
@@ -20,8 +20,12 @@ export default defineSchema({
     .index("status", ["status"])
     .index("year", ["year"]),
   items: defineTable({
-    name: v.string(),
-    topBidder: v.string(),
-    topBid: v.number(),
-  }),
+    auctionId: v.id("auctions"),
+    description: v.string(),
+    lotNo: v.number(),
+    hammerPrice: v.number(),
+    billedOn: v.optional(v.string()),
+    initialPrice: v.number(),
+    status: v.optional(v.union(v.literal("withheld"))),
+  }).index("auctionId", ["auctionId"]),
 });
