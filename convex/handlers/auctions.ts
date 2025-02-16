@@ -18,6 +18,7 @@ export const createAuctionHandler = async (
 ) => {
   const date = new Date(args.date);
   const dateTimestamp = date.getTime();
+  console.log("CREATE A:", args.date, date);
   await ctx.db.insert("auctions", {
     dateTimestamp,
     status: "active",

@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { useMutationErrorHandler } from "@/hooks/use-mutation-error-handler";
 import { toast } from "@/hooks/use-toast";
+import { toServerDate } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "convex/react";
 import { useEffect, useState } from "react";
@@ -58,7 +59,8 @@ export function CreateAuctionDialog({
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     setIsLoading(true);
-    createAuction({ date: values.date.toISOString() })
+    const formattedDate = toServerDate(values.date);
+    createAuction({ date: formattedDate })
       .then(() => {
         form.reset();
         onOpenChange(false);

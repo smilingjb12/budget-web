@@ -18,3 +18,7 @@ export function formatEuro(money: number): string {
 export function unixToDate(timestamp: number): Date {
   return fromUnixTime(timestamp / 1000);
 }
+
+export function toServerDate(date: Date): string {
+  return date.toLocaleString("sv").replace(",", "");
+}
