@@ -8,7 +8,7 @@ import { useMutationErrorHandler } from "@/hooks/use-mutation-error-handler";
 import { toast } from "@/hooks/use-toast";
 import { unixToDate } from "@/lib/utils";
 import { useMutation, useQuery } from "convex/react";
-import { useAtom } from "jotai";
+import { useAtom, useSetAtom } from "jotai";
 import { useParams } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
 import { api } from "../../../../../../convex/_generated/api";
@@ -37,9 +37,7 @@ const CALENDAR_CLASS_NAMES = {
 } as const;
 
 export function AuctionsCalendar() {
-  const [auctionDetailsPopover, setAuctionDetailsPopover] = useAtom(
-    auctionDetailsPopoverAtom
-  );
+  const setAuctionDetailsPopover = useSetAtom(auctionDetailsPopoverAtom);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [createDialogDate, setCreateDialogDate] = useState<Date | undefined>();
   const [isAuctionDeleteInProgress, setIsAuctionDeleteInProgress] =

@@ -16,7 +16,7 @@ interface InlineEditInputProps
 export const InlineEditInput = React.forwardRef<
   HTMLInputElement,
   InlineEditInputProps
->(({ value, displayValue, displayNode, onSave, className, ...props }, ref) => {
+>(({ value, displayValue, displayNode, onSave, className, ...props }) => {
   const [isEditing, setIsEditing] = React.useState(false);
   const [inputValue, setInputValue] = React.useState(value);
   const inputRef = React.useRef<HTMLInputElement>(null);
