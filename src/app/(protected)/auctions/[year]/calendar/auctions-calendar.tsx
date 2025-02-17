@@ -148,7 +148,7 @@ export function AuctionsCalendar() {
       <ConfirmDialog
         actionButton={{ text: "Delete", variant: "destructive" }}
         content={
-          <DeleteAuctionDialogContent auction={auctionDetailsPopover.auction} />
+          <DeleteAuctionDialogContent auction={auctionDeleteDialog.auction} />
         }
         isActionInProgress={isAuctionDeleteInProgress}
         isOpen={auctionDeleteDialog.visible}
