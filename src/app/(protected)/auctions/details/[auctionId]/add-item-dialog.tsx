@@ -152,7 +152,8 @@ export function AddItemDialog({
             </ActionButton>
             <Button
               className="w-25 float-right mr-2"
-              onClick={() => {
+              onClick={(e) => {
+                e.preventDefault();
                 onOpenChange(false);
                 form.reset();
               }}
