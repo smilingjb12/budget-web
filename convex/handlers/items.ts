@@ -3,6 +3,33 @@ import { MutationCtx, QueryCtx } from "../_generated/server";
 import { centsToDecimal, decimalToCents } from "../lib/helpers";
 import { ItemDto } from "../lib/types";
 
+export const updateItemHandler = async (
+  ctx: MutationCtx,
+  args: {
+    itemId: Id<"items">;
+    updates: {
+      description?: string;
+      lotNo?: number;
+      hammerPriceInEuros?: number;
+      billedOn?: string;
+    };
+  }
+) => {
+  const definedUpdates = Object.fromEntries(
+    Object.entries(args.updates)
+      .filter(([_, value]) => value !== undefined && value !== null)
+      .map(([key, value]) =>
+        key === "hammerPriceInEuros"
+          ? ["hammerPriceInCents", decimalToCents(value as number)]
+          : [key, value]
+      )
+  );
+
+  console.log("updates:", definedUpdates);
+
+  await ctx.db.patch(args.itemId, definedUpdates);
+};
+
 export const getItemsHandler = async (
   ctx: QueryCtx,
   args: { auctionId: Id<"auctions"> }
@@ -22,6 +49,7 @@ export const getItemsHandler = async (
     billedOn: i.billedOn,
     initialPriceInEuros: centsToDecimal(i.initialPriceInCents),
     status: i.status,
+    creationTimestamp: i._creationTime,
   }));
 };
 

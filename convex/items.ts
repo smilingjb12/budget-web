@@ -1,6 +1,10 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
-import { createItemHandler, getItemsHandler } from "./handlers/items";
+import {
+  createItemHandler,
+  getItemsHandler,
+  updateItemHandler,
+} from "./handlers/items";
 import { requireAuthentication } from "./lib/helpers";
 
 export const getItems = query({
@@ -24,5 +28,21 @@ export const createItem = mutation({
   handler: async (ctx, args) => {
     await requireAuthentication(ctx);
     return await createItemHandler(ctx, args);
+  },
+});
+
+export const updateItem = mutation({
+  args: {
+    itemId: v.id("items"),
+    updates: v.object({
+      description: v.optional(v.string()),
+      lotNo: v.optional(v.number()),
+      hammerPriceInEuros: v.optional(v.number()),
+      billedOn: v.optional(v.string()),
+    }),
+  },
+  handler: async (ctx, args) => {
+    await requireAuthentication(ctx);
+    return await updateItemHandler(ctx, args);
   },
 });

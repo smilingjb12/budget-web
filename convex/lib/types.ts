@@ -31,4 +31,5 @@ export type ItemDto = {
   billedOn: string | undefined;
   initialPriceInEuros: number;
   status: string | undefined;
+  creationTimestamp: number;
 };

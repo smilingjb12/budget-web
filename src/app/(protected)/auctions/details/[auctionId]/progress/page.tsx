@@ -1,5 +1,6 @@
 "use client";
 
+import { InlineEditInput } from "@/components/inline-edit-input";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -10,17 +11,29 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useMutationErrorHandler } from "@/hooks/use-mutation-error-handler";
+import { toast } from "@/hooks/use-toast";
 import { TABLE_TEXT_SIZE } from "@/lib/constants";
 import { cn, formatEuro } from "@/lib/utils";
-import { useQuery } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
+import { format, fromUnixTime } from "date-fns";
 import { useParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { api } from "../../../../../../../convex/_generated/api";
 import { Id } from "../../../../../../../convex/_generated/dataModel";
+import { ItemDto } from "../../../../../../../convex/lib/types";
+
+type EditableField = Pick<
+  ItemDto,
+  "description" | "lotNo" | "hammerPriceInEuros" | "billedOn"
+>;
 
 export default function AuctionProgressPage() {
+  const updateItem = useMutation(api.items.updateItem);
   const params = useParams<{ auctionId: string }>();
+  const { handleError } = useMutationErrorHandler();
   const HIGHLIGHT_DURATION_MS = 4000;
+  const CELL_PADDING = "py-2 px-4";
   const items =
     useQuery(api.items.getItems, {
       auctionId: params.auctionId as Id<"auctions">,
@@ -79,6 +92,43 @@ export default function AuctionProgressPage() {
     setSelectedItemIds(newSelected);
   };
 
+  const handleFieldUpdate = (
+    itemId: Id<"items">,
+    field: keyof EditableField,
+    value: string
+  ) => {
+    let parsedValue: EditableField[typeof field];
+    switch (field) {
+      case "hammerPriceInEuros":
+        parsedValue = value
+          ? parseFloat(
+              value.replace(/[,]/g, "") // Remove dots (thousand separators)
+            )
+          : 0;
+        break;
+      case "lotNo":
+        parsedValue = value ? parseInt(value) : 0;
+        break;
+      case "billedOn":
+        parsedValue = value ?? "";
+        break;
+      default:
+        parsedValue = value;
+    }
+
+    console.log("parsedValue:", parsedValue);
+
+    updateItem({ itemId, updates: { [field]: parsedValue } })
+      .then(() => {
+        toast({
+          title: "Item updated",
+          variant: "default",
+        });
+      })
+      .catch(handleError)
+      .finally(() => {});
+  };
+
   return (
     <>
       <style jsx global>{`
@@ -99,8 +149,8 @@ export default function AuctionProgressPage() {
         <Table>
           <TableHeader className="bg-muted">
             <TableRow>
-              <TableHead className="w-12">#</TableHead>
-              <TableHead className="w-12">
+              <TableHead className={cn("w-10", CELL_PADDING)}>#</TableHead>
+              <TableHead className={cn(CELL_PADDING, "w-10")}>
                 <Checkbox
                   checked={
                     selectedItemIds.size === items.length && items.length > 0
@@ -108,46 +158,85 @@ export default function AuctionProgressPage() {
                   onCheckedChange={toggleAll}
                 />
               </TableHead>
-              <TableHead>DESCRIPTION</TableHead>
-              <TableHead>LOT No.</TableHead>
-              <TableHead>HAMMER PRICE</TableHead>
-              <TableHead>INITIAL PRICE</TableHead>
-              <TableHead>BILLED ON</TableHead>
-              <TableHead></TableHead>
+              <TableHead className={cn("w-[30%]", CELL_PADDING)}>
+                DESCRIPTION
+              </TableHead>
+              <TableHead className={CELL_PADDING}>LOT No.</TableHead>
+              <TableHead className={CELL_PADDING}>HAMMER PRICE</TableHead>
+              <TableHead className={CELL_PADDING}>BILLED ON</TableHead>
+              <TableHead className={CELL_PADDING}></TableHead>
+              <TableHead className={cn(CELL_PADDING, "w-20")}>TIME</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {items.map((item, index) => (
               <TableRow
                 key={item.id}
-                className={cn(newItemIds.has(item.id) && "highlight-new-row")}
+                className={cn(
+                  "hover:bg-transparent",
+                  newItemIds.has(item.id) && "highlight-new-row"
+                )}
               >
-                <TableCell className={TABLE_TEXT_SIZE}>{index + 1}</TableCell>
-                <TableCell>
+                <TableCell className={cn(TABLE_TEXT_SIZE, CELL_PADDING)}>
+                  {index + 1}
+                </TableCell>
+                <TableCell className={CELL_PADDING}>
                   <Checkbox
                     checked={selectedItemIds.has(item.id)}
                     onCheckedChange={() => toggleItem(item.id)}
                   />
                 </TableCell>
-                <TableCell className={TABLE_TEXT_SIZE}>
-                  {item.description}
-                </TableCell>
-                <TableCell className={TABLE_TEXT_SIZE}>{item.lotNo}</TableCell>
-                <TableCell className={TABLE_TEXT_SIZE}>
-                  {item.hammerPriceInEuros > 0
-                    ? formatEuro(item.hammerPriceInEuros)
-                    : ""}
-                </TableCell>
-                <TableCell className={TABLE_TEXT_SIZE}>
-                  {item.initialPriceInEuros > 0
-                    ? formatEuro(item.initialPriceInEuros)
-                    : ""}
-                </TableCell>
-                <TableCell className={TABLE_TEXT_SIZE}>
-                  {item.billedOn}
+                <TableCell
+                  className={cn(TABLE_TEXT_SIZE, CELL_PADDING, "pl-2")}
+                >
+                  <InlineEditInput
+                    value={item.description}
+                    onSave={(value) =>
+                      handleFieldUpdate(item.id, "description", value)
+                    }
+                  />
                 </TableCell>
                 <TableCell
-                  className={cn(TABLE_TEXT_SIZE, "text-muted-foreground")}
+                  className={cn(TABLE_TEXT_SIZE, CELL_PADDING, "pl-2")}
+                >
+                  <InlineEditInput
+                    value={String(item.lotNo)}
+                    onSave={(value) =>
+                      handleFieldUpdate(item.id, "lotNo", value)
+                    }
+                  />
+                </TableCell>
+                <TableCell
+                  className={cn(TABLE_TEXT_SIZE, CELL_PADDING, "pl-2")}
+                >
+                  <InlineEditInput
+                    value={String(item.hammerPriceInEuros ?? "")}
+                    displayValue={
+                      item.hammerPriceInEuros > 0
+                        ? formatEuro(item.hammerPriceInEuros)
+                        : ""
+                    }
+                    onSave={(value) =>
+                      handleFieldUpdate(item.id, "hammerPriceInEuros", value)
+                    }
+                  />
+                </TableCell>
+                <TableCell
+                  className={cn(TABLE_TEXT_SIZE, CELL_PADDING, "pl-2")}
+                >
+                  <InlineEditInput
+                    value={item.billedOn ?? ""}
+                    onSave={(value) =>
+                      handleFieldUpdate(item.id, "billedOn", value)
+                    }
+                  />
+                </TableCell>
+                <TableCell
+                  className={cn(
+                    TABLE_TEXT_SIZE,
+                    "text-muted-foreground",
+                    CELL_PADDING
+                  )}
                 >
                   {item.status && (
                     <Badge
@@ -157,6 +246,15 @@ export default function AuctionProgressPage() {
                       {item.status.toUpperCase()}
                     </Badge>
                   )}
+                </TableCell>
+                <TableCell
+                  className={cn(
+                    TABLE_TEXT_SIZE,
+                    "text-muted-foreground text-sm",
+                    CELL_PADDING
+                  )}
+                >
+                  {format(fromUnixTime(item.creationTimestamp), "HH:mm")}
                 </TableCell>
               </TableRow>
             ))}

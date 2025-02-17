@@ -30,10 +30,10 @@ interface AuctionDetailsPopoverProps {
 }
 
 function AuctionDetailsPopoverContent({ auction }: { auction: AuctionDto }) {
+  const setAuctionDeleteDialog = useSetAtom(auctionDeleteDialogAtom);
   const deleteAuction = () => {
     setAuctionDeleteDialog({ visible: true, auction });
   };
-  const setAuctionDeleteDialog = useSetAtom(auctionDeleteDialogAtom);
   const items = [
     { icon: Package, label: "Sold items", value: auction.soldItems },
     {
