@@ -1,10 +1,10 @@
-import { format } from "date-fns";
-import { Doc } from "../../../../../../convex/_generated/dataModel";
 import { unixToDate } from "@/lib/utils";
+import { format } from "date-fns";
 import React from "react";
+import { AuctionDto } from "../../../../../../convex/lib/types";
 
 interface DeleteAuctionDialogContentProps {
-  auction: Doc<"auctions"> | null;
+  auction: AuctionDto | null;
 }
 
 export const DeleteAuctionDialogContent = React.memo(

@@ -18,7 +18,7 @@ import { api } from "../../../../../../convex/_generated/api";
 export function AuctionsTable() {
   const params = useParams<{ year: string }>();
   const auctions =
-    useQuery(api.auctions.getAuctions, {
+    useQuery(api.auctions.getAuctionsByYear, {
       year: Number(params.year),
     }) ?? [];
 
@@ -39,13 +39,13 @@ export function AuctionsTable() {
         </TableHeader>
         <TableBody>
           {auctions.map((row, index) => (
-            <TableRow key={row._id}>
+            <TableRow key={row.id}>
               <TableCell className={TABLE_TEXT_SIZE}>
                 {auctions.length - index}
               </TableCell>
               <TableCell className={TABLE_TEXT_SIZE}>
                 <Link
-                  href={Routes.auctionDetailsProgress(row._id)}
+                  href={Routes.auctionDetailsProgress(row.id)}
                   className="hover:text-primary"
                 >
                   {format(unixToDate(row.dateTimestamp), "yyyy-MM-dd")}
@@ -53,16 +53,16 @@ export function AuctionsTable() {
               </TableCell>
               <TableCell className={TABLE_TEXT_SIZE}>{row.soldItems}</TableCell>
               <TableCell className={TABLE_TEXT_SIZE}>
-                {formatEuro(row.sales)}
+                {formatEuro(row.salesInEuros)}
               </TableCell>
               <TableCell className={TABLE_TEXT_SIZE}>
-                {formatEuro(row.auctionFee)}
+                {formatEuro(row.auctionFeesInEuros)}
               </TableCell>
               <TableCell className={TABLE_TEXT_SIZE}>
-                - {formatEuro(row.commissions)}
+                {formatEuro(row.commissionsInEuros)}
               </TableCell>
               <TableCell className={TABLE_TEXT_SIZE}>
-                {formatEuro(row.netReceipts)}
+                {formatEuro(row.netReceiptsInEuros)}
               </TableCell>
               <TableCell className={TABLE_TEXT_SIZE}>
                 {format(unixToDate(row.dateTimestamp), "dd/MM/yy")}

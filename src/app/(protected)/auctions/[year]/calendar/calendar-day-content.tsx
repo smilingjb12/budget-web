@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import { Plus } from "lucide-react";
 import { memo, useCallback, useMemo } from "react";
-import { Doc } from "../../../../../../convex/_generated/dataModel";
+import { AuctionDto } from "../../../../../../convex/lib/types";
 import { useCalendar } from "../hooks/use-calendar";
 import { AuctionDetailsPopover } from "./auction-details-popover";
 
@@ -11,7 +11,7 @@ interface DayContentProps {
   date: Date;
   calendarMonth: Date;
   handleDayClick: (date: Date) => void;
-  auctions: Doc<"auctions">[];
+  auctions: AuctionDto[];
 }
 
 export const DayContent = memo(function DayContent({

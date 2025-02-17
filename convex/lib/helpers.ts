@@ -1,8 +1,6 @@
 import { UserIdentity } from "convex/server";
 import { ConvexError } from "convex/values";
-import { api } from "../_generated/api";
 import { QueryCtx } from "../_generated/server";
-import { convexEnv } from "./convexEnv";
 
 export async function requireAuthentication(
   ctx: QueryCtx
@@ -13,4 +11,12 @@ export async function requireAuthentication(
   }
 
   return userIdentity;
+}
+
+export function decimalToCents(value: number): number {
+  return Math.round(value * 100);
+}
+
+export function centsToDecimal(value: number): number {
+  return value / 100;
 }

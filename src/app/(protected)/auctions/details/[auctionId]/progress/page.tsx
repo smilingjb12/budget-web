@@ -47,9 +47,9 @@ export default function AuctionProgressPage() {
 
     const newIds = items
       .filter(
-        (item) => !prevItemsRef.current.find((prev) => prev._id === item._id)
+        (item) => !prevItemsRef.current.find((prev) => prev.id === item.id)
       )
-      .map((item) => item._id);
+      .map((item) => item.id);
 
     if (newIds.length > 0) {
       setNewItemIds(new Set(newIds));
@@ -63,7 +63,7 @@ export default function AuctionProgressPage() {
 
   const toggleAll = (checked: boolean) => {
     if (checked && items) {
-      setSelectedItemIds(new Set(items.map((item) => item._id)));
+      setSelectedItemIds(new Set(items.map((item) => item.id)));
     } else {
       setSelectedItemIds(new Set());
     }
@@ -119,14 +119,14 @@ export default function AuctionProgressPage() {
           <TableBody>
             {items.map((item, index) => (
               <TableRow
-                key={item._id}
-                className={cn(newItemIds.has(item._id) && "highlight-new-row")}
+                key={item.id}
+                className={cn(newItemIds.has(item.id) && "highlight-new-row")}
               >
                 <TableCell className={TABLE_TEXT_SIZE}>{index + 1}</TableCell>
                 <TableCell>
                   <Checkbox
-                    checked={selectedItemIds.has(item._id)}
-                    onCheckedChange={() => toggleItem(item._id)}
+                    checked={selectedItemIds.has(item.id)}
+                    onCheckedChange={() => toggleItem(item.id)}
                   />
                 </TableCell>
                 <TableCell className={TABLE_TEXT_SIZE}>
@@ -134,10 +134,14 @@ export default function AuctionProgressPage() {
                 </TableCell>
                 <TableCell className={TABLE_TEXT_SIZE}>{item.lotNo}</TableCell>
                 <TableCell className={TABLE_TEXT_SIZE}>
-                  {item.hammerPrice > 0 ? formatEuro(item.hammerPrice) : ""}
+                  {item.hammerPriceInEuros > 0
+                    ? formatEuro(item.hammerPriceInEuros)
+                    : ""}
                 </TableCell>
                 <TableCell className={TABLE_TEXT_SIZE}>
-                  {formatEuro(item.initialPrice)}
+                  {item.initialPriceInEuros > 0
+                    ? formatEuro(item.initialPriceInEuros)
+                    : ""}
                 </TableCell>
                 <TableCell className={TABLE_TEXT_SIZE}>
                   {item.billedOn}

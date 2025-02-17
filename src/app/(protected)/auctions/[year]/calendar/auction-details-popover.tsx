@@ -22,18 +22,14 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { ReactNode, memo } from "react";
-import { Doc } from "../../../../../../convex/_generated/dataModel";
+import { AuctionDto } from "../../../../../../convex/lib/types";
 
 interface AuctionDetailsPopoverProps {
-  auction: Doc<"auctions">;
+  auction: AuctionDto;
   children: ReactNode;
 }
 
-function AuctionDetailsPopoverContent({
-  auction,
-}: {
-  auction: Doc<"auctions">;
-}) {
+function AuctionDetailsPopoverContent({ auction }: { auction: AuctionDto }) {
   const deleteAuction = () => {
     setAuctionDeleteDialog({ visible: true, auction });
   };
@@ -45,21 +41,21 @@ function AuctionDetailsPopoverContent({
       label: "Unsold items",
       value: auction.unsoldItems,
     },
-    { icon: Gavel, label: "Sales", value: formatEuro(auction.sales) },
+    { icon: Gavel, label: "Sales", value: formatEuro(auction.salesInEuros) },
     {
       icon: MicVocal,
       label: "Auction fee (20%)",
-      value: formatEuro(auction.auctionFee),
+      value: formatEuro(auction.auctionFeesInEuros),
     },
     {
       icon: Handshake,
       label: "Commissions",
-      value: formatEuro(Math.abs(auction.commissions)),
+      value: formatEuro(Math.abs(auction.commissionsInEuros)),
     },
     {
       icon: Package,
       label: "Net receipts",
-      value: formatEuro(auction.netReceipts),
+      value: formatEuro(auction.netReceiptsInEuros),
     },
   ];
   return (
@@ -67,7 +63,7 @@ function AuctionDetailsPopoverContent({
       <div className="flex items-center justify-between mb-2">
         <h3 className="font-medium text-md">
           <Link
-            href={Routes.auctionDetailsProgress(auction._id)}
+            href={Routes.auctionDetailsProgress(auction.id)}
             className="hover:text-primary"
           >
             Auction #{format(unixToDate(auction.dateTimestamp), "yyyy-MM-dd")}
@@ -115,7 +111,7 @@ export const AuctionDetailsPopover = memo(function AuctionDetailsPopover({
       <Popover
         open={
           auctionDetailsPopover.visible &&
-          auctionDetailsPopover.auction!._id === auction._id
+          auctionDetailsPopover.auction!.id === auction.id
         }
       >
         <PopoverTrigger asChild>{children}</PopoverTrigger>

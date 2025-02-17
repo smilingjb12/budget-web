@@ -1,14 +1,14 @@
 import { unixToDate } from "@/lib/utils";
-import { Doc } from "../../../../../../convex/_generated/dataModel";
+import { AuctionDto } from "../../../../../../convex/lib/types";
 
 export function useCalendar() {
-  const isAuctionDate = (auctions: Doc<"auctions">[], date: Date) =>
+  const isAuctionDate = (auctions: AuctionDto[], date: Date) =>
     auctions.some((auction) => {
       const auctionDate = unixToDate(auction.dateTimestamp);
       return auctionDate.toDateString() === date.toDateString();
     });
 
-  const getAuctionForDate = (auctions: Doc<"auctions">[], date: Date) =>
+  const getAuctionForDate = (auctions: AuctionDto[], date: Date) =>
     auctions.find(
       (auction) =>
         unixToDate(auction.dateTimestamp).toDateString() === date.toDateString()

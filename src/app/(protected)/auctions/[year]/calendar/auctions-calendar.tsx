@@ -50,7 +50,7 @@ export function AuctionsCalendar() {
   const deleteAuction = useMutation(api.auctions.deleteAuction);
   const { handleError } = useMutationErrorHandler();
   const params = useParams<{ year: string }>();
-  const auctionsQuery = useQuery(api.auctions.getAuctions, {
+  const auctionsQuery = useQuery(api.auctions.getAuctionsByYear, {
     year: Number(params.year),
   });
 
@@ -79,7 +79,7 @@ export function AuctionsCalendar() {
     setAuctionDeleteDialog({ visible: false, auction: null });
     setIsAuctionDeleteInProgress(true);
     const auction = auctionDeleteDialog.auction!;
-    deleteAuction({ id: auction._id })
+    deleteAuction({ id: auction.id })
       .then(() => {
         toast({
           title: "Auction deleted",

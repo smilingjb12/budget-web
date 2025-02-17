@@ -13,10 +13,10 @@ interface SummaryPanelProps {
     | {
         soldItems: number;
         unsoldItems: number;
-        sales: number;
-        auctionFees: number;
-        commissions: number;
-        netReceipts: number;
+        salesInEuros: number;
+        auctionFeesInEuros: number;
+        commissionsInEuros: number;
+        netReceiptsInEuros: number;
       }
     | undefined;
 }
@@ -36,25 +36,25 @@ export function SummaryPanel({ stats }: SummaryPanelProps) {
     {
       icon: Gavel,
       title: "Sales",
-      value: stats?.sales ?? 0,
+      value: stats?.salesInEuros ?? 0,
       isCurrency: true,
     },
     {
       icon: MicVocal,
       title: "Auction fee (20%)",
-      value: stats?.auctionFees ?? 0,
+      value: stats?.auctionFeesInEuros ?? 0,
       isCurrency: true,
     },
     {
       icon: Handshake,
       title: "Commissions",
-      value: stats?.commissions ?? 0,
+      value: stats?.commissionsInEuros ?? 0,
       isCurrency: true,
     },
     {
       icon: Landmark,
       title: "Net receipts",
-      value: stats?.netReceipts ?? 0,
+      value: stats?.netReceiptsInEuros ?? 0,
       isCurrency: true,
     },
   ];

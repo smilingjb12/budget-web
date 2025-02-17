@@ -4,19 +4,19 @@ import {
   createAuctionHandler,
   deleteAuctionHandler,
   getAuctionByIdHandler,
-  getAuctionsHandler,
+  getAuctionsByYearHandler,
   getAuctionsSummaryHandler,
   getAuctionSummaryHandler,
 } from "./handlers/auctions";
 import { requireAuthentication } from "./lib/helpers";
 
-export const getAuctions = query({
+export const getAuctionsByYear = query({
   args: {
     year: v.number(),
   },
   handler: async (ctx, args) => {
     await requireAuthentication(ctx);
-    return await getAuctionsHandler(ctx, args);
+    return await getAuctionsByYearHandler(ctx, args);
   },
 });
 

@@ -10,11 +10,11 @@ export default defineSchema({
     dateTimestamp: v.number(),
     status: v.union(v.literal("active"), v.literal("completed")),
     soldItems: v.number(),
-    sales: v.number(),
+    salesInCents: v.number(),
     unsoldItems: v.number(),
-    auctionFee: v.number(),
-    commissions: v.number(),
-    netReceipts: v.number(),
+    auctionFeeInCents: v.number(),
+    commissionsInCents: v.number(),
+    netReceiptsInCents: v.number(),
     year: v.number(),
   })
     .index("status", ["status"])
@@ -23,9 +23,9 @@ export default defineSchema({
     auctionId: v.id("auctions"),
     description: v.string(),
     lotNo: v.number(),
-    hammerPrice: v.number(),
+    hammerPriceInCents: v.number(),
     billedOn: v.optional(v.string()),
-    initialPrice: v.number(),
+    initialPriceInCents: v.number(),
     status: v.optional(v.union(v.literal("withheld"))),
   }).index("auctionId", ["auctionId"]),
 });

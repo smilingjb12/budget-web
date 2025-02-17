@@ -1,12 +1,12 @@
 import { atom } from "jotai";
-import { Doc } from "../../convex/_generated/dataModel";
+import { AuctionDto } from "../../convex/lib/types";
 
 export const auctionDeleteDialogAtom = atom<{
-  auction: Doc<"auctions"> | null;
+  auction: AuctionDto | null;
   visible: boolean;
 }>({ auction: null, visible: false });
 
 export const auctionDetailsPopoverAtom = atom<{
-  auction: Doc<"auctions"> | null;
+  auction: AuctionDto | null;
   visible: boolean;
 }>({ auction: null, visible: false });
