@@ -18,10 +18,11 @@ import { cn, formatEuro } from "@/lib/utils";
 import { useMutation, useQuery } from "convex/react";
 import { format, fromUnixTime } from "date-fns";
 import { useParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { api } from "../../../../../../../convex/_generated/api";
 import { Id } from "../../../../../../../convex/_generated/dataModel";
 import { ItemDto } from "../../../../../../../convex/lib/types";
+import { useHighlightNewItems } from "./hooks/use-highlight-new-items";
 
 type EditableField = Pick<
   ItemDto,
@@ -41,38 +42,7 @@ export default function AuctionProgressPage() {
   const [selectedItemIds, setSelectedItemIds] = useState<Set<Id<"items">>>(
     new Set()
   );
-  const [newItemIds, setNewItemIds] = useState<Set<Id<"items">>>(new Set());
-  const prevItemsRef = useRef<typeof items>([]);
-  const initialItemsLengthRef = useRef<number | null>(null);
-
-  useEffect(() => {
-    // Skip if items is empty (initial load or error state)
-    if (items.length === 0) {
-      return;
-    }
-
-    // Set initial items length if not set
-    if (initialItemsLengthRef.current === null) {
-      initialItemsLengthRef.current = items.length;
-      prevItemsRef.current = items;
-      return;
-    }
-
-    const newIds = items
-      .filter(
-        (item) => !prevItemsRef.current.find((prev) => prev.id === item.id)
-      )
-      .map((item) => item.id);
-
-    if (newIds.length > 0) {
-      setNewItemIds(new Set(newIds));
-      setTimeout(() => {
-        setNewItemIds(new Set());
-      }, HIGHLIGHT_DURATION_MS);
-    }
-
-    prevItemsRef.current = items;
-  }, [items]);
+  const { newItemIds } = useHighlightNewItems(items, HIGHLIGHT_DURATION_MS);
 
   const toggleAll = (checked: boolean) => {
     if (checked && items) {
@@ -142,7 +112,10 @@ export default function AuctionProgressPage() {
           }
         }
         .highlight-new-row {
-          animation: highlightRow 4s cubic-bezier(0.4, 0, 0.2, 1);
+          animation: highlightRow 3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .highlight-new-row input {
+          background-color: transparent !important;
         }
       `}</style>
       <div className="py-4">
@@ -161,7 +134,9 @@ export default function AuctionProgressPage() {
               <TableHead className={cn("w-[30%]", CELL_PADDING)}>
                 DESCRIPTION
               </TableHead>
-              <TableHead className={CELL_PADDING}>LOT No.</TableHead>
+              <TableHead className={cn(CELL_PADDING, "w-30")}>
+                LOT No.
+              </TableHead>
               <TableHead className={CELL_PADDING}>HAMMER PRICE</TableHead>
               <TableHead className={CELL_PADDING}>BILLED ON</TableHead>
               <TableHead className={CELL_PADDING}></TableHead>
@@ -178,7 +153,7 @@ export default function AuctionProgressPage() {
                 )}
               >
                 <TableCell className={cn(TABLE_TEXT_SIZE, CELL_PADDING)}>
-                  {index + 1}
+                  {items.length - index}
                 </TableCell>
                 <TableCell className={CELL_PADDING}>
                   <Checkbox
@@ -201,6 +176,14 @@ export default function AuctionProgressPage() {
                 >
                   <InlineEditInput
                     value={String(item.lotNo)}
+                    displayNode={
+                      <Badge
+                        variant="outline"
+                        className="text-muted-foreground rounded-md text-sm font-medium"
+                      >
+                        #{item.lotNo}
+                      </Badge>
+                    }
                     onSave={(value) =>
                       handleFieldUpdate(item.id, "lotNo", value)
                     }

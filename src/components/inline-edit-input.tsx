@@ -8,6 +8,7 @@ interface InlineEditInputProps
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "prefix"> {
   value: string;
   displayValue?: string;
+  displayNode?: React.ReactNode;
   onSave: (value: string) => void;
   className?: string;
 }
@@ -15,7 +16,7 @@ interface InlineEditInputProps
 export const InlineEditInput = React.forwardRef<
   HTMLInputElement,
   InlineEditInputProps
->(({ value, displayValue, onSave, className, ...props }, ref) => {
+>(({ value, displayValue, displayNode, onSave, className, ...props }, ref) => {
   const [isEditing, setIsEditing] = React.useState(false);
   const [inputValue, setInputValue] = React.useState(value);
   const inputRef = React.useRef<HTMLInputElement>(null);
@@ -46,6 +47,18 @@ export const InlineEditInput = React.forwardRef<
       setInputValue(value);
     }
   };
+
+  if (!isEditing && displayNode) {
+    return (
+      <div
+        onClick={() => setIsEditing(true)}
+        className="group relative mr-1 cursor-pointer rounded-md hover:bg-muted/70 p-1"
+      >
+        {displayNode}
+        <Pencil className="absolute text-primary right-3 top-1/2 size-4.5 -translate-y-1/2 opacity-0 group-hover:opacity-100" />
+      </div>
+    );
+  }
 
   return (
     <div className="group relative mr-1">
