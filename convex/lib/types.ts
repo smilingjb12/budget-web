@@ -33,3 +33,15 @@ export type ItemDto = {
   status: string | undefined;
   creationTimestamp: number;
 };
+
+export type BidderItemsDto = {
+  bidder: string;
+  items: {
+    itemId: Id<"items">;
+    description: string;
+    lotNumber: string;
+    hammerPriceInEuros: number;
+    auctionFeeInEuros: number;
+    amountInEuros: number;
+  }[];
+};

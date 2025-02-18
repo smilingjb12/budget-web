@@ -1,7 +1,7 @@
 import { Id } from "../_generated/dataModel";
 import { MutationCtx, QueryCtx } from "../_generated/server";
 import { centsToDecimal, decimalToCents } from "../lib/helpers";
-import { ItemDto } from "../lib/types";
+import { BidderItemsDto, ItemDto } from "../lib/types";
 
 export const updateItemHandler = async (
   ctx: MutationCtx,
@@ -24,8 +24,6 @@ export const updateItemHandler = async (
           : [key, value]
       )
   );
-
-  console.log("updates:", definedUpdates);
 
   await ctx.db.patch(args.itemId, definedUpdates);
 };
@@ -75,4 +73,40 @@ export const createItemHandler = async (
     billedOn: args.billedOn,
     hammerPriceInCents: decimalToCents(0),
   });
+};
+
+export const getBidderItemsHandler = async (
+  ctx: QueryCtx,
+  args: { auctionId: Id<"auctions"> }
+): Promise<BidderItemsDto[]> => {
+  const items = await ctx.db
+    .query("items")
+    .withIndex("auctionId", (q) => q.eq("auctionId", args.auctionId))
+    .collect();
+
+  const itemsByBidder = new Map<string, typeof items>();
+  items
+    .filter((i) => Boolean(i.billedOn))
+    .forEach((item) => {
+      const billedOn = item.billedOn!;
+      const bidderItems = itemsByBidder.get(billedOn) || [];
+      bidderItems.push(item);
+      itemsByBidder.set(billedOn, bidderItems);
+    });
+
+  return Array.from(itemsByBidder.entries()).map(([bidder, items]) => ({
+    bidder,
+    items: items.map((item) => {
+      const hammerPrice = centsToDecimal(item.hammerPriceInCents);
+      const auctionFee = hammerPrice * 0.2;
+      return {
+        itemId: item._id,
+        description: item.description,
+        lotNumber: String(item.lotNo),
+        hammerPriceInEuros: centsToDecimal(item.hammerPriceInCents),
+        auctionFeeInEuros: centsToDecimal(auctionFee),
+        amountInEuros: centsToDecimal(hammerPrice + auctionFee),
+      };
+    }),
+  }));
 };
