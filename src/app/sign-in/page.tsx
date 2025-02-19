@@ -1,7 +1,7 @@
 "use client";
 
 import { ActionButton } from "@/components/action-button";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { FormFieldWithError } from "@/components/form-field-with-error";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,31 +10,53 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Form } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Routes } from "@/lib/routes";
 import { useAuthActions } from "@convex-dev/auth/react";
+import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import type React from "react";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 import { useSignIn } from "./hooks/use-sign-in";
 
-export default function SSOCallback() {
+type Flow = "signUp" | "signIn";
+
+const formSchema = z.object({
+  email: z.string().min(1, "Email is required").email("Invalid email format"),
+  password: z
+    .string({ required_error: "Password is required" })
+    .min(1, "Password is required"),
+  flow: z.enum(["signUp", "signIn"]),
+});
+
+export default function SignInPage() {
   const { signIn } = useAuthActions();
-  const [step, setStep] = useState<"signUp" | "signIn">("signIn");
-  const [error, setError] = useState<string | null>(null);
+  const [step, setStep] = useState<Flow>("signIn");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
   const { getErrorTitle } = useSignIn();
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    setError("");
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+      flow: step,
+    },
+  });
+
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
     setIsLoading(true);
+    const formData = new FormData();
+    formData.append("email", values.email);
+    formData.append("password", values.password);
+    formData.append("flow", values.flow);
+
     signIn("password", formData)
       .then(() => {
         router.push(Routes.auctionsList(new Date().getFullYear()));
@@ -70,35 +92,39 @@ export default function SSOCallback() {
           <CardTitle>{step === "signIn" ? "Sign In" : "Sign Up"}</CardTitle>
         </CardHeader>
         <CardContent>
-          {error && (
-            <Alert variant="destructive" className="mb-4">
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" name="email" type="email" required />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input id="password" name="password" type="password" required />
-            </div>
-            <input name="flow" type="hidden" value={step} />
-            <ActionButton
-              type="submit"
-              className="w-full"
-              isLoading={isLoading}
-            >
-              {step === "signIn" ? "Sign In" : "Sign Up"}
-            </ActionButton>
-          </form>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormFieldWithError
+                label="Email"
+                error={form.formState.errors.email}
+              >
+                <Input {...form.register("email")} type="email" />
+              </FormFieldWithError>
+              <FormFieldWithError
+                label="Password"
+                error={form.formState.errors.password}
+              >
+                <Input {...form.register("password")} type="password" />
+              </FormFieldWithError>
+              <input type="hidden" {...form.register("flow")} value={step} />
+              <ActionButton
+                type="submit"
+                className="w-full"
+                isLoading={isLoading}
+              >
+                {step === "signIn" ? "Sign In" : "Sign Up"}
+              </ActionButton>
+            </form>
+          </Form>
         </CardContent>
         <CardFooter>
           <Button
             variant="link"
             className="w-full"
-            onClick={() => setStep(step === "signIn" ? "signUp" : "signIn")}
+            onClick={() => {
+              setStep(step === "signIn" ? "signUp" : "signIn");
+              form.setValue("flow", step === "signIn" ? "signUp" : "signIn");
+            }}
           >
             {step === "signIn" ? "Sign up instead" : "Sign in instead"}
           </Button>

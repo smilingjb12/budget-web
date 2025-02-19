@@ -22,3 +22,7 @@ export function unixToDate(timestamp: number): Date {
 export function toServerDate(date: Date): string {
   return date.toLocaleString("sv").replace(",", "");
 }
+
+export function nameof<T>(key: keyof T): keyof T {
+  return key;
+}
