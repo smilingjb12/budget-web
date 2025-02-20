@@ -20,7 +20,7 @@ export const DayContent = memo(function DayContent({
   handleDayClick,
   auctions,
 }: DayContentProps) {
-  const { isAuctionDate, getAuctionForDate } = useCalendar();
+  const { isAuctionDate, getAuctionForDate, isWeekend } = useCalendar();
   const isCurrentMonth = useMemo(
     () => date.getMonth() === calendarMonth.getMonth(),
     [date, calendarMonth]
@@ -31,30 +31,27 @@ export const DayContent = memo(function DayContent({
     [date, isAuctionDate, auctions]
   );
 
-  const isWeekend = useMemo(
-    () => date.getDay() === 0 || date.getDay() === 6,
-    [date]
-  );
+  const isWeekendDay = useMemo(() => isWeekend(date), [date, isWeekend]);
 
   const handleClick = useCallback(() => {
-    if (!isWeekend) {
-      handleDayClick(date);
-    }
-  }, [date, isWeekend, handleDayClick]);
+    handleDayClick(date);
+  }, [date, handleDayClick]);
 
   const dayContent = useMemo(
     () => (
       <div
         className={cn(
-          `${CALENDAR_CELL_SIZE} p-0 font-normal flex items-center justify-center relative cursor-pointer`,
-          isWeekend && "text-muted-foreground ",
+          `${CALENDAR_CELL_SIZE} p-0 font-normal flex items-center justify-center relative`,
+          isWeekendDay
+            ? "text-muted-foreground cursor-default"
+            : "cursor-pointer",
           hasAuction && "bg-primary text-primary-foreground rounded-full",
           !hasAuction && "hover:bg-transparent group"
         )}
         onClick={handleClick}
       >
         {date.getDate()}
-        {!hasAuction && !isWeekend && (
+        {!hasAuction && !isWeekendDay && (
           <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100">
             <div
               className={`bg-primary-foreground border-2 border-primary rounded-full ${CALENDAR_CELL_SIZE} flex items-center justify-center`}
@@ -65,7 +62,7 @@ export const DayContent = memo(function DayContent({
         )}
       </div>
     ),
-    [date, isWeekend, hasAuction, handleClick]
+    [date, isWeekendDay, hasAuction, handleClick]
   );
 
   if (!isCurrentMonth || !hasAuction) {

@@ -19,26 +19,46 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
+import type { GenericId } from "convex/values";
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
 
-interface DataTableProps<TData extends object> {
+export interface DataTableMeta<
+  TData extends { id: GenericId<string> },
+  TEditableFields extends keyof TData = never,
+  TId = TData["id"],
+> {
+  getRowClassName?: (row: TData) => string;
+  updateItem?: (id: TId, field: TEditableFields, value: string) => void;
+}
+
+export interface DataTableProps<
+  TData extends { id: GenericId<string> },
+  TEditableFields extends keyof TData = never,
+  TId = TData["id"],
+> {
   columns: ColumnDef<TData, TData[keyof TData]>[];
   data: TData[];
   className?: string;
   isLoading: boolean;
   initialSorting: SortingState;
+  meta?: DataTableMeta<TData, TEditableFields, TId>;
 }
 
-export function DataTable<TData extends object>({
+export function DataTable<
+  TData extends { id: GenericId<string> },
+  TEditableFields extends keyof TData = never,
+  TId = TData["id"],
+>({
   columns,
   data,
   className,
   isLoading = false,
   initialSorting = [],
-}: DataTableProps<TData>) {
+  meta,
+}: DataTableProps<TData, TEditableFields, TId>) {
   const [sorting, setSorting] = React.useState<SortingState>(initialSorting);
 
-  const table = useReactTable({
+  const table = useReactTable<TData>({
     data,
     columns,
     enableSortingRemoval: false,
@@ -48,6 +68,7 @@ export function DataTable<TData extends object>({
     state: {
       sorting,
     },
+    meta,
   });
 
   return (
@@ -95,13 +116,23 @@ export function DataTable<TData extends object>({
         <TableBody>
           {isLoading ? (
             <TableRow>
-              <TableCell colSpan={columns.length} className="h-24"></TableCell>
+              <TableCell colSpan={columns.length} className="h-24">
+                {/* emptiness instead of loading indicator */}
+              </TableCell>
             </TableRow>
           ) : table.getRowModel().rows?.length ? (
             table.getRowModel().rows.map((row) => (
               <TableRow
                 key={row.id}
                 data-state={row.getIsSelected() && "selected"}
+                className={(
+                  table.options.meta as DataTableMeta<
+                    TData,
+                    TEditableFields,
+                    TId
+                  >
+                )?.getRowClassName?.(row.original)}
+                noHover
               >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id} className="text-base">

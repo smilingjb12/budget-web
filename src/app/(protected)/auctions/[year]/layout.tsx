@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { SIDEBAR_WIDTH_PX } from "@/lib/constants";
+import { Constants } from "@/constants";
 import { CALENDAR_SEGMENT, LIST_SEGMENT, Routes } from "@/lib/routes";
 import { useQuery } from "convex/react";
 import { CalendarDays, List, SquarePlus } from "lucide-react";
@@ -69,7 +69,10 @@ export default function AuctionsLayout({
 
   return (
     <div className="flex">
-      <div className="flex-1" style={{ paddingLeft: SIDEBAR_WIDTH_PX }}>
+      <div
+        className="flex-1"
+        style={{ paddingLeft: Constants.SIDEBAR_WIDTH_PX }}
+      >
         <div className="p-2 mx-auto">
           <div className="flex justify-between items-center mb-4">
             <YearSelector />

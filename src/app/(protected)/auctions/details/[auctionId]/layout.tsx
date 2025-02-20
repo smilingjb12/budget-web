@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { SIDEBAR_WIDTH_PX } from "@/lib/constants";
+import { Constants } from "@/constants";
 import { unixToDate } from "@/lib/utils";
 import { useQuery } from "convex/react";
 import { format } from "date-fns";
@@ -31,7 +31,10 @@ export default function AuctionDetailsLayout({
   return (
     <>
       <div className="flex">
-        <div className="flex-1" style={{ paddingLeft: SIDEBAR_WIDTH_PX }}>
+        <div
+          className="flex-1"
+          style={{ paddingLeft: Constants.SIDEBAR_WIDTH_PX }}
+        >
           <div className="p-2 mx-auto">
             <div className="flex justify-between items-center mb-4">
               <div className="text-3xl font-bold p-4 pl-0">

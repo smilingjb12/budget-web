@@ -1,4 +1,5 @@
-import { Id } from "../_generated/dataModel";
+import { Constants } from "../../src/constants";
+import { Doc, Id } from "../_generated/dataModel";
 import { MutationCtx, QueryCtx } from "../_generated/server";
 import { centsToDecimal, decimalToCents } from "../lib/helpers";
 import { BidderItemsDto, ItemDto } from "../lib/types";
@@ -15,16 +16,29 @@ export const updateItemHandler = async (
     };
   }
 ) => {
+  type Updates = typeof args.updates;
+  type UpdateKeys = keyof Updates;
+  type DbFields = keyof Doc<"items">;
+
+  const updateToDbFieldMap: Record<UpdateKeys, DbFields> = {
+    description: "description",
+    lotNo: "lotNo",
+    hammerPriceInEuros: "hammerPriceInCents",
+    billedOn: "billedOn",
+  } as const;
+
+  const priceFields = new Set<UpdateKeys>(["hammerPriceInEuros"]);
+
   const definedUpdates = Object.fromEntries(
-    Object.entries(args.updates)
+    (Object.entries(args.updates) as [UpdateKeys, Updates[UpdateKeys]][])
       .filter(([_, value]) => value !== undefined && value !== null)
       .map(([key, value]) =>
-        key === "hammerPriceInEuros"
-          ? ["hammerPriceInCents", decimalToCents(value as number)]
-          : [key, value]
+        priceFields.has(key)
+          ? [updateToDbFieldMap[key], decimalToCents(value as number)]
+          : [updateToDbFieldMap[key], (value as string).trim()]
       )
   );
-
+  console.log(definedUpdates);
   await ctx.db.patch(args.itemId, definedUpdates);
 };
 
@@ -61,16 +75,12 @@ export const createItemHandler = async (
     billedOn?: string;
   }
 ) => {
-  const auction = await ctx.db.get(args.auctionId);
-  await ctx.db.patch(args.auctionId, {
-    unsoldItems: auction!.unsoldItems + 1,
-  });
   await ctx.db.insert("items", {
     auctionId: args.auctionId,
     lotNo: args.lotNo,
-    description: args.description,
+    description: args.description?.trim(),
     initialPriceInCents: decimalToCents(args.initialPrice),
-    billedOn: args.billedOn,
+    billedOn: args.billedOn?.trim(),
     hammerPriceInCents: decimalToCents(0),
   });
 };
@@ -97,15 +107,17 @@ export const getBidderItemsHandler = async (
   return Array.from(itemsByBidder.entries()).map(([bidder, items]) => ({
     bidder,
     items: items.map((item) => {
-      const hammerPrice = centsToDecimal(item.hammerPriceInCents);
-      const auctionFee = hammerPrice * 0.2;
+      const auctionFeeInCents =
+        (item.hammerPriceInCents * Constants.AUCTION_FEE_PERCENT) / 100;
       return {
         itemId: item._id,
         description: item.description,
-        lotNumber: String(item.lotNo),
+        lotNumber: item.lotNo,
         hammerPriceInEuros: centsToDecimal(item.hammerPriceInCents),
-        auctionFeeInEuros: centsToDecimal(auctionFee),
-        amountInEuros: centsToDecimal(hammerPrice + auctionFee),
+        auctionFeeInEuros: centsToDecimal(auctionFeeInCents),
+        amountInEuros: centsToDecimal(
+          item.hammerPriceInCents + auctionFeeInCents
+        ),
       };
     }),
   }));

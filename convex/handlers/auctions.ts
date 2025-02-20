@@ -1,4 +1,4 @@
-import { Id } from "../_generated/dataModel";
+import { Doc, Id } from "../_generated/dataModel";
 import { MutationCtx, QueryCtx } from "../_generated/server";
 import { centsToDecimal } from "../lib/helpers";
 import { AuctionDto, AuctionSummaryDto } from "../lib/types";
@@ -12,17 +12,7 @@ export const getAuctionsByYearHandler = async (
     .withIndex("year", (q) => q.eq("year", args.year))
     .collect();
 
-  return auctions.map((auction) => ({
-    id: auction._id,
-    year: auction.year,
-    dateTimestamp: auction.dateTimestamp,
-    soldItems: auction.soldItems,
-    salesInEuros: centsToDecimal(auction.salesInCents),
-    unsoldItems: auction.unsoldItems,
-    auctionFeesInEuros: centsToDecimal(auction.auctionFeeInCents),
-    commissionsInEuros: centsToDecimal(auction.commissionsInCents),
-    netReceiptsInEuros: centsToDecimal(auction.netReceiptsInCents),
-  }));
+  return auctions.map(mapAuctionToDto);
 };
 
 export const createAuctionHandler = async (
@@ -79,30 +69,9 @@ export const getAuctionsSummaryHandler = async (
 export const getAuctionSummaryHandler = async (
   ctx: QueryCtx,
   args: { auctionId: Id<"auctions"> }
-): Promise<AuctionSummaryDto> => {
+): Promise<AuctionSummaryDto | null> => {
   const auction = await ctx.db.get(args.auctionId);
-  if (!auction) {
-    return {
-      year: 0,
-      soldItems: 0,
-      unsoldItems: 0,
-      salesInEuros: 0,
-      auctionFeesInEuros: 0,
-      commissionsInEuros: 0,
-      netReceiptsInEuros: 0,
-    };
-  }
-
-  const stats = {
-    year: auction.year,
-    soldItems: auction.soldItems,
-    unsoldItems: auction.unsoldItems,
-    salesInEuros: centsToDecimal(auction.salesInCents),
-    auctionFeesInEuros: centsToDecimal(auction.auctionFeeInCents),
-    commissionsInEuros: centsToDecimal(auction.commissionsInCents),
-    netReceiptsInEuros: centsToDecimal(auction.netReceiptsInCents),
-  };
-  return stats;
+  return mapAuctionToSummaryDto(auction!);
 };
 
 export const deleteAuctionHandler = async (
@@ -120,8 +89,13 @@ export const getAuctionByIdHandler = async (
   if (!auction) {
     return null;
   }
+  return mapAuctionToDto(auction);
+};
+
+function mapAuctionToDto(auction: Doc<"auctions">): AuctionDto {
   return {
     id: auction._id,
+    year: auction.year,
     dateTimestamp: auction.dateTimestamp,
     soldItems: auction.soldItems,
     salesInEuros: centsToDecimal(auction.salesInCents),
@@ -129,6 +103,17 @@ export const getAuctionByIdHandler = async (
     auctionFeesInEuros: centsToDecimal(auction.auctionFeeInCents),
     commissionsInEuros: centsToDecimal(auction.commissionsInCents),
     netReceiptsInEuros: centsToDecimal(auction.netReceiptsInCents),
-    year: auction.year,
   };
-};
+}
+
+function mapAuctionToSummaryDto(auction: Doc<"auctions">): AuctionSummaryDto {
+  return {
+    year: auction.year,
+    soldItems: auction.soldItems,
+    unsoldItems: auction.unsoldItems,
+    salesInEuros: centsToDecimal(auction.salesInCents),
+    auctionFeesInEuros: centsToDecimal(auction.auctionFeeInCents),
+    commissionsInEuros: centsToDecimal(auction.commissionsInCents),
+    netReceiptsInEuros: centsToDecimal(auction.netReceiptsInCents),
+  };
+}

@@ -18,7 +18,8 @@ interface SummaryPanelProps {
         commissionsInEuros: number;
         netReceiptsInEuros: number;
       }
-    | undefined;
+    | undefined
+    | null;
 }
 
 export function SummaryPanel({ stats }: SummaryPanelProps) {

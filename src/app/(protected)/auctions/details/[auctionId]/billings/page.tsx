@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { TABLE_TEXT_SIZE } from "@/lib/constants";
+import { Constants } from "@/constants";
 import { formatEuro } from "@/lib/utils";
 import { useQuery } from "convex/react";
 import { useParams } from "next/navigation";
@@ -122,27 +122,27 @@ export default function BillingsPage() {
                     <TableBody>
                       {bidderItem.items.map((item, index) => (
                         <TableRow key={item.itemId}>
-                          <TableCell className={TABLE_TEXT_SIZE}>
+                          <TableCell className={Constants.TABLE_TEXT_SIZE}>
                             {index + 1}
                           </TableCell>
-                          <TableCell className={TABLE_TEXT_SIZE}>
+                          <TableCell className={Constants.TABLE_TEXT_SIZE}>
                             {item.description}
                           </TableCell>
-                          <TableCell className={TABLE_TEXT_SIZE}>
+                          <TableCell className={Constants.TABLE_TEXT_SIZE}>
                             {item.lotNumber}
                           </TableCell>
                           <TableCell
-                            className={`${TABLE_TEXT_SIZE} text-right`}
+                            className={`${Constants.TABLE_TEXT_SIZE} text-right`}
                           >
                             {formatEuro(item.hammerPriceInEuros)}
                           </TableCell>
                           <TableCell
-                            className={`${TABLE_TEXT_SIZE} text-right`}
+                            className={`${Constants.TABLE_TEXT_SIZE} text-right`}
                           >
                             {formatEuro(item.auctionFeeInEuros)}
                           </TableCell>
                           <TableCell
-                            className={`${TABLE_TEXT_SIZE} text-right`}
+                            className={`${Constants.TABLE_TEXT_SIZE} text-right`}
                           >
                             {formatEuro(item.amountInEuros)}
                           </TableCell>

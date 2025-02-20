@@ -39,7 +39,7 @@ export type BidderItemsDto = {
   items: {
     itemId: Id<"items">;
     description: string;
-    lotNumber: string;
+    lotNumber: number;
     hammerPriceInEuros: number;
     auctionFeeInEuros: number;
     amountInEuros: number;

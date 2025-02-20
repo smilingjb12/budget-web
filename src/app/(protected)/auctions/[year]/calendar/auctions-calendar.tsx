@@ -53,12 +53,15 @@ export function AuctionsCalendar() {
   });
 
   const auctions = useMemo(() => auctionsQuery ?? [], [auctionsQuery]);
-  const { isAuctionDate, getAuctionForDate, generateYearMonths } =
+  const { isAuctionDate, getAuctionForDate, generateYearMonths, isWeekend } =
     useCalendar();
   const months = generateYearMonths(Number(params.year));
 
   const handleDayClick = useCallback(
     (date: Date) => {
+      if (isWeekend(date)) {
+        return;
+      }
       if (isAuctionDate(auctions!, date)) {
         setAuctionDetailsPopover({
           visible: true,
@@ -69,7 +72,13 @@ export function AuctionsCalendar() {
         setIsCreateDialogOpen(true);
       }
     },
-    [isAuctionDate, auctions, getAuctionForDate, setAuctionDetailsPopover]
+    [
+      isAuctionDate,
+      auctions,
+      getAuctionForDate,
+      setAuctionDetailsPopover,
+      isWeekend,
+    ]
   );
 
   const onAuctionDeleteConfirmed = (confirmed: boolean) => {

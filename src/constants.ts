@@ -1,6 +1,13 @@
+const SIDEBAR_WIDTH = 90;
+const SIDEBAR_WIDTH_PX = `${SIDEBAR_WIDTH}px`;
+
 export const Constants = {
   APP_NAME: "Bid",
   APP_DESCRIPTION_META: "Big App",
   SUPPORT_EMAIL: "support@support.com",
   TOP_LOADER_COLOR: "hsl(221.2deg 83.2% 53.3% / 60%)",
+  AUCTION_FEE_PERCENT: 20,
+  SIDEBAR_WIDTH: SIDEBAR_WIDTH,
+  SIDEBAR_WIDTH_PX: SIDEBAR_WIDTH_PX,
+  TABLE_TEXT_SIZE: "text-[16px]",
 };

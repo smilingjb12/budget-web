@@ -20,9 +20,19 @@ export function useCalendar() {
       key: i,
     }));
 
+  const isWeekend = (date: Date) => {
+    const day = date.getDay();
+    return day === 0 || day === 6;
+  };
+
+  const isDisabledDay = (auctions: AuctionDto[], date: Date) =>
+    isWeekend(date) || isAuctionDate(auctions, date);
+
   return {
     isAuctionDate,
     getAuctionForDate,
     generateYearMonths,
+    isWeekend,
+    isDisabledDay,
   };
 }

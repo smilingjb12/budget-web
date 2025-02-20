@@ -6,7 +6,7 @@ import {
   BreadcrumbSeparator,
 } from "@/app/(protected)/breadcrumbs";
 import { Button } from "@/components/ui/button";
-import { SIDEBAR_WIDTH_PX } from "@/lib/constants";
+import { Constants } from "@/constants";
 import { DETAILS_SEGMENT, Routes } from "@/lib/routes";
 import { unixToDate } from "@/lib/utils";
 import { useAuthActions } from "@convex-dev/auth/react";
@@ -35,7 +35,7 @@ export function Header() {
   return (
     <div
       className="h-12 fixed top-0 right-0 bg-background z-50 flex items-center px-6 pl-10 border-b"
-      style={{ left: SIDEBAR_WIDTH_PX }}
+      style={{ left: Constants.SIDEBAR_WIDTH_PX }}
     >
       <Breadcrumbs>
         <BreadcrumbItem>Auctions</BreadcrumbItem>
