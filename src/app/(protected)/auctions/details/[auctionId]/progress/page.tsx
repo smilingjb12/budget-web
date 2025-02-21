@@ -19,12 +19,11 @@ export default function AuctionProgressPage() {
   const updateItem = useMutation(api.items.updateItem);
   const params = useParams<{ auctionId: string }>();
   const { handleError } = useMutationErrorHandler();
-  const HIGHLIGHT_DURATION_MS = 4000;
   const items =
     useQuery(api.items.getItems, {
       auctionId: params.auctionId as Id<"auctions">,
     }) ?? [];
-  const { newItemIds } = useHighlightNewItems(items, HIGHLIGHT_DURATION_MS);
+  const { newItemIds } = useHighlightNewItems(items);
 
   const handleFieldUpdate = (
     itemId: Id<"items">,
@@ -73,7 +72,7 @@ export default function AuctionProgressPage() {
           }
         }
         .highlight-new-row {
-          animation: highlightRow 3s cubic-bezier(0.4, 0, 0.2, 1);
+          animation: highlightRow 4s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .highlight-new-row input {
           background-color: transparent !important;

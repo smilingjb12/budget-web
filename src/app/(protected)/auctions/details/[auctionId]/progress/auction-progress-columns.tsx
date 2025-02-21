@@ -12,17 +12,18 @@ export type EditableField = Pick<
   ItemDto,
   "description" | "lotNo" | "hammerPriceInEuros" | "billedOn"
 >;
-
 export type EditableFieldKeys = keyof EditableField;
-
 export type TableMeta = DataTableMeta<ItemDto, EditableFieldKeys, Id<"items">>;
 
 export const columns: ColumnDef<ItemDto, ItemDto[keyof ItemDto]>[] = [
   {
     id: "index",
     header: "#",
-    cell: ({ row }) => {
-      return row.index + 1;
+    cell: ({ row, table }) => {
+      const sortedByDate = [...table.getRowModel().rows].sort(
+        (a, b) => a.original.creationTimestamp - b.original.creationTimestamp
+      );
+      return sortedByDate.findIndex((r) => r.id === row.id) + 1;
     },
   },
   {

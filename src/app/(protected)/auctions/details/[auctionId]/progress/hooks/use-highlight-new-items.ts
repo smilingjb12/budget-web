@@ -2,9 +2,9 @@ import { useEffect, useRef, useState } from "react";
 import { Id } from "../../../../../../../../convex/_generated/dataModel";
 
 export const useHighlightNewItems = <T extends { id: Id<"items"> }>(
-  items: T[],
-  highlightDuration = 3000
+  items: T[]
 ) => {
+  const HIGHLIGHT_DURATION_MS = 4000;
   const [newItemIds, setNewItemIds] = useState<Set<Id<"items">>>(new Set());
   const prevItemsRef = useRef<T[]>([]);
   const initialItemsLengthRef = useRef<number | null>(null);
@@ -32,11 +32,11 @@ export const useHighlightNewItems = <T extends { id: Id<"items"> }>(
       setNewItemIds(new Set(newIds));
       setTimeout(() => {
         setNewItemIds(new Set());
-      }, highlightDuration);
+      }, HIGHLIGHT_DURATION_MS);
     }
 
     prevItemsRef.current = items;
-  }, [items, highlightDuration]);
+  }, [items, HIGHLIGHT_DURATION_MS]);
 
   return { newItemIds };
 };
