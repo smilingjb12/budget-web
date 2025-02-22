@@ -2,6 +2,7 @@ import { InlineEditInput } from "@/components/inline-edit-input";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { type DataTableMeta } from "@/components/ui/data-table";
+import { Constants } from "@/constants";
 import { formatEuro, unixToDate } from "@/lib/utils";
 import { ColumnDef, type Row } from "@tanstack/react-table";
 import { format } from "date-fns";
@@ -59,7 +60,9 @@ export const columns: ColumnDef<
   },
   {
     accessorKey: "description",
-    header: "DESCRIPTION",
+    header: () => (
+      <div className={Constants.EDITABLE_CELL_INPUT_PADDING}>DESCRIPTION</div>
+    ),
     cell: ({ row, table }) => {
       const item = row.original;
       const updateItem = (table.options.meta as TableMeta)?.updateItem;
@@ -73,7 +76,10 @@ export const columns: ColumnDef<
   },
   {
     accessorKey: "lotNo",
-    header: "LOT No.",
+    header: () => (
+      <div className={Constants.EDITABLE_CELL_INPUT_PADDING}>LOT No.</div>
+    ),
+    size: 100,
     cell: ({ row, table }) => {
       const item = row.original;
       const updateItem = (table.options.meta as TableMeta)?.updateItem;
@@ -88,6 +94,7 @@ export const columns: ColumnDef<
               #{item.lotNo}
             </Badge>
           }
+          className="w-[80px]"
           onSave={(value) => updateItem?.(item.id, "lotNo", value)}
         />
       );
@@ -95,7 +102,9 @@ export const columns: ColumnDef<
   },
   {
     accessorKey: "hammerPriceInEuros",
-    header: "HAMMER PRICE",
+    header: () => (
+      <div className={Constants.EDITABLE_CELL_INPUT_PADDING}>HAMMER PRICE</div>
+    ),
     cell: ({ row, table }) => {
       const item = row.original;
       const updateItem = (table.options.meta as TableMeta)?.updateItem;
@@ -114,7 +123,10 @@ export const columns: ColumnDef<
   },
   {
     accessorKey: "billedOn",
-    header: "BILLED ON",
+    header: () => (
+      <div className={Constants.EDITABLE_CELL_INPUT_PADDING}>BILLED ON</div>
+    ),
+    size: 100,
     cell: ({ row, table }) => {
       const item = row.original;
       const updateItem = (table.options.meta as TableMeta)?.updateItem;

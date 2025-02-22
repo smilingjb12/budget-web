@@ -82,7 +82,7 @@ export const InlineEditInput = React.forwardRef<
             "h-8",
             Constants.TABLE_TEXT_SIZE,
             !isEditing &&
-              "cursor-pointer hover:bg-muted/70 border-transparent focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0",
+              `${Constants.EDITABLE_CELL_INPUT_PADDING} cursor-pointer hover:bg-muted/70 border-transparent focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0`,
             className
           )}
         />

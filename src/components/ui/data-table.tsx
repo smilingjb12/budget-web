@@ -95,7 +95,7 @@ export function DataTable<
       <Table>
         <TableHeader className="bg-muted">
           {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
+            <TableRow key={headerGroup.id} noHover={true}>
               {headerGroup.headers.map((header) => (
                 <TableHead
                   key={header.id}
@@ -134,7 +134,7 @@ export function DataTable<
         </TableHeader>
         <TableBody>
           {isLoading ? (
-            <TableRow>
+            <TableRow noHover={true}>
               <TableCell colSpan={columns.length} className="h-24">
                 {/* emptiness instead of loading indicator */}
               </TableCell>
@@ -151,7 +151,7 @@ export function DataTable<
                     TId
                   >
                 )?.getRowClassName?.(row.original)}
-                noHover
+                noHover={true}
               >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id} className="text-base">
@@ -161,7 +161,7 @@ export function DataTable<
               </TableRow>
             ))
           ) : (
-            <TableRow>
+            <TableRow noHover={true}>
               <TableCell
                 colSpan={columns.length}
                 className="h-24 text-center text-lg text-muted-foreground"
