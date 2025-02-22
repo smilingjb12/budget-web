@@ -24,7 +24,6 @@ import type * as lib_convexEnv from "../lib/convexEnv.js";
 import type * as lib_env from "../lib/env.js";
 import type * as lib_helpers from "../lib/helpers.js";
 import type * as lib_rateLimits from "../lib/rateLimits.js";
-import type * as lib_session from "../lib/session.js";
 import type * as lib_types from "../lib/types.js";
 import type * as users from "../users.js";
 
@@ -48,7 +47,6 @@ declare const fullApi: ApiFromModules<{
   "lib/env": typeof lib_env;
   "lib/helpers": typeof lib_helpers;
   "lib/rateLimits": typeof lib_rateLimits;
-  "lib/session": typeof lib_session;
   "lib/types": typeof lib_types;
   users: typeof users;
 }>;

@@ -2,6 +2,8 @@
 
 import {
   ColumnDef,
+  Row,
+  RowSelectionState,
   SortingState,
   flexRender,
   getCoreRowModel,
@@ -42,6 +44,8 @@ export interface DataTableProps<
   isLoading: boolean;
   initialSorting: SortingState;
   meta?: DataTableMeta<TData, TEditableFields, TId>;
+  enableRowSelection?: boolean;
+  onRowSelectionChange?: (rows: Row<TData>[]) => void;
 }
 
 export function DataTable<
@@ -55,8 +59,20 @@ export function DataTable<
   isLoading = false,
   initialSorting = [],
   meta,
+  enableRowSelection = false,
+  onRowSelectionChange,
 }: DataTableProps<TData, TEditableFields, TId>) {
   const [sorting, setSorting] = React.useState<SortingState>(initialSorting);
+  const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
+
+  React.useEffect(() => {
+    if (onRowSelectionChange) {
+      const selectedRows = table
+        .getRowModel()
+        .rows.filter((row) => rowSelection[row.id]);
+      onRowSelectionChange(selectedRows);
+    }
+  }, [rowSelection]);
 
   const table = useReactTable<TData>({
     data,
@@ -65,8 +81,11 @@ export function DataTable<
     getCoreRowModel: getCoreRowModel(),
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
+    enableRowSelection: enableRowSelection,
+    onRowSelectionChange: setRowSelection,
     state: {
       sorting,
+      rowSelection,
     },
     meta,
   });

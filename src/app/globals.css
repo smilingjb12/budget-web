@@ -172,3 +172,43 @@
   --normal-border: hsl(var(--border));
   --normal-text: hsl(var(--foreground));
 }
+
+::-webkit-scrollbar {
+  width: 6px;               /* width of vertical scrollbar */
+  height: 6px;             /* height of horizontal scrollbar */
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;  /* track color */
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.5);      /* slightly lighter scrollbar */
+  border-radius: 3px;       /* rounded corners */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.7);      /* darker on hover */
+}
+
+/* For Firefox */
+* {
+  scrollbar-width: thin;    /* "auto" or "thin" */
+  scrollbar-color: hsl(var(--muted-foreground) / 0.5) transparent; /* thumb and track color */
+}
+
+/* Optional: Hide scrollbar but keep functionality */
+.hide-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;     /* Firefox */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;            /* Chrome, Safari and Opera */
+}
+
+/* For custom scrollable containers */
+.custom-scrollbar {
+  overflow-y: auto;
+  scrollbar-gutter: stable; /* prevents layout shift */
+}

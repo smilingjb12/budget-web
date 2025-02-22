@@ -3,19 +3,50 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { type DataTableMeta } from "@/components/ui/data-table";
 import { formatEuro, unixToDate } from "@/lib/utils";
-import { ColumnDef } from "@tanstack/react-table";
+import { ColumnDef, type Row } from "@tanstack/react-table";
 import { format } from "date-fns";
 import { Id } from "../../../../../../../convex/_generated/dataModel";
 import { ItemDto } from "../../../../../../../convex/lib/types";
+import { AuctionRowActions } from "./auction-row-actions";
 
 export type EditableField = Pick<
   ItemDto,
   "description" | "lotNo" | "hammerPriceInEuros" | "billedOn"
 >;
 export type EditableFieldKeys = keyof EditableField;
-export type TableMeta = DataTableMeta<ItemDto, EditableFieldKeys, Id<"items">>;
+export type TableMeta = DataTableMeta<
+  ItemDto,
+  EditableFieldKeys,
+  Id<"items">
+> & {
+  onWithhold?: (row: Row<ItemDto>) => void;
+  onAddNote?: (row: Row<ItemDto>) => void;
+  onDelete?: (row: Row<ItemDto>) => void;
+};
 
-export const columns: ColumnDef<ItemDto, ItemDto[keyof ItemDto]>[] = [
+export const columns: ColumnDef<
+  ItemDto,
+  string | number | Id<"auctions"> | Id<"items"> | undefined
+>[] = [
+  {
+    id: "select",
+    header: ({ table }) => (
+      <Checkbox
+        checked={table.getIsAllPageRowsSelected()}
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        aria-label="Select all"
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        aria-label="Select row"
+      />
+    ),
+    enableSorting: false,
+    size: 40,
+  },
   {
     id: "index",
     header: "#",
@@ -25,22 +56,6 @@ export const columns: ColumnDef<ItemDto, ItemDto[keyof ItemDto]>[] = [
       );
       return sortedByDate.findIndex((r) => r.id === row.id) + 1;
     },
-  },
-  {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={table.getIsAllPageRowsSelected()}
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-      />
-    ),
-    enableSorting: false,
   },
   {
     accessorKey: "description",
@@ -68,7 +83,7 @@ export const columns: ColumnDef<ItemDto, ItemDto[keyof ItemDto]>[] = [
           displayNode={
             <Badge
               variant="outline"
-              className="text-muted-foreground rounded-md text-sm font-medium"
+              className="text-muted-foreground rounded-md text-sm font-medium py-0"
             >
               #{item.lotNo}
             </Badge>
@@ -114,6 +129,7 @@ export const columns: ColumnDef<ItemDto, ItemDto[keyof ItemDto]>[] = [
   {
     accessorKey: "status",
     header: "",
+    enableSorting: false,
     cell: ({ row }) => {
       const item = row.original;
       return item.status ? (
@@ -135,6 +151,24 @@ export const columns: ColumnDef<ItemDto, ItemDto[keyof ItemDto]>[] = [
         <span className="text-muted-foreground text-sm">
           {format(unixToDate(item.creationTimestamp), "HH:mm")}
         </span>
+      );
+    },
+  },
+  {
+    id: "actions",
+    size: 30,
+    cell: ({ row, table }) => {
+      const meta = table.options.meta as TableMeta;
+      if (!meta?.onWithhold && !meta?.onAddNote && !meta?.onDelete) {
+        return null;
+      }
+      return (
+        <AuctionRowActions
+          row={row}
+          onWithhold={meta.onWithhold!}
+          onAddNote={meta.onAddNote!}
+          onDelete={meta.onDelete!}
+        />
       );
     },
   },
