@@ -45,13 +45,3 @@ export type BidderItemsDto = {
     amountInEuros: number;
   }[];
 };
-
-export interface BillingItemDto {
-  id: Id<"items">;
-  itemId: Id<"items">;
-  description: string;
-  lotNumber: number;
-  hammerPriceInEuros: number;
-  auctionFeeInEuros: number;
-  amountInEuros: number;
-}

@@ -65,7 +65,7 @@ export default function AuctionProgressPage() {
   const handleAddNote = (row: Row<ItemDto>) => {
     // TODO: Implement note dialog
     toast({
-      title: "Add note feature coming soon",
+      title: `Adding note for ${row.original.id}`,
       variant: "default",
     });
   };

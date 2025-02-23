@@ -105,7 +105,7 @@ export function CreateAuctionDialog({
         <DialogHeader>
           <DialogTitle>Create auction</DialogTitle>
         </DialogHeader>
-        <form onSubmit={form.handleSubmit(onSubmit)}>
+        <form onSubmit={void form.handleSubmit(onSubmit)}>
           <Controller
             control={form.control}
             name="date"

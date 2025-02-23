@@ -14,6 +14,7 @@ export function useMutationErrorHandler() {
       } else {
         toast({
           title: "Error",
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           description: error.data,
           variant: "destructive",
         });

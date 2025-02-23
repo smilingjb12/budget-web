@@ -7,6 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "test": "vitest",
+    "test:once": "vitest run",
     "stripe:listen": "stripe listen --forward-to https://combative-barracuda-101.convex.site/stripe",
     "stripe:trigger": "stripe trigger payment_intent.succeeded"
   },
@@ -54,16 +56,21 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
+    "@edge-runtime/vm": "^5.0.0",
     "@tailwindcss/postcss": "^4.0.6",
     "@types/lodash": "^4.17.15",
     "@types/node": "^22.13.2",
     "@types/react": "19.0.8",
     "@types/react-dom": "19.0.3",
+    "@typescript-eslint/eslint-plugin": "^8.24.1",
+    "@typescript-eslint/parser": "^8.24.1",
+    "convex-test": "^0.0.35",
     "eslint": "^9.20.1",
     "eslint-config-next": "15.1.7",
     "postcss": "^8.5.2",
     "tailwindcss": "^4.0.6",
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.6"
   },
   "overrides": {
     "@types/react": "19.0.8",

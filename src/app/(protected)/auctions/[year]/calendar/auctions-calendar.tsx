@@ -62,7 +62,7 @@ export function AuctionsCalendar() {
       if (isWeekend(date)) {
         return;
       }
-      if (isAuctionDate(auctions!, date)) {
+      if (isAuctionDate(auctions, date)) {
         setAuctionDetailsPopover({
           visible: true,
           auction: getAuctionForDate(auctions, date)!,

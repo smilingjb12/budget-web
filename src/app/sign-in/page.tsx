@@ -63,7 +63,7 @@ export default function SignInPage() {
       })
       .catch((error) => {
         console.error(error);
-        const errorTitle = getErrorTitle(error);
+        const errorTitle = getErrorTitle(error as { message: string });
         console.error(errorTitle);
         toast({
           title: "Invalid Email or Password",
@@ -93,7 +93,10 @@ export default function SignInPage() {
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <form
+              onSubmit={void form.handleSubmit(onSubmit)}
+              className="space-y-4"
+            >
               <FormFieldWithError
                 label="Email"
                 error={form.formState.errors.email}

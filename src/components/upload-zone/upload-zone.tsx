@@ -1,11 +1,11 @@
+import { CloudUpload } from "lucide-react";
 import { useCallback, useState } from "react";
 import type { Accept, FileWithPath } from "react-dropzone";
 import { useDropzone } from "react-dropzone";
 import { twMerge } from "tailwind-merge";
 import { UploadFileResponse } from "./upload-files";
-import { useUploadFiles } from "./use-upload-files";
 import { UploadSpinner } from "./upload-spinner";
-import { CloudUpload } from "lucide-react";
+import { useUploadFiles } from "./use-upload-files";
 
 type UploadDropzoneState = {
   progress: number | null;
@@ -72,7 +72,7 @@ export function UploadZone(props: {
     (acceptedFiles: FileWithPath[]) => {
       if (props.maxFileSizeInBytes) {
         const oversizedFiles = acceptedFiles.filter(
-          (f) => f.size > props.maxFileSizeInBytes!
+          (f) => f.size > props.maxFileSizeInBytes
         );
         if (oversizedFiles.length) {
           const sizeLimit = formatFileSize(props.maxFileSizeInBytes);

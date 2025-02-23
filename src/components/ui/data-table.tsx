@@ -66,15 +66,6 @@ export function DataTable<
   const [sorting, setSorting] = React.useState<SortingState>(initialSorting);
   const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
 
-  React.useEffect(() => {
-    if (onRowSelectionChange) {
-      const selectedRows = table
-        .getRowModel()
-        .rows.filter((row) => rowSelection[row.id]);
-      onRowSelectionChange(selectedRows);
-    }
-  }, [rowSelection]);
-
   const table = useReactTable<TData>({
     data,
     columns,
@@ -90,6 +81,15 @@ export function DataTable<
     },
     meta,
   });
+
+  React.useEffect(() => {
+    if (onRowSelectionChange) {
+      const selectedRows = table
+        .getRowModel()
+        .rows.filter((row) => rowSelection[row.id]);
+      onRowSelectionChange(selectedRows);
+    }
+  }, [rowSelection, onRowSelectionChange, table]);
 
   return (
     <div className={cn("rounded-md border-t", className)}>

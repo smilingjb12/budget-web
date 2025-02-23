@@ -14,7 +14,7 @@ export interface BillingItem {
   amountInEuros: number;
 }
 
-export const billingsColumns: ColumnDef<BillingItem, any>[] = [
+export const billingsColumns: ColumnDef<BillingItem, BillingItem>[] = [
   {
     accessorKey: "index",
     header: "#",

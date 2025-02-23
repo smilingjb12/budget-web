@@ -8,9 +8,6 @@ import { AuctionDto } from "../../../../../../convex/lib/types";
 const sortByTimestamp = (a: AuctionDto, b: AuctionDto) =>
   a.dateTimestamp - b.dateTimestamp;
 
-const sortByTimestampDesc = (a: AuctionDto, b: AuctionDto) =>
-  b.dateTimestamp - a.dateTimestamp;
-
 export const columns: ColumnDef<AuctionDto, AuctionDto[keyof AuctionDto]>[] = [
   {
     id: "index",

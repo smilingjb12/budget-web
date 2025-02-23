@@ -2,7 +2,6 @@
 
 import { Checkbox } from "@/components/ui/checkbox";
 import { DataTable } from "@/components/ui/data-table";
-import { useMutationErrorHandler } from "@/hooks/use-mutation-error-handler";
 import { toast } from "@/hooks/use-toast";
 import { formatEuro } from "@/lib/utils";
 import { useQuery } from "convex/react";
@@ -21,7 +20,6 @@ export default function BillingsPage() {
   const [selectedBidders, setSelectedBidders] = useState<Set<string>>(
     new Set()
   );
-  const { handleError } = useMutationErrorHandler();
 
   const bidderItems =
     useQuery(api.items.getBidderItems, {
