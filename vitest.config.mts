@@ -4,5 +4,7 @@ export default defineConfig({
   test: {
     environment: "edge-runtime",
     server: { deps: { inline: ["convex-test"] } },
+    reporters: ["default", "json"],
+    outputFile: "./test-results.json",
   },
 });
