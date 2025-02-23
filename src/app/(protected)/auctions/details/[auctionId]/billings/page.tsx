@@ -1,21 +1,17 @@
 "use client";
 
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Constants } from "@/constants";
+import { DataTable } from "@/components/ui/data-table";
+import { useMutationErrorHandler } from "@/hooks/use-mutation-error-handler";
+import { toast } from "@/hooks/use-toast";
 import { formatEuro } from "@/lib/utils";
 import { useQuery } from "convex/react";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import { api } from "../../../../../../../convex/_generated/api";
 import { Id } from "../../../../../../../convex/_generated/dataModel";
+import { BillingsBulkActionsBar } from "./billings-bulk-actions-bar";
+import { billingsColumns } from "./billings-columns";
 
 export default function BillingsPage() {
   const { auctionId } = useParams<{ auctionId: string }>();
@@ -25,6 +21,7 @@ export default function BillingsPage() {
   const [selectedBidders, setSelectedBidders] = useState<Set<string>>(
     new Set()
   );
+  const { handleError } = useMutationErrorHandler();
 
   const bidderItems =
     useQuery(api.items.getBidderItems, {
@@ -51,8 +48,35 @@ export default function BillingsPage() {
     setSelectedBidders(newSelected);
   };
 
+  const handleMergeBills = (items: { bidder: string }[]) => {
+    // TODO: Implement merge bills functionality
+    toast({
+      title: `Merging ${items.length} bills`,
+      variant: "default",
+    });
+    setSelectedBidders(new Set());
+  };
+
+  const handleMarkPaymentsReceived = (items: { bidder: string }[]) => {
+    // TODO: Implement mark payments received functionality
+    toast({
+      title: `Marking ${items.length} payments as received`,
+      variant: "default",
+    });
+    setSelectedBidders(new Set());
+  };
+
+  const handleCreateInvoices = (items: { bidder: string }[]) => {
+    // TODO: Implement create invoices functionality
+    toast({
+      title: `Creating invoices for ${items.length} items`,
+      variant: "default",
+    });
+    setSelectedBidders(new Set());
+  };
+
   return (
-    <div className="space-y-2">
+    <div className="space-y-4 pb-24">
       {bidderItems.map((bidderItem) => {
         const totalHammerPrice = bidderItem.items.reduce(
           (sum, item) => sum + item.hammerPriceInEuros,
@@ -67,95 +91,121 @@ export default function BillingsPage() {
           0
         );
         const isExpanded = expandedBidders.has(bidderItem.bidder);
+        const bidderColumnPadding = 30;
+        const bidderColumnWidth =
+          (billingsColumns[0]?.size ?? 0) +
+          (billingsColumns[1]?.size ?? 0) +
+          (billingsColumns[2]?.size ?? 0) +
+          bidderColumnPadding;
 
-        return (
-          <div key={bidderItem.bidder} className="rounded-lg border">
-            <div className="flex flex-col">
-              <div
-                className="flex items-center p-4 cursor-pointer hover:bg-muted/50"
-                onClick={() => toggleExpand(bidderItem.bidder)}
-              >
-                <div className="flex items-center space-x-4 w-[400px]">
-                  <Checkbox
-                    checked={selectedBidders.has(bidderItem.bidder)}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleSelect(bidderItem.bidder);
-                    }}
-                  />
-                  <span className="font-medium">{bidderItem.bidder}</span>
-                  <div className="border rounded-md px-2.5 py-1 text-sm">
-                    {bidderItem.items.length}
-                  </div>
-                </div>
-                <div className="flex-1 flex justify-end pr-4">
-                  <div className="w-[180px] text-right">
-                    {formatEuro(totalHammerPrice)}
-                  </div>
-                  <div className="w-[180px] text-right">
-                    {formatEuro(totalAuctionFee)}
-                  </div>
-                  <div className="w-[180px] text-right">
-                    {formatEuro(totalAmount)}
-                  </div>
+        const bidderColumns = [
+          {
+            id: "bidder",
+            header: billingsColumns[0]?.header,
+            size: bidderColumnWidth,
+            minSize: bidderColumnWidth,
+            cell: () => (
+              <div className="flex items-center space-x-4">
+                <Checkbox
+                  checked={selectedBidders.has(bidderItem.bidder)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleSelect(bidderItem.bidder);
+                  }}
+                />
+                <span className="font-medium">{bidderItem.bidder}</span>
+                <div className="border rounded-md px-2.5 py-1 text-sm">
+                  {bidderItem.items.length}
                 </div>
               </div>
+            ),
+          },
+          {
+            ...billingsColumns[3],
+            cell: () => (
+              <div className="text-base">{formatEuro(totalHammerPrice)}</div>
+            ),
+          },
+          {
+            ...billingsColumns[4],
+            cell: () => (
+              <div className="text-base">{formatEuro(totalAuctionFee)}</div>
+            ),
+          },
+          {
+            ...billingsColumns[5],
+            cell: () => (
+              <div className="text-base">{formatEuro(totalAmount)}</div>
+            ),
+          },
+        ];
+
+        return (
+          <div
+            key={bidderItem.bidder}
+            className="rounded-lg border first:border-t-0"
+          >
+            <div className="flex flex-col">
+              <DataTable
+                columns={bidderColumns}
+                data={[
+                  {
+                    id: bidderItem.items[0].itemId,
+                    itemId: bidderItem.items[0].itemId,
+                    description: "Totals",
+                    lotNumber: bidderItem.items.length,
+                    hammerPriceInEuros: totalHammerPrice,
+                    auctionFeeInEuros: totalAuctionFee,
+                    amountInEuros: totalAmount,
+                  },
+                ]}
+                isLoading={false}
+                initialSorting={[]}
+                className="border-none [&_thead]:collapse"
+                meta={{
+                  getRowClassName: () => "cursor-pointer hover:bg-muted/50",
+                  onRowClick: () => toggleExpand(bidderItem.bidder),
+                }}
+              />
               {isExpanded && (
-                <div className="">
-                  <Table>
-                    <TableHeader className="bg-muted">
-                      <TableRow>
-                        <TableHead className="w-12">#</TableHead>
-                        <TableHead>Description</TableHead>
-                        <TableHead>Lot Number</TableHead>
-                        <TableHead className="text-right w-[180px]">
-                          Hammer Price
-                        </TableHead>
-                        <TableHead className="text-right w-[180px]">
-                          Auction Fee
-                        </TableHead>
-                        <TableHead className="text-right w-[180px]">
-                          Amount
-                        </TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {bidderItem.items.map((item, index) => (
-                        <TableRow key={item.itemId}>
-                          <TableCell className={Constants.TABLE_TEXT_SIZE}>
-                            {index + 1}
-                          </TableCell>
-                          <TableCell className={Constants.TABLE_TEXT_SIZE}>
-                            {item.description}
-                          </TableCell>
-                          <TableCell className={Constants.TABLE_TEXT_SIZE}>
-                            {item.lotNumber}
-                          </TableCell>
-                          <TableCell
-                            className={`${Constants.TABLE_TEXT_SIZE} text-right`}
-                          >
-                            {formatEuro(item.hammerPriceInEuros)}
-                          </TableCell>
-                          <TableCell
-                            className={`${Constants.TABLE_TEXT_SIZE} text-right`}
-                          >
-                            {formatEuro(item.auctionFeeInEuros)}
-                          </TableCell>
-                          <TableCell
-                            className={`${Constants.TABLE_TEXT_SIZE} text-right`}
-                          >
-                            {formatEuro(item.amountInEuros)}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
+                <>
+                  <DataTable
+                    columns={billingsColumns}
+                    data={bidderItem.items.map((item) => ({
+                      id: item.itemId,
+                      itemId: item.itemId,
+                      description: item.description,
+                      lotNumber: item.lotNumber,
+                      hammerPriceInEuros: item.hammerPriceInEuros,
+                      auctionFeeInEuros: item.auctionFeeInEuros,
+                      amountInEuros: item.amountInEuros,
+                    }))}
+                    isLoading={false}
+                    initialSorting={[]}
+                  />
+                  <div className="bg-muted py-3 px-4 text-muted-foreground uppercase text-[13px]">
+                    {bidderItem.items.length} items
+                  </div>
+                </>
               )}
             </div>
           </div>
         );
       })}
+      <BillingsBulkActionsBar
+        selectedBidders={bidderItems
+          .filter((bidderItem) => selectedBidders.has(bidderItem.bidder))
+          .map((bidderItem) => ({
+            bidder: bidderItem.bidder,
+            items: bidderItem.items.map((item) => ({
+              ...item,
+              id: item.itemId,
+            })),
+          }))}
+        onMergeBills={handleMergeBills}
+        onMarkPaymentsReceived={handleMarkPaymentsReceived}
+        onCreateInvoices={handleCreateInvoices}
+      />
     </div>
   );
 }

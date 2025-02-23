@@ -31,6 +31,7 @@ export interface DataTableMeta<
 > {
   getRowClassName?: (row: TData) => string;
   updateItem?: (id: TId, field: TEditableFields, value: string) => void;
+  onRowClick?: (row: TData) => void;
 }
 
 export interface DataTableProps<
@@ -107,6 +108,11 @@ export function DataTable<
                       ? header.column.getToggleSortingHandler()
                       : undefined
                   }
+                  style={{
+                    width: header.column.columnDef.size,
+                    minWidth: header.column.columnDef.minSize,
+                    maxWidth: header.column.columnDef.maxSize,
+                  }}
                 >
                   {header.isPlaceholder ? null : (
                     <div className="flex items-center">
@@ -152,9 +158,26 @@ export function DataTable<
                   >
                 )?.getRowClassName?.(row.original)}
                 noHover={true}
+                onClick={() => {
+                  (
+                    table.options.meta as DataTableMeta<
+                      TData,
+                      TEditableFields,
+                      TId
+                    >
+                  )?.onRowClick?.(row.original);
+                }}
               >
                 {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id} className="text-base">
+                  <TableCell
+                    key={cell.id}
+                    className="text-base"
+                    style={{
+                      width: cell.column.columnDef.size,
+                      minWidth: cell.column.columnDef.minSize,
+                      maxWidth: cell.column.columnDef.maxSize,
+                    }}
+                  >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </TableCell>
                 ))}

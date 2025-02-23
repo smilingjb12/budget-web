@@ -1,4 +1,5 @@
 import { InlineEditInput } from "@/components/inline-edit-input";
+import { LotNumberBadge } from "@/components/lot-number-badge";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { type DataTableMeta } from "@/components/ui/data-table";
@@ -86,15 +87,8 @@ export const columns: ColumnDef<
       return (
         <InlineEditInput
           value={String(item.lotNo)}
-          displayNode={
-            <Badge
-              variant="outline"
-              className="text-muted-foreground rounded-md text-sm font-medium py-0"
-            >
-              #{item.lotNo}
-            </Badge>
-          }
-          className="w-[80px]"
+          displayNode={<LotNumberBadge lotNumber={item.lotNo} />}
+          className="w-[60px]"
           onSave={(value) => updateItem?.(item.id, "lotNo", value)}
         />
       );

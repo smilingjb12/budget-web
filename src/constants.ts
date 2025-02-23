@@ -11,4 +11,4 @@ export const Constants = {
   SIDEBAR_WIDTH_PX: SIDEBAR_WIDTH_PX,
   TABLE_TEXT_SIZE: "text-[16px]",
   EDITABLE_CELL_INPUT_PADDING: "pl-3",
-};
+} as const;
