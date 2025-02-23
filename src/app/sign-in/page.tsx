@@ -93,10 +93,7 @@ export default function SignInPage() {
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form
-              onSubmit={void form.handleSubmit(onSubmit)}
-              className="space-y-4"
-            >
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormFieldWithError
                 label="Email"
                 error={form.formState.errors.email}

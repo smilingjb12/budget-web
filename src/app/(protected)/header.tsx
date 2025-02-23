@@ -65,7 +65,7 @@ export function Header() {
         <Button
           variant="ghost"
           className="text-muted-foreground cursor-pointer"
-          onClick={() => void signOut()}
+          onClick={() => signOut()}
         >
           <LogOut className="w-4 h-4 mr-2 text-primary" />
           Log out

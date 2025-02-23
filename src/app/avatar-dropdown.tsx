@@ -42,7 +42,7 @@ export const AvatarDropdown = ({ email, imageUrl }: Props) => {
             <div className="text-sm flex items-center">{email}</div>
           </div>
           <DropdownMenuItem
-            onClick={() => void signOut()}
+            onClick={() => signOut()}
             className="px-8 py-3 cursor-pointer"
           >
             <LogOut className="mr-2 h-4 w-4" />
