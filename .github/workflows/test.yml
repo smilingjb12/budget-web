@@ -24,18 +24,3 @@ jobs:
       
     - name: Run tests
       run: npm test
-      
-    - name: Upload test results
-      if: always()  # This ensures that test results are uploaded even if tests fail
-      uses: actions/upload-artifact@v4
-      with:
-        name: test-results
-        path: junit.xml
-        
-    - name: Report Test Results
-      uses: dorny/test-reporter@v1
-      if: always()
-      with:
-        name: Vitest Tests
-        path: junit.xml
-        reporter: jest-junit 
