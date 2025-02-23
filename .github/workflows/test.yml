@@ -30,12 +30,12 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: test-results
-        path: test-results.json
+        path: junit.xml
         
     - name: Report Test Results
       uses: dorny/test-reporter@v1
       if: always()
       with:
         name: Vitest Tests
-        path: test-results.json
-        reporter: vitest-json 
+        path: junit.xml
+        reporter: jest-junit 
