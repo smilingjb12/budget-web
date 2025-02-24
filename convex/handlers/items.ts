@@ -38,7 +38,6 @@ export const updateItemHandler = async (
           : [updateToDbFieldMap[key], (value as string).trim()]
       )
   );
-  console.log(definedUpdates);
   await ctx.db.patch(args.itemId, definedUpdates);
 };
 

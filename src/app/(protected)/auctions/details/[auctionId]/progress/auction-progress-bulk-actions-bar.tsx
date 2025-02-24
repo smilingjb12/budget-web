@@ -29,5 +29,11 @@ export const AuctionProgressBulkActionsBar = ({
     },
   ];
 
-  return <BulkActionsBar selectedRows={selectedRows} actions={actions} />;
+  return (
+    <BulkActionsBar
+      selectedRows={selectedRows}
+      actions={actions}
+      minSelectedRows={1}
+    />
+  );
 };

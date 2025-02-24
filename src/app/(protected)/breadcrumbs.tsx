@@ -1,3 +1,4 @@
+import React from "react";
 import { ChevronRight } from "lucide-react";
 import { ReactNode } from "react";
 
@@ -23,4 +24,4 @@ export function BreadcrumbSeparator() {
 
 export function Breadcrumbs({ children }: { children: ReactNode }) {
   return <div className="flex items-center text-sm">{children}</div>;
-}
+} 
