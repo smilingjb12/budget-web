@@ -1,6 +1,7 @@
 import { categories, db, records } from "@/db";
 import { sql } from "drizzle-orm";
 import { desc, eq } from "drizzle-orm/expressions";
+import { z } from "zod";
 
 export type CategorySummaryDto = {
   categoryName: string;
@@ -26,13 +27,17 @@ export type RecordDto = {
   isExpense: boolean;
 };
 
-export type CreateOrUpdateRecordRequest = {
-  id?: number;
-  categoryId: number;
-  value: number;
-  comment?: string;
-  dateUtc: string; // ISO string in UTC format
-};
+export const createOrUpdateRecordSchema = z.object({
+  id: z.number().optional(),
+  categoryId: z.number(),
+  value: z.number(),
+  comment: z.string().optional(),
+  dateUtc: z.string(), // ISO string in UTC format
+});
+
+export type CreateOrUpdateRecordRequest = z.infer<
+  typeof createOrUpdateRecordSchema
+>;
 
 export const RecordService = {
   async getMonthSummary(year: number, month: number): Promise<MonthSummaryDto> {
@@ -132,11 +137,8 @@ export const RecordService = {
   },
 
   async createRecord(request: CreateOrUpdateRecordRequest) {
-    const InsertType = records.$inferInsert;
-
     const date = new Date(request.dateUtc);
-
-    const row: typeof InsertType = {
+    const row: typeof records.$inferInsert = {
       categoryId: request.categoryId,
       date,
       value: String(request.value),

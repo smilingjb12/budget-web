@@ -2,28 +2,23 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   CreateOrUpdateRecordRequest,
   RecordService,
+  createOrUpdateRecordSchema,
 } from "../(services)/record-service";
 
 export async function POST(request: NextRequest) {
-  const body = await request.json();
+  const result = createOrUpdateRecordSchema.safeParse(await request.json());
 
-  // Validate the request body
-  if (!body.categoryId || body.value === undefined || !body.dateUtc) {
+  if (!result.success) {
     return NextResponse.json(
       {
-        error:
-          "Missing required fields: categoryId, value, and dateUtc are required",
+        error: "Invalid request data",
+        details: result.error.format(),
       },
       { status: 400 }
     );
   }
 
-  const recordData: CreateOrUpdateRecordRequest = {
-    categoryId: body.categoryId,
-    value: body.value,
-    comment: body.comment,
-    dateUtc: body.dateUtc,
-  };
+  const recordData: CreateOrUpdateRecordRequest = result.data;
 
   try {
     const result = await RecordService.createRecord(recordData);

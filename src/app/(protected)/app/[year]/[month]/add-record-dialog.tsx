@@ -1,5 +1,8 @@
 import { CategoryDto } from "@/app/api/(services)/category-service";
-import { RecordDto } from "@/app/api/(services)/record-service";
+import {
+  CreateOrUpdateRecordRequest,
+  RecordDto,
+} from "@/app/api/(services)/record-service";
 import { ActionButton } from "@/components/action-button";
 import { Button } from "@/components/ui/button";
 import {
@@ -28,11 +31,11 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format, parseISO } from "date-fns";
 import { PencilIcon, PlusIcon } from "lucide-react";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-// Define the form schema
+// Define the form schema based on the API schema but with string values for form inputs
 const formSchema = z.object({
   categoryId: z.string().min(1, "Category is required"),
   value: z.string().min(1, "Value is required"),
@@ -65,7 +68,7 @@ export function AddRecordDialog({
     queryKey: QueryKeys.categories(),
     queryFn: async () => {
       const response = await fetch(ApiRoutes.categories());
-      return response.json();
+      return response.json() as Promise<CategoryDto[]>;
     },
   });
 
@@ -77,14 +80,14 @@ export function AddRecordDialog({
       if (!response.ok) {
         throw new Error("Failed to fetch record");
       }
-      return response.json();
+      return response.json() as Promise<RecordDto>;
     },
     enabled: isEditMode && isDialogOpen, // Only fetch when in edit mode and dialog is open
     refetchOnMount: true, // Refetch when the component mounts or remounts
     refetchOnWindowFocus: false, // Don't refetch when window regains focus
   });
 
-  const getDefaultCategoryId = () => {
+  const getDefaultCategoryId = useCallback(() => {
     if (categories && categories.length > 0) {
       const foodCategory = categories.find(
         (category) => category.name === "Food"
@@ -92,7 +95,7 @@ export function AddRecordDialog({
       return foodCategory ? foodCategory.id.toString() : "";
     }
     return "";
-  };
+  }, [categories]);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -117,13 +120,13 @@ export function AddRecordDialog({
         form.setValue("categoryId", defaultCategoryId);
       }
     }
-  }, [categories, form, isEditMode, recordData]);
+  }, [categories, form, isEditMode, recordData, getDefaultCategoryId]);
 
   const recordMutation = useMutation({
     mutationFn: async (values: FormValues) => {
       // Use the records/[id] endpoint for updates, or a new records endpoint for creation
       const url = isEditMode
-        ? ApiRoutes.recordById(recordId!)
+        ? ApiRoutes.recordById(recordId)
         : ApiRoutes.records();
 
       // Date handling based on create/edit mode
@@ -146,46 +149,49 @@ export function AddRecordDialog({
         dateUtc = date.toISOString();
       }
 
+      // Create a request body that matches our Zod schema
+      const requestBody: CreateOrUpdateRecordRequest = {
+        ...(isEditMode && recordId ? { id: recordId } : {}),
+        categoryId: parseInt(values.categoryId),
+        value: parseFloat(values.value),
+        comment: values.comment,
+        dateUtc: dateUtc,
+      };
+
       const response = await fetch(url, {
         method: isEditMode ? "PUT" : "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          id: isEditMode ? recordId : undefined,
-          categoryId: parseInt(values.categoryId),
-          value: parseFloat(values.value),
-          comment: values.comment,
-          dateUtc: dateUtc,
-        }),
+        body: JSON.stringify(requestBody),
       });
 
       if (!response.ok) {
         throw new Error(`Failed to ${isEditMode ? "update" : "add"} record`);
       }
 
-      return response.json();
+      return response.json() as Promise<RecordDto>;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
         queryKey: QueryKeys.monthSummary(year, month),
       });
 
-      queryClient.invalidateQueries({
+      await queryClient.invalidateQueries({
         queryKey: QueryKeys.monthSummary(prevYear, prevMonth),
       });
 
-      queryClient.invalidateQueries({
+      await queryClient.invalidateQueries({
         queryKey: QueryKeys.allTimeSummary(),
       });
 
-      queryClient.invalidateQueries({
+      await queryClient.invalidateQueries({
         queryKey: QueryKeys.monthRecords(year, month),
       });
 
       if (isEditMode) {
-        queryClient.invalidateQueries({
-          queryKey: QueryKeys.record(recordId!),
+        await queryClient.invalidateQueries({
+          queryKey: QueryKeys.record(recordId),
         });
       }
 

@@ -3,9 +3,10 @@ import { RecordService } from "../../../../../(services)/record-service";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { year: string; month: string } }
+  context: { params: Promise<{ year: string; month: string }> }
 ) {
-  const { year, month } = await params;
+  const params = await context.params;
+  const { year, month } = params;
   const yearNum = parseInt(year);
   const monthNum = parseInt(month);
 

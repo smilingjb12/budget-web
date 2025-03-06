@@ -2,12 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   CreateOrUpdateRecordRequest,
   RecordService,
+  createOrUpdateRecordSchema,
 } from "../../(services)/record-service";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
+  const params = await context.params;
   const { id } = params;
   const recordId = parseInt(id);
 
@@ -26,8 +28,9 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
+  const params = await context.params;
   const { id } = params;
   const recordId = parseInt(id);
 
@@ -35,26 +38,22 @@ export async function PUT(
     return NextResponse.json({ error: "Invalid record ID" }, { status: 400 });
   }
 
-  const body = await request.json();
+  const validationResult = createOrUpdateRecordSchema.safeParse({
+    ...(await request.json()),
+    id: recordId,
+  });
 
-  // Validate the request body
-  if (!body.categoryId || body.value === undefined || !body.dateUtc) {
+  if (!validationResult.success) {
     return NextResponse.json(
       {
-        error:
-          "Missing required fields: categoryId, value, and dateUtc are required",
+        error: "Invalid request data",
+        details: validationResult.error.format(),
       },
       { status: 400 }
     );
   }
 
-  const recordData: CreateOrUpdateRecordRequest = {
-    id: recordId,
-    categoryId: body.categoryId,
-    value: body.value,
-    comment: body.comment,
-    dateUtc: body.dateUtc,
-  };
+  const recordData: CreateOrUpdateRecordRequest = validationResult.data;
 
   try {
     const result = await RecordService.updateRecord(recordData);

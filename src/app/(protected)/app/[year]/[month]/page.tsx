@@ -33,13 +33,13 @@ export default function MonthYearPage() {
   const monthName = format(date, "MMMM");
   const yearString = format(date, "yyyy");
 
-  const { data, isLoading, error } = useQuery<MonthSummaryDto>({
+  const { data, error } = useQuery<MonthSummaryDto>({
     queryKey: QueryKeys.monthSummary(year, month),
     queryFn: async () => {
       const response = await fetch(
         ApiRoutes.monthlyExpensesSummary(year, month)
       );
-      return response.json();
+      return response.json() as Promise<MonthSummaryDto>;
     },
   });
 
@@ -50,7 +50,7 @@ export default function MonthYearPage() {
       const response = await fetch(
         ApiRoutes.monthlyExpensesSummary(prevYear, prevMonth)
       );
-      return response.json();
+      return response.json() as Promise<MonthSummaryDto>;
     },
   });
 
@@ -59,16 +59,15 @@ export default function MonthYearPage() {
       queryKey: QueryKeys.allTimeSummary(),
       queryFn: async () => {
         const response = await fetch(ApiRoutes.allTimeSummary());
-        return response.json();
+        return response.json() as Promise<AllTimeSummaryDto>;
       },
     });
 
-  // Fetch categories to get category IDs
   const { data: categories } = useQuery<CategoryDto[]>({
     queryKey: QueryKeys.categories(),
     queryFn: async () => {
       const response = await fetch(ApiRoutes.categories());
-      return response.json();
+      return response.json() as Promise<CategoryDto[]>;
     },
   });
 
@@ -225,7 +224,6 @@ export default function MonthYearPage() {
 
               <div className="space-y-2 mt-4">
                 {sortedCategories.map((category) => {
-                  const IconComponent = getCategoryIcon(category.icon);
                   const diff = formatDifference(
                     category.difference,
                     category.previousMonthExpenses

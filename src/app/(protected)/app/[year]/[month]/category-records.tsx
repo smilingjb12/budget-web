@@ -44,7 +44,7 @@ export function CategoryRecords({
       if (!response.ok) {
         throw new Error("Failed to fetch records");
       }
-      return response.json();
+      return response.json() as Promise<RecordDto[]>;
     },
     enabled: isExpanded, // Only fetch when expanded
   });
