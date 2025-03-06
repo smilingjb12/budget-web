@@ -7,10 +7,28 @@ import {
   MonthSummaryDto,
   RecordDto,
 } from "@/app/api/(services)/record-service";
+import { ExchangeRateDto } from "@/app/api/exchange-rate/route";
 import { ApiRoutes, Month } from "@/lib/routes";
 import { useQuery } from "@tanstack/react-query";
 import { format, parse } from "date-fns";
 import { QueryKeys } from "./query-keys";
+
+// Exchange rate query
+export function useExchangeRateQuery() {
+  return useQuery({
+    queryKey: QueryKeys.exchangeRate(),
+    queryFn: async () => {
+      const response = await fetch(ApiRoutes.exchangeRate());
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch exchange rate");
+      }
+
+      const data = (await response.json()) as ExchangeRateDto;
+      return data.rate;
+    },
+  });
+}
 
 // Categories queries
 export function useCategoriesQuery() {

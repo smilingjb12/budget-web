@@ -8,4 +8,5 @@ export const QueryKeys = {
   allTimeSummary: () => ["all-time-summary"],
   record: (id: number) => ["record", id],
   monthRecords: (year: number, month: Month) => ["month-records", year, month],
+  exchangeRate: () => ["exchange-rate"],
 } as const;

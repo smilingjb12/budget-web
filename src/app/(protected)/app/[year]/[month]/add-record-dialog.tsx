@@ -23,7 +23,11 @@ import { Input } from "@/components/ui/input";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useCategoryIcon } from "@/lib/hooks/use-category-icon";
 import { usePreviousMonth } from "@/lib/hooks/use-previous-month";
-import { useCategoriesQuery, useRecordQuery } from "@/lib/queries";
+import {
+  useCategoriesQuery,
+  useExchangeRateQuery,
+  useRecordQuery,
+} from "@/lib/queries";
 import { QueryKeys } from "@/lib/query-keys";
 import { ApiRoutes, Month } from "@/lib/routes";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -66,6 +70,19 @@ export function AddRecordDialog({
   const { prevMonth, prevYear } = usePreviousMonth(month, year);
   const isEditMode = !!recordId;
 
+  // State for PLN and USD values
+  const [plnValue, setPlnValue] = useState<string>("");
+  const [usdValue, setUsdValue] = useState<string>("");
+  const [, setIsUpdatingPln] = useState(false);
+  const [, setIsUpdatingUsd] = useState(false);
+
+  // Fetch exchange rate
+  const {
+    data: exchangeRate,
+    isLoading: isLoadingExchangeRate,
+    isError: isExchangeRateError,
+  } = useExchangeRateQuery();
+
   const { data: allCategories } = useCategoriesQuery();
   const categories = useMemo(() => {
     if (!allCategories) return [];
@@ -94,12 +111,66 @@ export function AddRecordDialog({
     },
   });
 
+  // Convert PLN to USD
+  const convertPlnToUsd = useCallback(
+    (pln: string) => {
+      if (!pln || !exchangeRate) return "";
+      const plnAmount = parseFloat(pln);
+      if (isNaN(plnAmount)) return "";
+      return (plnAmount / exchangeRate).toFixed(2);
+    },
+    [exchangeRate]
+  );
+
+  // Convert USD to PLN
+  const convertUsdToPln = useCallback(
+    (usd: string) => {
+      if (!usd || !exchangeRate) return "";
+      const usdAmount = parseFloat(usd);
+      if (isNaN(usdAmount)) return "";
+      return (usdAmount * exchangeRate).toFixed(2);
+    },
+    [exchangeRate]
+  );
+
+  // Handle PLN input change
+  const handlePlnChange = (value: string) => {
+    setIsUpdatingPln(true);
+    setPlnValue(value);
+    form.setValue("value", value);
+
+    // Convert to USD
+    const newUsdValue = convertPlnToUsd(value);
+    setUsdValue(newUsdValue);
+    setIsUpdatingPln(false);
+  };
+
+  // Handle USD input change
+  const handleUsdChange = (value: string) => {
+    setIsUpdatingUsd(true);
+    setUsdValue(value);
+
+    // Convert to PLN and update form
+    const newPlnValue = convertUsdToPln(value);
+    setPlnValue(newPlnValue);
+    form.setValue("value", newPlnValue);
+    setIsUpdatingUsd(false);
+  };
+
   // Set default values or populate form with record data when available
   useEffect(() => {
-    if (isEditMode && recordData) {
+    if (isEditMode && recordData && exchangeRate) {
+      // For edit mode, we get USD value from backend
+      const usd = recordData.value.toString();
+      setUsdValue(usd);
+
+      // Convert USD to PLN
+      const pln = convertUsdToPln(usd);
+      setPlnValue(pln);
+
       form.reset({
         categoryId: recordData.categoryId.toString(),
-        value: recordData.value.toString(),
+        value: pln, // Store PLN value in the form
         comment: recordData.comment || "",
       });
     } else if (!isEditMode && categories) {
@@ -108,7 +179,15 @@ export function AddRecordDialog({
         form.setValue("categoryId", defaultCategoryId);
       }
     }
-  }, [categories, form, isEditMode, recordData, getDefaultCategoryId]);
+  }, [
+    categories,
+    form,
+    isEditMode,
+    recordData,
+    getDefaultCategoryId,
+    exchangeRate,
+    convertUsdToPln,
+  ]);
 
   const recordMutation = useMutation({
     mutationFn: async (values: FormValues) => {
@@ -140,11 +219,17 @@ export function AddRecordDialog({
         dateUtc = date.toISOString();
       }
 
+      // Use USD value directly
+      const usdAmount = parseFloat(usdValue);
+      if (isNaN(usdAmount)) {
+        throw new Error("USD value is invalid");
+      }
+
       // Create a request body that matches our Zod schema
       const requestBody: CreateOrUpdateRecordRequest = {
         ...(isEditMode && recordId ? { id: recordId } : {}),
         categoryId: parseInt(values.categoryId),
-        value: parseFloat(values.value),
+        value: usdAmount, // Send USD value
         comment: values.comment,
         dateUtc: dateUtc,
         isExpense: !isIncome,
@@ -195,6 +280,10 @@ export function AddRecordDialog({
         comment: "",
       });
 
+      // Reset PLN and USD values
+      setPlnValue("");
+      setUsdValue("");
+
       if (onSuccess) {
         onSuccess();
       }
@@ -218,6 +307,8 @@ export function AddRecordDialog({
             value: "",
             comment: "",
           });
+          setPlnValue("");
+          setUsdValue("");
         }
       }}
     >
@@ -256,23 +347,55 @@ export function AddRecordDialog({
         ) : (
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="value"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        step="0.01"
-                        placeholder="Enter amount"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="grid grid-cols-2 gap-4">
+                <FormItem>
+                  <div className="relative">
+                    <Input
+                      type="number"
+                      step="0.01"
+                      placeholder="PLN"
+                      value={plnValue}
+                      onChange={(e) => handlePlnChange(e.target.value)}
+                      className="pr-16"
+                    />
+                  </div>
+                </FormItem>
+                <FormItem>
+                  <div className="relative">
+                    <Input
+                      type="number"
+                      step="0.01"
+                      placeholder="USD"
+                      value={usdValue}
+                      onChange={(e) => handleUsdChange(e.target.value)}
+                      className="pr-16"
+                      disabled={isLoadingExchangeRate || isExchangeRateError}
+                    />
+                  </div>
+                </FormItem>
+              </div>
+              {isExchangeRateError && (
+                <div className="text-sm text-destructive">
+                  Exchange rate unavailable. Cannot save record.
+                </div>
+              )}
+
+              {/* Hidden form field to store the value */}
+              <div className="hidden">
+                <FormField
+                  control={form.control}
+                  name="value"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Input type="hidden" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
               <FormField
                 control={form.control}
                 name="comment"
@@ -336,7 +459,12 @@ export function AddRecordDialog({
                   variant="default"
                   className="w-full"
                   type="submit"
-                  disabled={recordMutation.isPending}
+                  disabled={
+                    recordMutation.isPending ||
+                    isExchangeRateError ||
+                    isLoadingExchangeRate ||
+                    !exchangeRate
+                  }
                   isLoading={recordMutation.isPending}
                 >
                   {isEditMode ? "Update" : "Add"}

@@ -38,3 +38,12 @@ export const records = pgTable(
     index("is_expense_idx").on(table.isExpense),
   ]
 );
+
+export const exchangeRates = pgTable("exchangeRates", {
+  id: serial().primaryKey(),
+  rate: decimal({
+    precision: 10,
+    scale: 2,
+  }).notNull(),
+  lastUpdatedAt: timestamp({ withTimezone: true }).notNull(),
+});
