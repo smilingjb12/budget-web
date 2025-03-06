@@ -100,7 +100,7 @@ export function CategoryRecords({
                   key={record.id}
                   recordId={record.id}
                   trigger={
-                    <div className="flex justify-between items-center py-2 px-6 text-sm border border-border rounded-md cursor-pointer hover:bg-muted/50">
+                    <div className="flex justify-between items-center py-2 px-3 text-sm border border-border rounded-md cursor-pointer hover:bg-muted/50">
                       <div className="flex items-center gap-4">
                         <span className="text-md text-muted-foreground">
                           {format(
@@ -108,7 +108,7 @@ export function CategoryRecords({
                             "MMM d, yyyy h:mm a"
                           )}
                         </span>
-                        <span className="font-medium text-lg">
+                        <span className="font-medium text-md">
                           {formatUSD(record.value)}
                         </span>
                         {record.comment && (

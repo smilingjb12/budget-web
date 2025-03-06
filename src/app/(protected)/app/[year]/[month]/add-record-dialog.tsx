@@ -309,7 +309,7 @@ export function AddRecordDialog({
                         <ToggleGroup
                           type="single"
                           variant="outline"
-                          className="grid grid-cols-3 gap-2 mt-2"
+                          className="grid grid-cols-3 gap-2 mt-2 mx-auto"
                           onValueChange={field.onChange}
                           value={field.value}
                         >

@@ -165,12 +165,12 @@ export default function MonthYearPage() {
   };
 
   return (
-    <div className="p-4 space-y-4 relative">
+    <div className="p-0 space-y-4 relative">
       <div className="flex justify-between items-center">
         <MonthYearPicker initialMonth={month} initialYear={year} />
         {!isLoadingAllTime && allTimeSummary && (
           <div
-            className={`font-semibold text-xl ${
+            className={`font-semibold text-xl pr-2 ${
               isPositiveBalance ? "text-green-400" : "text-red-400"
             }`}
           >
@@ -229,7 +229,6 @@ export default function MonthYearPage() {
                     category.previousMonthExpenses
                   );
 
-                  // Find the category ID from the categories data
                   const categoryData = categories?.find(
                     (c) => c.name === category.categoryName
                   );
