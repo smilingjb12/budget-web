@@ -1,34 +1,55 @@
 "use client";
 
+import { CategoryDto } from "@/app/api/(services)/category-service";
 import {
   AllTimeSummaryDto,
   MonthSummaryDto,
 } from "@/app/api/(services)/record-service";
+import { MonthYearPicker } from "@/components/month-year-picker";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SegmentedProgress } from "@/components/ui/segmented-progress";
 import { useCategoryIcon } from "@/lib/hooks/use-category-icon";
+import { usePreviousMonth } from "@/lib/hooks/use-previous-month";
 import { QueryKeys } from "@/lib/query-keys";
 import { ApiRoutes, Month } from "@/lib/routes";
 import { formatUSD } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
+import { ArrowDown, ArrowUp } from "lucide-react";
 import { useParams } from "next/navigation";
 import { AddRecordDialog } from "./add-record-dialog";
+import { CategoryRecords } from "./category-records";
 
-export default function MonthsPage() {
-  const params = useParams<{ month: string }>();
+export default function MonthYearPage() {
+  const params = useParams<{ month: string; year: string }>();
   const month = Number(params.month) as Month;
+  const year = Number(params.year);
   const { getCategoryIcon } = useCategoryIcon();
 
-  const date = new Date();
-  date.setMonth(month - 1); // Adjust for 0-indexed months in JS
+  // Use the custom hook to calculate previous month and year
+  const { prevMonth, prevYear } = usePreviousMonth(month, year);
+
+  const date = new Date(year, month - 1); // Adjust for 0-indexed months in JS
   const monthName = format(date, "MMMM");
-  const year = format(date, "yyyy");
+  const yearString = format(date, "yyyy");
 
   const { data, isLoading, error } = useQuery<MonthSummaryDto>({
-    queryKey: QueryKeys.monthSummary(month),
+    queryKey: QueryKeys.monthSummary(year, month),
     queryFn: async () => {
-      const response = await fetch(ApiRoutes.recordsByMonth(month));
+      const response = await fetch(
+        ApiRoutes.monthlyExpensesSummary(year, month)
+      );
+      return response.json();
+    },
+  });
+
+  // Fetch previous month data
+  const { data: prevMonthData } = useQuery<MonthSummaryDto>({
+    queryKey: QueryKeys.monthSummary(prevYear, prevMonth),
+    queryFn: async () => {
+      const response = await fetch(
+        ApiRoutes.monthlyExpensesSummary(prevYear, prevMonth)
+      );
       return response.json();
     },
   });
@@ -42,9 +63,14 @@ export default function MonthsPage() {
       },
     });
 
-  if (isLoading) {
-    return <div className="p-4">Loading month summary...</div>;
-  }
+  // Fetch categories to get category IDs
+  const { data: categories } = useQuery<CategoryDto[]>({
+    queryKey: QueryKeys.categories(),
+    queryFn: async () => {
+      const response = await fetch(ApiRoutes.categories());
+      return response.json();
+    },
+  });
 
   if (error) {
     return (
@@ -68,15 +94,37 @@ export default function MonthsPage() {
     Gifts: "bg-red-500",
   };
 
+  // Create a map of previous month expenses by category name
+  const prevMonthExpensesByCategory = new Map<string, number>();
+  prevMonthData?.categorySummaries?.forEach((category) => {
+    prevMonthExpensesByCategory.set(
+      category.categoryName,
+      Number(category.totalExpenses)
+    );
+  });
+
+  // Enhance current month data with previous month comparison
+  const enhancedCategories = data?.categorySummaries?.map((category) => {
+    const previousMonthExpenses =
+      prevMonthExpensesByCategory.get(category.categoryName) || 0;
+    const difference = Number(category.totalExpenses) - previousMonthExpenses;
+
+    return {
+      ...category,
+      previousMonthExpenses,
+      difference,
+    };
+  });
+
   // Calculate total spending for all categories
   const totalMonthlySpending =
-    data?.categorySummaries?.reduce(
+    enhancedCategories?.reduce(
       (sum, category) => sum + Number(category.totalExpenses),
       0
     ) || 0;
 
   // Sort categories by value for better visualization
-  const sortedCategories = [...(data?.categorySummaries || [])].sort(
+  const sortedCategories = [...(enhancedCategories || [])].sort(
     (a, b) => b.totalExpenses - a.totalExpenses
   );
 
@@ -89,12 +137,38 @@ export default function MonthsPage() {
     : 0;
   const isPositiveBalance = balance >= 0;
 
+  // Helper function to format the difference
+  const formatDifference = (
+    difference: number | undefined,
+    previousMonthExpenses: number | undefined
+  ) => {
+    // Only show difference if there were expenses in the previous month
+    if (
+      difference === undefined ||
+      previousMonthExpenses === undefined ||
+      previousMonthExpenses === 0
+    ) {
+      return null;
+    }
+
+    const isMore = difference > 0;
+    const absValue = Math.abs(difference);
+
+    return {
+      text: `($${absValue.toFixed(2)})`,
+      icon: isMore ? (
+        <ArrowUp className="h-4 w-4" />
+      ) : (
+        <ArrowDown className="h-4 w-4" />
+      ),
+      color: isMore ? "text-red-400" : "text-green-400",
+    };
+  };
+
   return (
     <div className="p-4 space-y-4 relative">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">
-          {monthName} {year}
-        </h1>
+        <MonthYearPicker initialMonth={month} initialYear={year} />
         {!isLoadingAllTime && allTimeSummary && (
           <div
             className={`font-semibold text-xl ${
@@ -152,17 +226,27 @@ export default function MonthsPage() {
               <div className="space-y-2 mt-4">
                 {sortedCategories.map((category) => {
                   const IconComponent = getCategoryIcon(category.icon);
+                  const diff = formatDifference(
+                    category.difference,
+                    category.previousMonthExpenses
+                  );
+
+                  // Find the category ID from the categories data
+                  const categoryData = categories?.find(
+                    (c) => c.name === category.categoryName
+                  );
+
                   return (
-                    <div
+                    <CategoryRecords
                       key={category.categoryName}
-                      className="flex justify-between items-center"
-                    >
-                      <span className="flex items-center">
-                        <IconComponent className="mr-2 size-5" />
-                        {category.categoryName}
-                      </span>
-                      <span>{formatUSD(Number(category.totalExpenses))}</span>
-                    </div>
+                      categoryName={category.categoryName}
+                      categoryId={categoryData?.id || 0}
+                      year={year}
+                      month={month}
+                      totalExpenses={Number(category.totalExpenses)}
+                      icon={category.icon}
+                      difference={diff || undefined}
+                    />
                   );
                 })}
               </div>
@@ -173,7 +257,7 @@ export default function MonthsPage() {
         <Card>
           <CardContent className="p-6">
             <p className="text-center text-muted-foreground">
-              No expense data available for {monthName}.
+              No expense data available for {monthName} {yearString}.
             </p>
           </CardContent>
         </Card>

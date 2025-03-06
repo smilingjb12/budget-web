@@ -53,12 +53,7 @@ export default function SignInPage() {
     setTimeout(() => {
       // For demo purposes, any login succeeds
       if (values.flow === "signIn") {
-        // In a real app, you would validate credentials here
-        localStorage.setItem("isAuthenticated", "true");
-        localStorage.setItem("userEmail", values.email);
-        router.push(
-          Routes.recordsByMonth((new Date().getMonth() + 1) as Month)
-        );
+        handleSignIn();
       } else {
         // In a real app, you would create a user here
         toast({
@@ -70,6 +65,19 @@ export default function SignInPage() {
       }
       setIsLoading(false);
     }, 1000);
+  };
+
+  const handleSignIn = () => {
+    // In a real app, you would validate the credentials and set a token
+    localStorage.setItem("isAuthenticated", "true");
+    localStorage.setItem("userEmail", form.getValues("email"));
+
+    const currentDate = new Date();
+    const year = currentDate.getFullYear();
+    const month = (currentDate.getMonth() + 1) as Month;
+
+    // Redirect to the app
+    router.push(Routes.monthlyExpensesSummary(year, month));
   };
 
   return (

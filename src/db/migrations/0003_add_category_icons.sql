@@ -1,6 +1,3 @@
--- Add icon column to categories table
-ALTER TABLE "categories" ADD COLUMN "icon" text NOT NULL;
-
 -- Update existing categories with their respective icons
 UPDATE "categories" SET "icon" = 'utensils' WHERE "name" = 'Food';
 UPDATE "categories" SET "icon" = 'car-taxi-front' WHERE "name" = 'Transportation';

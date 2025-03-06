@@ -16,8 +16,9 @@ export function formatEuro(money: number): string {
 }
 
 export function formatUSD(amount: number): string {
+  const isWholeNumber = amount % 1 === 0;
   return `$${amount.toLocaleString("en-US", {
-    minimumFractionDigits: 2,
+    minimumFractionDigits: isWholeNumber ? 0 : 2,
     maximumFractionDigits: 2,
   })}`;
 }

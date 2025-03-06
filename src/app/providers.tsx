@@ -6,7 +6,25 @@ import { Provider as JotaiProvider } from "jotai";
 import { useState } from "react";
 
 export const Providers = ({ children }: { children: React.ReactNode }) => {
-  const [queryClient] = useState(() => new QueryClient());
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            // Disable automatic refetching
+            refetchOnWindowFocus: false,
+            refetchOnReconnect: false,
+            refetchOnMount: false,
+            // Set stale time to Infinity to prevent automatic refetching
+            staleTime: Infinity,
+            // Cache data forever until explicitly invalidated
+            gcTime: Infinity,
+            // Don't retry failed queries automatically
+            retry: false,
+          },
+        },
+      })
+  );
 
   return (
     <QueryClientProvider client={queryClient}>

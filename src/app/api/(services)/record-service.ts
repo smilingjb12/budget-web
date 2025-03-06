@@ -1,5 +1,6 @@
 import { categories, db, records } from "@/db";
 import { sql } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm/expressions";
 
 export type CategorySummaryDto = {
   categoryName: string;
@@ -16,14 +17,25 @@ export type AllTimeSummaryDto = {
   totalProfit: number;
 };
 
-export type CreateRecordRequest = {
+export type RecordDto = {
+  id: number;
+  categoryId: number;
+  value: number;
+  comment: string | null;
+  dateUtc: string;
+  isExpense: boolean;
+};
+
+export type CreateOrUpdateRecordRequest = {
+  id?: number;
   categoryId: number;
   value: number;
   comment?: string;
+  dateUtc: string; // ISO string in UTC format
 };
 
 export const RecordService = {
-  async getMonthSummary(month: number): Promise<MonthSummaryDto> {
+  async getMonthSummary(year: number, month: number): Promise<MonthSummaryDto> {
     const categorySummaries = await db
       .select({
         categoryName: categories.name,
@@ -33,7 +45,7 @@ export const RecordService = {
       .from(records)
       .innerJoin(categories, sql`${records.categoryId} = ${categories.id}`)
       .where(
-        sql`EXTRACT(MONTH FROM ${records.date}) = ${month} AND ${records.isExpense} = true`
+        sql`EXTRACT(YEAR FROM ${records.date}) = ${year} AND EXTRACT(MONTH FROM ${records.date}) = ${month} AND ${records.isExpense} = true`
       )
       .groupBy(categories.name, categories.icon)
       .orderBy(sql`SUM(${records.value}) DESC`);
@@ -64,15 +76,87 @@ export const RecordService = {
     };
   },
 
-  async createRecord(request: CreateRecordRequest) {
+  async getRecordById(id: number): Promise<RecordDto | null> {
+    const result = await db
+      .select({
+        id: records.id,
+        categoryId: records.categoryId,
+        value: records.value,
+        comment: records.comment,
+        date: records.date,
+        isExpense: records.isExpense,
+      })
+      .from(records)
+      .where(eq(records.id, id))
+      .limit(1);
+
+    if (result.length === 0) {
+      return null;
+    }
+
+    const record = result[0];
+    return {
+      id: record.id,
+      categoryId: record.categoryId,
+      value: parseFloat(record.value),
+      comment: record.comment,
+      dateUtc: record.date.toISOString(),
+      isExpense: record.isExpense,
+    };
+  },
+
+  async getRecordsByMonth(year: number, month: number): Promise<RecordDto[]> {
+    const result = await db
+      .select({
+        id: records.id,
+        categoryId: records.categoryId,
+        value: records.value,
+        comment: records.comment,
+        date: records.date,
+        isExpense: records.isExpense,
+      })
+      .from(records)
+      .where(
+        sql`EXTRACT(YEAR FROM ${records.date}) = ${year} AND EXTRACT(MONTH FROM ${records.date}) = ${month}`
+      )
+      .orderBy(desc(records.date));
+
+    return result.map((record) => ({
+      id: record.id,
+      categoryId: record.categoryId,
+      value: parseFloat(record.value),
+      comment: record.comment,
+      dateUtc: record.date.toISOString(),
+      isExpense: record.isExpense,
+    }));
+  },
+
+  async createRecord(request: CreateOrUpdateRecordRequest) {
     const InsertType = records.$inferInsert;
+
+    const date = new Date(request.dateUtc);
+
     const row: typeof InsertType = {
       categoryId: request.categoryId,
-      date: new Date(),
+      date,
       value: String(request.value),
       comment: request.comment || null,
       isExpense: true,
     };
     return await db.insert(records).values(row);
+  },
+
+  async updateRecord(request: CreateOrUpdateRecordRequest) {
+    if (!request.id) {
+      throw new Error("Record ID is required for update");
+    }
+
+    const row = {
+      categoryId: request.categoryId,
+      value: String(request.value),
+      comment: request.comment || null,
+    };
+
+    return await db.update(records).set(row).where(eq(records.id, request.id));
   },
 };

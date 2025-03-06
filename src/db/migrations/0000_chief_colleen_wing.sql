@@ -1,7 +1,8 @@
 CREATE TABLE "categories" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"name" text NOT NULL,
-	"order" integer NOT NULL
+	"order" integer NOT NULL,
+	"icon" text NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "records" (

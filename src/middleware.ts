@@ -21,8 +21,10 @@ const isSignInPage = createRouteMatcher([SIGNIN_ROUTE]);
 const isProtectedRoute = createRouteMatcher([APP_WILDCARD]);
 
 export function middleware(request: NextRequest) {
-  const defaultRoute = Routes.recordsByMonth(
-    (new Date().getMonth() + 1) as Month
+  const currentDate = new Date();
+  const defaultRoute = Routes.monthlyExpensesSummary(
+    currentDate.getFullYear(),
+    (currentDate.getMonth() + 1) as Month
   );
 
   // For API routes, we'll need a different authentication mechanism
