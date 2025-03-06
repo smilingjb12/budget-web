@@ -34,3 +34,7 @@ export function toServerDate(date: Date): string {
 export function nameof<T>(key: keyof T): keyof T {
   return key;
 }
+
+export function formatCurrency(amount: number): string {
+  return formatUSD(amount);
+}

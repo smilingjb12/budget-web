@@ -5,6 +5,7 @@ export type CategoryDto = {
   id: number;
   name: string;
   icon: string;
+  isExpense: boolean;
 };
 
 export const CategoryService = {
@@ -14,6 +15,7 @@ export const CategoryService = {
         id: categories.id,
         name: categories.name,
         icon: categories.icon,
+        isExpense: categories.isExpense,
       })
       .from(categories)
       .orderBy(categories.order);
@@ -27,6 +29,7 @@ export const CategoryService = {
         id: categories.id,
         name: categories.name,
         icon: categories.icon,
+        isExpense: categories.isExpense,
       })
       .from(categories)
       .where(eq(categories.isExpense, true))
@@ -41,6 +44,7 @@ export const CategoryService = {
         id: categories.id,
         name: categories.name,
         icon: categories.icon,
+        isExpense: categories.isExpense,
       })
       .from(categories)
       .where(eq(categories.isExpense, false))

@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/select";
 import { useCategoryIcon } from "@/lib/hooks/use-category-icon";
 import { useMonthNavigation } from "@/lib/hooks/use-previous-month";
+import { useMonthSummaryQuery } from "@/lib/queries";
 import { QueryKeys } from "@/lib/query-keys";
 import { ApiRoutes, Month, Routes } from "@/lib/routes";
 import { formatUSD } from "@/lib/utils";
@@ -59,15 +60,7 @@ export default function MonthYearPage() {
   const yearString = format(date, "yyyy");
 
   // Fetch data for both expenses and income
-  const { data, error } = useQuery<MonthSummaryDto>({
-    queryKey: QueryKeys.monthSummary(year, month),
-    queryFn: async () => {
-      const response = await fetch(
-        ApiRoutes.monthlyExpensesSummary(year, month)
-      );
-      return response.json() as Promise<MonthSummaryDto>;
-    },
-  });
+  const { data, error } = useMonthSummaryQuery(year, month);
 
   // Fetch previous month data
   const { data: prevMonthData } = useQuery<MonthSummaryDto>({
@@ -271,22 +264,25 @@ export default function MonthYearPage() {
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
-              <CardTitle className="text-center">
+              <CardTitle className="flex items-center justify-center flex-col">
                 {formatUSD(totalMonthlyAmount)}
                 {(() => {
                   const monthDiff = formatDifference(
                     totalMonthDifference,
                     totalPreviousMonthAmount
                   );
-                  return (
-                    monthDiff && (
-                      <span
-                        className={`ml-2 text-sm items-center inline-flex ${monthDiff.color}`}
-                      >
-                        {monthDiff.text}
-                        {monthDiff.icon}
-                      </span>
-                    )
+                  return monthDiff ? (
+                    <span
+                      className={`ml-2 text-sm items-center inline-flex ${monthDiff.color}`}
+                    >
+                      {monthDiff.text}
+                      {monthDiff.icon}
+                    </span>
+                  ) : (
+                    <span className="ml-2 text-sm items-center inline-flex invisible">
+                      $0.00
+                      <ArrowDown className="h-4 w-4" />
+                    </span>
                   );
                 })()}
               </CardTitle>
@@ -376,7 +372,7 @@ export default function MonthYearPage() {
         </Card>
       )}
 
-      <div className="fixed bottom-10 right-10 z-50">
+      <div className="fixed bottom-20 right-10 z-50">
         <AddRecordDialog isIncome={viewType === "income"} />
       </div>
     </div>

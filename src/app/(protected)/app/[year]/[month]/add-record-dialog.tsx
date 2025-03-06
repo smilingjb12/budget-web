@@ -1,4 +1,3 @@
-import { CategoryDto } from "@/app/api/(services)/category-service";
 import {
   CreateOrUpdateRecordRequest,
   RecordDto,
@@ -24,14 +23,15 @@ import { Input } from "@/components/ui/input";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useCategoryIcon } from "@/lib/hooks/use-category-icon";
 import { usePreviousMonth } from "@/lib/hooks/use-previous-month";
+import { useCategoriesQuery, useRecordQuery } from "@/lib/queries";
 import { QueryKeys } from "@/lib/query-keys";
 import { ApiRoutes, Month } from "@/lib/routes";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { format, parseISO } from "date-fns";
 import { PencilIcon, PlusIcon } from "lucide-react";
 import { useParams } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -66,32 +66,17 @@ export function AddRecordDialog({
   const { prevMonth, prevYear } = usePreviousMonth(month, year);
   const isEditMode = !!recordId;
 
-  const { data: categories } = useQuery<CategoryDto[]>({
-    queryKey: isIncome
-      ? QueryKeys.incomeCategories()
-      : QueryKeys.expenseCategories(),
-    queryFn: async () => {
-      const response = await fetch(
-        isIncome ? ApiRoutes.incomeCategories() : ApiRoutes.expenseCategories()
-      );
-      return response.json() as Promise<CategoryDto[]>;
-    },
-  });
+  const { data: allCategories } = useCategoriesQuery();
+  const categories = useMemo(() => {
+    if (!allCategories) return [];
+    return allCategories.filter((category) => category.isExpense !== isIncome);
+  }, [allCategories, isIncome]);
 
   // Fetch record data if in edit mode
-  const { data: recordData, isLoading: isLoadingRecord } = useQuery<RecordDto>({
-    queryKey: QueryKeys.record(recordId!),
-    queryFn: async () => {
-      const response = await fetch(ApiRoutes.recordById(recordId!));
-      if (!response.ok) {
-        throw new Error("Failed to fetch record");
-      }
-      return response.json() as Promise<RecordDto>;
-    },
-    enabled: isEditMode && isDialogOpen, // Only fetch when in edit mode and dialog is open
-    refetchOnMount: true, // Refetch when the component mounts or remounts
-    refetchOnWindowFocus: false, // Don't refetch when window regains focus
-  });
+  const { data: recordData, isLoading: isLoadingRecord } = useRecordQuery(
+    recordId,
+    isEditMode && isDialogOpen
+  );
 
   const getDefaultCategoryId = useCallback(() => {
     if (categories && categories.length > 0) {

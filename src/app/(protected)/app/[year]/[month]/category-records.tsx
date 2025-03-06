@@ -1,9 +1,7 @@
-import { RecordDto } from "@/app/api/(services)/record-service";
 import { useCategoryIcon } from "@/lib/hooks/use-category-icon";
-import { QueryKeys } from "@/lib/query-keys";
-import { ApiRoutes, Month } from "@/lib/routes";
+import { useMonthRecordsQuery } from "@/lib/queries";
+import { Month } from "@/lib/routes";
 import { formatUSD } from "@/lib/utils";
-import { useQuery } from "@tanstack/react-query";
 import { format, parseISO } from "date-fns";
 import { useState } from "react";
 import { AddRecordDialog } from "./add-record-dialog";
@@ -38,17 +36,11 @@ export function CategoryRecords({
   const IconComponent = getCategoryIcon(icon);
 
   // Only fetch records when the category is expanded
-  const { data: records, isLoading } = useQuery<RecordDto[]>({
-    queryKey: QueryKeys.monthRecords(year, month),
-    queryFn: async () => {
-      const response = await fetch(ApiRoutes.allRecordsByMonth(year, month));
-      if (!response.ok) {
-        throw new Error("Failed to fetch records");
-      }
-      return response.json() as Promise<RecordDto[]>;
-    },
-    enabled: isExpanded, // Only fetch when expanded
-  });
+  const { data: records, isLoading } = useMonthRecordsQuery(
+    year,
+    month,
+    isExpanded
+  );
 
   // Filter records by category and expense/income type
   const categoryRecords =

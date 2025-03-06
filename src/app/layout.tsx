@@ -23,7 +23,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${inter.className} antialiased`}>
         <Providers>
-          <div className="flex min-h-screen w-full flex-col py-12 px-2">
+          <div className="flex min-h-screen w-full flex-col pt-6 pb-12 px-2">
             {children}
           </div>
           <Toaster />
