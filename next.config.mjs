@@ -5,11 +5,14 @@ const nextConfig = {
       hostname: 'localhost'
     }],
   },
-  // Configuration to fix CSS loading issues
+  // Simplified configuration to fix CSS loading issues
   experimental: {
+    // Keep only essential optimizations
     optimizePackageImports: ['@radix-ui/react-icons', 'lucide-react'],
   },
   serverExternalPackages: [],
+  // Disable CSS optimization that might be causing issues
+  //optimizeCss: false,
 };
 
 export default nextConfig;
