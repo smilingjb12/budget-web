@@ -85,10 +85,7 @@ export function MonthYearPicker({
       <PopoverTrigger asChild>
         <Button
           variant="ghost"
-          className={cn(
-            "font-bold text-2xl justify-start text-left",
-            className
-          )}
+          className={cn("font-bold text-xl justify-start text-left", className)}
         >
           {formatSelectedDate()}
         </Button>

@@ -5,7 +5,6 @@ import { ApiRoutes, Month } from "@/lib/routes";
 import { formatUSD } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { format, parseISO } from "date-fns";
-import { ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
 import { AddRecordDialog } from "./add-record-dialog";
 
@@ -79,11 +78,6 @@ export function CategoryRecords({
               {difference.text}
               {difference.icon}
             </span>
-          )}
-          {isExpanded ? (
-            <ChevronUp className="h-4 w-4 text-muted-foreground" />
-          ) : (
-            <ChevronDown className="h-4 w-4 text-muted-foreground" />
           )}
         </span>
       </div>
