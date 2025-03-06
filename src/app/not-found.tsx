@@ -1,12 +1,7 @@
-import { Month, Routes } from "@/lib/routes";
-import { redirect } from "next/navigation";
-
 export default function NotFound() {
-  const currentDate = new Date();
-  redirect(
-    Routes.monthlyExpensesSummary(
-      currentDate.getFullYear(),
-      (currentDate.getMonth() + 1) as Month
-    )
+  return (
+    <div className="flex h-full flex-col items-center justify-center">
+      <h1 className="text-2xl font-bold">Not Found</h1>
+    </div>
   );
 }

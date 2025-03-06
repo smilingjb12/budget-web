@@ -20,7 +20,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en">
       <body className={`${inter.className} antialiased`}>
         <Providers>
           <div className="flex min-h-screen w-full flex-col py-12 px-6">
