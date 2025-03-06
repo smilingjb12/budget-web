@@ -48,12 +48,14 @@ interface AddRecordDialogProps {
   recordId?: number;
   trigger?: React.ReactNode;
   onSuccess?: () => void;
+  isIncome?: boolean;
 }
 
 export function AddRecordDialog({
   recordId,
   trigger,
   onSuccess,
+  isIncome = false,
 }: AddRecordDialogProps) {
   const params = useParams<{ month: string; year: string }>();
   const month = Number(params.month) as Month;
@@ -65,9 +67,13 @@ export function AddRecordDialog({
   const isEditMode = !!recordId;
 
   const { data: categories } = useQuery<CategoryDto[]>({
-    queryKey: QueryKeys.categories(),
+    queryKey: isIncome
+      ? QueryKeys.incomeCategories()
+      : QueryKeys.expenseCategories(),
     queryFn: async () => {
-      const response = await fetch(ApiRoutes.categories());
+      const response = await fetch(
+        isIncome ? ApiRoutes.incomeCategories() : ApiRoutes.expenseCategories()
+      );
       return response.json() as Promise<CategoryDto[]>;
     },
   });
@@ -89,10 +95,7 @@ export function AddRecordDialog({
 
   const getDefaultCategoryId = useCallback(() => {
     if (categories && categories.length > 0) {
-      const foodCategory = categories.find(
-        (category) => category.name === "Food"
-      );
-      return foodCategory ? foodCategory.id.toString() : "";
+      return categories[0].id.toString();
     }
     return "";
   }, [categories]);
@@ -156,6 +159,7 @@ export function AddRecordDialog({
         value: parseFloat(values.value),
         comment: values.comment,
         dateUtc: dateUtc,
+        isExpense: !isIncome,
       };
 
       const response = await fetch(url, {
@@ -254,7 +258,9 @@ export function AddRecordDialog({
                     "MMM d, yyyy"
                   )})`
                 : "Edit Record"
-              : "Add New Record"}
+              : isIncome
+              ? "Add Income"
+              : "Add Expense"}
           </DialogTitle>
         </DialogHeader>
         {isEditMode && isLoadingRecord ? (

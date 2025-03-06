@@ -1,5 +1,5 @@
 {
-  "id": "a4b5c6d7-e8f9-0123-4567-89abcdef0123",
+  "id": "ff90bc45-4f04-4bb8-bc1c-b0f8700d90ef",
   "prevId": "29a752e7-d64e-41d4-b27e-153368cc0ba2",
   "version": "7",
   "dialect": "postgresql",
@@ -31,12 +31,22 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true
+        },
+        "isExpense": {
+          "name": "isExpense",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
         }
       },
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
     },
     "public.records": {
       "name": "records",
@@ -84,23 +94,47 @@
         "category_id_idx": {
           "name": "category_id_idx",
           "columns": [
-            "categoryId"
+            {
+              "expression": "categoryId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "isUnique": false
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
         },
         "date_idx": {
           "name": "date_idx",
           "columns": [
-            "date"
+            {
+              "expression": "date",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "isUnique": false
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
         },
         "is_expense_idx": {
           "name": "is_expense_idx",
           "columns": [
-            "isExpense"
+            {
+              "expression": "isExpense",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
           ],
-          "isUnique": false
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
         }
       },
       "foreignKeys": {
@@ -119,14 +153,21 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
     }
   },
   "enums": {},
   "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
   "_meta": {
+    "columns": {},
     "schemas": {},
-    "tables": {},
-    "columns": {}
+    "tables": {}
   }
-} 
+}

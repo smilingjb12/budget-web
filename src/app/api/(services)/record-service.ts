@@ -33,6 +33,7 @@ export const createOrUpdateRecordSchema = z.object({
   value: z.number(),
   comment: z.string().optional(),
   dateUtc: z.string(), // ISO string in UTC format
+  isExpense: z.boolean().default(true),
 });
 
 export type CreateOrUpdateRecordRequest = z.infer<
@@ -143,7 +144,7 @@ export const RecordService = {
       date,
       value: String(request.value),
       comment: request.comment || null,
-      isExpense: true,
+      isExpense: request.isExpense,
     };
     return await db.insert(records).values(row);
   },

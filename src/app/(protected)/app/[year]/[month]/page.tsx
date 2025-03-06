@@ -26,7 +26,6 @@ export default function MonthYearPage() {
   const year = Number(params.year);
   const { getCategoryIcon } = useCategoryIcon();
 
-  // Use the custom hook to calculate previous month and year
   const { prevMonth, prevYear } = usePreviousMonth(month, year);
 
   const date = new Date(year, month - 1); // Adjust for 0-indexed months in JS
@@ -91,6 +90,9 @@ export default function MonthYearPage() {
     "Wellness and Beauty": "bg-rose-500",
     Other: "bg-gray-500",
     Gifts: "bg-red-500",
+    // Income categories
+    Paycheck: "bg-green-600",
+    Gift: "bg-teal-500",
   };
 
   // Create a map of previous month expenses by category name
@@ -172,9 +174,12 @@ export default function MonthYearPage() {
           <div
             className={`font-semibold text-xl pr-2 ${
               isPositiveBalance ? "text-green-400" : "text-red-400"
-            }`}
+            } cursor-pointer hover:underline`}
           >
-            {formatUSD(balance)}
+            <AddRecordDialog
+              isIncome={true}
+              trigger={<span>{formatUSD(balance)}</span>}
+            />
           </div>
         )}
       </div>

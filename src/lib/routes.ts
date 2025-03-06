@@ -10,6 +10,8 @@ export const ApiRoutes = {
   allRecordsByMonth: (year: number, month: Month) =>
     `/api/records/calendar/${year}/${month}/records`,
   categories: () => `/api/categories`,
+  expenseCategories: () => `/api/categories/expense`,
+  incomeCategories: () => `/api/categories/income`,
   allTimeSummary: () => `/api/records/summary`,
 } as const;
 

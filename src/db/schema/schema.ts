@@ -14,6 +14,7 @@ export const categories = pgTable("categories", {
   name: text().notNull(),
   order: integer().notNull(),
   icon: text().notNull(),
+  isExpense: boolean().notNull().default(true),
 });
 
 export const records = pgTable(

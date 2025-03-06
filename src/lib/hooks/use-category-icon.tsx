@@ -3,6 +3,7 @@ import {
   DramaIcon,
   GiftIcon,
   GraduationCapIcon,
+  HandCoinsIcon,
   HeartPulseIcon,
   HelpCircleIcon,
   HomeIcon,
@@ -36,6 +37,8 @@ export function useCategoryIcon() {
         return ReceiptTextIcon;
       case "gift":
         return GiftIcon;
+      case "hand-coins":
+        return HandCoinsIcon;
       default:
         return HelpCircleIcon;
     }
