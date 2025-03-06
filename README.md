@@ -31,35 +31,37 @@ npm run db:generate
 
 ### Environment Variables
 
-Make sure the following environment variables are set in your Railway project:
-
+For Railway deployment, you only need:
 - `DATABASE_URL` (automatically provided by Railway PostgreSQL plugin)
-- `NODE_ENV=production`
+- `NODE_ENV=production` (set this manually if not already set)
 
-### Database Migration on Railway
+### Database Connection
 
-The migration script (`src/db/migrate.ts`) is configured to detect production environment and use the correct database connection:
+The application uses a simple, consistent approach for database connections:
 
 ```typescript
-// Check if running in production (which we'll assume is Railway)
-const isProduction = process.env.NODE_ENV === "production";
-
-let connectionConfig;
-
-if (isProduction && process.env.DATABASE_URL) {
-  console.log("Using production database configuration");
-  // In production, use the DATABASE_URL provided by Railway
+// Prefer DATABASE_URL if available (for both local and production)
+if (process.env.DATABASE_URL) {
+  console.log("Using DATABASE_URL for connection");
   connectionConfig = {
     connectionString: process.env.DATABASE_URL,
-    ssl: { rejectUnauthorized: false }
+    // Only use SSL in production
+    ...(process.env.NODE_ENV === "production" && { ssl: { rejectUnauthorized: false } })
   };
 } else {
-  // For local development, use individual connection parameters
-  // ...
+  // Fallback to individual parameters if DATABASE_URL is not available
+  console.log("Using individual connection parameters");
+  connectionConfig = {
+    host: process.env.POSTGRES_HOST,
+    port: Number(process.env.POSTGRES_PORT),
+    user: process.env.POSTGRES_USER,
+    password: process.env.POSTGRES_PASSWORD,
+    database: process.env.POSTGRES_DATABASE,
+  };
 }
 ```
 
-This allows the migration to run successfully during deployment without modifying any other files.
+This approach works for both local development and production environments.
 
 ## Troubleshooting
 
@@ -67,6 +69,6 @@ This allows the migration to run successfully during deployment without modifyin
 
 If you encounter database connection errors:
 
-1. Make sure the PostgreSQL service is running on Railway
-2. Verify that the `DATABASE_URL` environment variable is correctly set
+1. Make sure the PostgreSQL service is running
+2. Verify that either `DATABASE_URL` or the individual connection parameters are correctly set
 3. Check the application logs for specific error messages

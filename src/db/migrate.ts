@@ -1,7 +1,7 @@
 import * as dotenv from "dotenv";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
-import { Pool, PoolConfig } from "pg";
+import { Pool } from "pg";
 
 // Load environment variables from .env.local file
 dotenv.config({ path: ".env.local" });
@@ -10,20 +10,21 @@ async function main() {
   console.log("Migration started...");
 
   // Initialize PostgreSQL connection pool
-  // Check if running in production (which we'll assume is Railway)
-  const isProduction = process.env.NODE_ENV === "production";
-  let connectionConfig: PoolConfig;
+  let connectionConfig;
 
-  if (isProduction) {
-    console.log("Using production database configuration");
-    // In production, use the DATABASE_URL provided by Railway
+  // Prefer DATABASE_URL if available (for both local and production)
+  if (process.env.DATABASE_URL) {
+    console.log("Using DATABASE_URL for connection");
     connectionConfig = {
       connectionString: process.env.DATABASE_URL,
-      ssl: { rejectUnauthorized: false },
+      // Only use SSL in production
+      ...(process.env.NODE_ENV === "production" && {
+        ssl: { rejectUnauthorized: false },
+      }),
     };
   } else {
-    console.log("Using local database configuration");
-    // For local development, use the individual connection parameters
+    // Fallback to individual parameters if DATABASE_URL is not available
+    console.log("Using individual connection parameters");
     connectionConfig = {
       host: process.env.POSTGRES_HOST,
       port: Number(process.env.POSTGRES_PORT),
