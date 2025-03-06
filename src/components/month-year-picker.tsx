@@ -109,14 +109,28 @@ export function MonthYearPicker({
               selectedDate.getMonth() === index &&
               selectedDate.getFullYear() === viewDate.getFullYear();
 
+            const isCurrentMonth =
+              currentDate.getMonth() === index &&
+              currentDate.getFullYear() === viewDate.getFullYear();
+
             return (
               <Button
                 key={monthName}
                 variant={isSelected ? "default" : "outline"}
-                className="h-9 py-7"
+                className={cn(
+                  "h-9 py-7",
+                  isCurrentMonth &&
+                    !isSelected &&
+                    "border-2 border-blue-500 font-bold"
+                )}
                 onClick={() => handleSelectMonth(index)}
               >
                 {monthName}
+                {isCurrentMonth && (
+                  <span className="absolute top-0 right-1 text-xs text-blue-500">
+                    •
+                  </span>
+                )}
               </Button>
             );
           })}

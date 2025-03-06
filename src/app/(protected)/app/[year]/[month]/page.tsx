@@ -232,7 +232,7 @@ export default function MonthYearPage() {
                 {formatUSD(totalMonthlyAmount)}
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-3">
               {hasValidData && (
                 <div className="mb-6">
                   <SegmentedProgress
