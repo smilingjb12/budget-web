@@ -12,7 +12,7 @@ import {
   Select,
   SelectContent,
   SelectItem,
-  SelectTrigger,
+  SelectTriggerNoChevron,
   SelectValue,
 } from "@/components/ui/select";
 import { useCategoryIcon } from "@/lib/hooks/use-category-icon";
@@ -182,7 +182,7 @@ export default function MonthYearPage() {
     const absValue = Math.abs(difference);
 
     return {
-      text: `($${absValue.toFixed(2)})`,
+      text: `$${absValue.toFixed(2)}`,
       icon: isMore ? (
         <ArrowUp className="h-4 w-4" />
       ) : (
@@ -201,9 +201,9 @@ export default function MonthYearPage() {
             value={viewType}
             onValueChange={(value) => setViewType(value as ViewType)}
           >
-            <SelectTrigger className="w-[60px]">
+            <SelectTriggerNoChevron className="w-auto">
               <SelectValue placeholder="View" />
-            </SelectTrigger>
+            </SelectTriggerNoChevron>
             <SelectContent>
               <SelectItem value="expenses">E</SelectItem>
               <SelectItem value="income">I</SelectItem>

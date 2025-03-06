@@ -72,13 +72,13 @@ export function CategoryRecords({
           {categoryName}
         </span>
         <span className="flex items-center gap-2">
-          {formatUSD(totalExpenses)}
           {difference && (
-            <span className={`flex items-center text-sm ${difference.color}`}>
+            <span className={`flex items-center text-xs ${difference.color}`}>
               {difference.text}
               {difference.icon}
             </span>
           )}
+          {formatUSD(totalExpenses)}
         </span>
       </div>
 
