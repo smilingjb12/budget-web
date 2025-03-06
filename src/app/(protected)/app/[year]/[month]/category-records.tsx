@@ -21,6 +21,7 @@ interface CategoryRecordsProps {
     color: string;
     icon?: React.ReactNode;
   };
+  isExpense?: boolean;
 }
 
 export function CategoryRecords({
@@ -31,6 +32,7 @@ export function CategoryRecords({
   totalExpenses,
   icon,
   difference,
+  isExpense = true,
 }: CategoryRecordsProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const { getCategoryIcon } = useCategoryIcon();
@@ -49,9 +51,12 @@ export function CategoryRecords({
     enabled: isExpanded, // Only fetch when expanded
   });
 
-  // Filter records by category
+  // Filter records by category and expense/income type
   const categoryRecords =
-    records?.filter((record) => record.categoryId === categoryId) || [];
+    records?.filter(
+      (record) =>
+        record.categoryId === categoryId && record.isExpense === isExpense
+    ) || [];
 
   const toggleExpand = () => {
     setIsExpanded(!isExpanded);
@@ -99,6 +104,7 @@ export function CategoryRecords({
                 <AddRecordDialog
                   key={record.id}
                   recordId={record.id}
+                  isIncome={!isExpense}
                   trigger={
                     <div className="flex justify-between items-center py-2 px-3 text-sm border border-border rounded-md cursor-pointer hover:bg-muted/50">
                       <div className="flex flex-col w-full">

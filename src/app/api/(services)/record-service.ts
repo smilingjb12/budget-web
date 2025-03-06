@@ -5,8 +5,9 @@ import { z } from "zod";
 
 export type CategorySummaryDto = {
   categoryName: string;
-  totalExpenses: number;
+  total: number;
   icon: string;
+  isExpense: boolean;
 };
 
 export type MonthSummaryDto = {
@@ -42,18 +43,20 @@ export type CreateOrUpdateRecordRequest = z.infer<
 
 export const RecordService = {
   async getMonthSummary(year: number, month: number): Promise<MonthSummaryDto> {
+    // Get all categories in a single query
     const categorySummaries = await db
       .select({
         categoryName: categories.name,
-        totalExpenses: sql<number>`SUM(${records.value})`,
+        total: sql<number>`SUM(${records.value})`,
         icon: categories.icon,
+        isExpense: records.isExpense,
       })
       .from(records)
       .innerJoin(categories, sql`${records.categoryId} = ${categories.id}`)
       .where(
-        sql`EXTRACT(YEAR FROM ${records.date}) = ${year} AND EXTRACT(MONTH FROM ${records.date}) = ${month} AND ${records.isExpense} = true`
+        sql`EXTRACT(YEAR FROM ${records.date}) = ${year} AND EXTRACT(MONTH FROM ${records.date}) = ${month}`
       )
-      .groupBy(categories.name, categories.icon)
+      .groupBy(categories.name, categories.icon, records.isExpense)
       .orderBy(sql`SUM(${records.value}) DESC`);
 
     return {

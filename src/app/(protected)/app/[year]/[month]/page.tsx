@@ -8,6 +8,13 @@ import {
 import { MonthYearPicker } from "@/components/month-year-picker";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SegmentedProgress } from "@/components/ui/segmented-progress";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useCategoryIcon } from "@/lib/hooks/use-category-icon";
 import { usePreviousMonth } from "@/lib/hooks/use-previous-month";
 import { QueryKeys } from "@/lib/query-keys";
@@ -17,10 +24,15 @@ import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { ArrowDown, ArrowUp } from "lucide-react";
 import { useParams } from "next/navigation";
+import { useState } from "react";
 import { AddRecordDialog } from "./add-record-dialog";
 import { CategoryRecords } from "./category-records";
 
+// Define view type for toggling between expenses and income
+type ViewType = "expenses" | "income";
+
 export default function MonthYearPage() {
+  const [viewType, setViewType] = useState<ViewType>("expenses");
   const params = useParams<{ month: string; year: string }>();
   const month = Number(params.month) as Month;
   const year = Number(params.year);
@@ -32,6 +44,7 @@ export default function MonthYearPage() {
   const monthName = format(date, "MMMM");
   const yearString = format(date, "yyyy");
 
+  // Fetch data for both expenses and income
   const { data, error } = useQuery<MonthSummaryDto>({
     queryKey: QueryKeys.monthSummary(year, month),
     queryFn: async () => {
@@ -95,20 +108,33 @@ export default function MonthYearPage() {
     Gift: "bg-teal-500",
   };
 
+  // Filter categories based on the selected view type
+  const filteredCategories =
+    data?.categorySummaries?.filter(
+      (category) =>
+        (viewType === "expenses" && category.isExpense) ||
+        (viewType === "income" && !category.isExpense)
+    ) || [];
+
   // Create a map of previous month expenses by category name
   const prevMonthExpensesByCategory = new Map<string, number>();
   prevMonthData?.categorySummaries?.forEach((category) => {
-    prevMonthExpensesByCategory.set(
-      category.categoryName,
-      Number(category.totalExpenses)
-    );
+    if (
+      (viewType === "expenses" && category.isExpense) ||
+      (viewType === "income" && !category.isExpense)
+    ) {
+      prevMonthExpensesByCategory.set(
+        category.categoryName,
+        Number(category.total)
+      );
+    }
   });
 
   // Enhance current month data with previous month comparison
-  const enhancedCategories = data?.categorySummaries?.map((category) => {
+  const enhancedCategories = filteredCategories.map((category) => {
     const previousMonthExpenses =
       prevMonthExpensesByCategory.get(category.categoryName) || 0;
-    const difference = Number(category.totalExpenses) - previousMonthExpenses;
+    const difference = Number(category.total) - previousMonthExpenses;
 
     return {
       ...category,
@@ -117,20 +143,20 @@ export default function MonthYearPage() {
     };
   });
 
-  // Calculate total spending for all categories
-  const totalMonthlySpending =
-    enhancedCategories?.reduce(
-      (sum, category) => sum + Number(category.totalExpenses),
+  // Calculate total spending or income for all categories
+  const totalMonthlyAmount =
+    enhancedCategories.reduce(
+      (sum, category) => sum + Number(category.total),
       0
     ) || 0;
 
   // Sort categories by value for better visualization
-  const sortedCategories = [...(enhancedCategories || [])].sort(
-    (a, b) => b.totalExpenses - a.totalExpenses
+  const sortedCategories = [...enhancedCategories].sort(
+    (a, b) => b.total - a.total
   );
 
   // Ensure we have valid data for the progress bar
-  const hasValidData = totalMonthlySpending > 0 && sortedCategories.length > 0;
+  const hasValidData = totalMonthlyAmount > 0 && sortedCategories.length > 0;
 
   // Calculate balance (profit - expenses)
   const balance = allTimeSummary
@@ -169,7 +195,21 @@ export default function MonthYearPage() {
   return (
     <div className="p-0 space-y-4 relative">
       <div className="flex justify-between items-center">
-        <MonthYearPicker initialMonth={month} initialYear={year} />
+        <div className="flex items-center gap-2">
+          <MonthYearPicker initialMonth={month} initialYear={year} />
+          <Select
+            value={viewType}
+            onValueChange={(value) => setViewType(value as ViewType)}
+          >
+            <SelectTrigger className="w-[80px]">
+              <SelectValue placeholder="View" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="expenses">E</SelectItem>
+              <SelectItem value="income">I</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
         {!isLoadingAllTime && allTimeSummary && (
           <div
             className={`font-semibold text-xl pr-2 ${
@@ -184,12 +224,12 @@ export default function MonthYearPage() {
         )}
       </div>
 
-      {data && data.categorySummaries && data.categorySummaries.length > 0 ? (
+      {filteredCategories.length > 0 ? (
         <div className="grid grid-cols-1 gap-4">
           <Card>
             <CardHeader>
               <CardTitle className="text-center">
-                {formatUSD(totalMonthlySpending)}
+                {formatUSD(totalMonthlyAmount)}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -200,7 +240,7 @@ export default function MonthYearPage() {
                     segments={sortedCategories.map((category) => {
                       const IconComponent = getCategoryIcon(category.icon);
                       return {
-                        value: Number(category.totalExpenses),
+                        value: Number(category.total),
                         color:
                           categoryColors[category.categoryName] || undefined,
                         tooltip: (
@@ -210,10 +250,9 @@ export default function MonthYearPage() {
                               <span>{category.categoryName}</span>
                             </div>
                             <div className="text-xs mt-1">
-                              {formatUSD(Number(category.totalExpenses))} (
+                              {formatUSD(Number(category.total))} (
                               {(
-                                (Number(category.totalExpenses) /
-                                  totalMonthlySpending) *
+                                (Number(category.total) / totalMonthlyAmount) *
                                 100
                               ).toFixed(1)}
                               %)
@@ -245,9 +284,10 @@ export default function MonthYearPage() {
                       categoryId={categoryData?.id || 0}
                       year={year}
                       month={month}
-                      totalExpenses={Number(category.totalExpenses)}
+                      totalExpenses={Number(category.total)}
                       icon={category.icon}
                       difference={diff || undefined}
+                      isExpense={category.isExpense}
                     />
                   );
                 })}
@@ -259,15 +299,14 @@ export default function MonthYearPage() {
         <Card>
           <CardContent className="p-6">
             <p className="text-center text-muted-foreground">
-              No expense data available for {monthName} {yearString}.
+              No {viewType} data available for {monthName} {yearString}.
             </p>
           </CardContent>
         </Card>
       )}
 
-      {/* Floating Action Button (FAB) */}
       <div className="fixed bottom-6 right-6 z-50">
-        <AddRecordDialog />
+        <AddRecordDialog isIncome={viewType === "income"} />
       </div>
     </div>
   );

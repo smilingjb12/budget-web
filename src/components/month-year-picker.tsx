@@ -116,7 +116,7 @@ export function MonthYearPicker({
               <Button
                 key={monthName}
                 variant={isSelected ? "default" : "outline"}
-                className="h-9"
+                className="h-9 py-7"
                 onClick={() => handleSelectMonth(index)}
               >
                 {monthName}
