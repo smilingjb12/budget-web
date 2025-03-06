@@ -33,6 +33,7 @@ async function main() {
     };
   }
 
+  console.log("connectionConfig:", connectionConfig);
   const pool = new Pool(connectionConfig);
 
   const db = drizzle(pool);
