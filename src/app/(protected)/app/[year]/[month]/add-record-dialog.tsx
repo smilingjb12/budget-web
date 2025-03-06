@@ -143,6 +143,9 @@ export function AddRecordDialog({
         const now = new Date(); // Get current date and time
         const date = new Date(year, month - 1); // Set year and month (0-indexed)
 
+        // Set the current day
+        date.setDate(now.getDate());
+
         // Copy the current time to our date
         date.setHours(now.getHours());
         date.setMinutes(now.getMinutes());
