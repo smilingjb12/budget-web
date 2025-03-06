@@ -84,7 +84,7 @@ export function CategoryRecords({
       </div>
 
       {isExpanded && (
-        <div className="pl-6 space-y-2 slide-in-from-top-2 duration-200">
+        <div className="pl-0 space-y-2 slide-in-from-top-2 duration-200">
           {isLoading ? (
             <div className="text-sm text-muted-foreground">
               Loading records...
@@ -101,20 +101,28 @@ export function CategoryRecords({
                   recordId={record.id}
                   trigger={
                     <div className="flex justify-between items-center py-2 px-3 text-sm border border-border rounded-md cursor-pointer hover:bg-muted/50">
-                      <div className="flex items-center gap-4">
-                        <span className="text-md text-muted-foreground">
-                          {format(
-                            parseISO(record.dateUtc),
-                            "MMM d, yyyy h:mm a"
-                          )}
-                        </span>
-                        <span className="font-medium text-md">
-                          {formatUSD(record.value)}
-                        </span>
-                        {record.comment && (
-                          <span className="text-muted-foreground">
-                            {record.comment}
+                      <div className="flex flex-col w-full">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-md text-muted-foreground">
+                              {format(
+                                parseISO(record.dateUtc),
+                                "MMM d, yyyy HH:mm"
+                              )}
+                            </span>
+                          </div>
+                          <span className="font-medium text-md">
+                            {formatUSD(record.value)}
                           </span>
+                        </div>
+                        {record.comment && (
+                          <div className="mt-1">
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-secondary-foreground/90">
+                                {record.comment}
+                              </span>
+                            </div>
+                          </div>
                         )}
                       </div>
                     </div>
