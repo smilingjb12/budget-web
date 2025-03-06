@@ -6,6 +6,7 @@ import {
   MonthSummaryDto,
 } from "@/app/api/(services)/record-service";
 import { MonthYearPicker } from "@/components/month-year-picker";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SegmentedProgress } from "@/components/ui/segmented-progress";
 import {
@@ -16,14 +17,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useCategoryIcon } from "@/lib/hooks/use-category-icon";
-import { usePreviousMonth } from "@/lib/hooks/use-previous-month";
+import { useMonthNavigation } from "@/lib/hooks/use-previous-month";
 import { QueryKeys } from "@/lib/query-keys";
-import { ApiRoutes, Month } from "@/lib/routes";
+import { ApiRoutes, Month, Routes } from "@/lib/routes";
 import { formatUSD } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
-import { ArrowDown, ArrowUp } from "lucide-react";
-import { useParams } from "next/navigation";
+import { ArrowDown, ArrowUp, ChevronLeft, ChevronRight } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import { AddRecordDialog } from "./add-record-dialog";
 import { CategoryRecords } from "./category-records";
@@ -37,8 +38,21 @@ export default function MonthYearPage() {
   const month = Number(params.month) as Month;
   const year = Number(params.year);
   const { getCategoryIcon } = useCategoryIcon();
+  const router = useRouter();
 
-  const { prevMonth, prevYear } = usePreviousMonth(month, year);
+  const { prevMonth, prevYear, nextMonth, nextYear } = useMonthNavigation(
+    month,
+    year
+  );
+
+  // Check if next month is in the future
+  const currentDate = new Date();
+  const nextMonthDate = new Date(nextYear, nextMonth - 1);
+  const currentMonthDate = new Date(
+    currentDate.getFullYear(),
+    currentDate.getMonth()
+  );
+  const isNextMonthInFuture = nextMonthDate > currentMonthDate;
 
   const date = new Date(year, month - 1); // Adjust for 0-indexed months in JS
   const monthName = format(date, "MMMM");
@@ -82,6 +96,14 @@ export default function MonthYearPage() {
       return response.json() as Promise<CategoryDto[]>;
     },
   });
+
+  const handlePreviousMonth = () => {
+    router.push(Routes.monthlyExpensesSummary(prevYear, prevMonth));
+  };
+
+  const handleNextMonth = () => {
+    router.push(Routes.monthlyExpensesSummary(nextYear, nextMonth));
+  };
 
   if (error) {
     return (
@@ -149,6 +171,19 @@ export default function MonthYearPage() {
       (sum, category) => sum + Number(category.total),
       0
     ) || 0;
+
+  // Calculate total for previous month
+  const totalPreviousMonthAmount =
+    prevMonthData?.categorySummaries
+      ?.filter(
+        (category) =>
+          (viewType === "expenses" && category.isExpense) ||
+          (viewType === "income" && !category.isExpense)
+      )
+      .reduce((sum, category) => sum + Number(category.total), 0) || 0;
+
+  // Calculate the difference between current and previous month totals
+  const totalMonthDifference = totalMonthlyAmount - totalPreviousMonthAmount;
 
   // Sort categories by value for better visualization
   const sortedCategories = [...enhancedCategories].sort(
@@ -227,10 +262,46 @@ export default function MonthYearPage() {
       {filteredCategories.length > 0 ? (
         <div className="grid grid-cols-1 gap-4">
           <Card>
-            <CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handlePreviousMonth}
+                aria-label="Previous month"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
               <CardTitle className="text-center">
                 {formatUSD(totalMonthlyAmount)}
+                {(() => {
+                  const monthDiff = formatDifference(
+                    totalMonthDifference,
+                    totalPreviousMonthAmount
+                  );
+                  return (
+                    monthDiff && (
+                      <span
+                        className={`ml-2 text-sm items-center inline-flex ${monthDiff.color}`}
+                      >
+                        {monthDiff.text}
+                        {monthDiff.icon}
+                      </span>
+                    )
+                  );
+                })()}
               </CardTitle>
+              {!isNextMonthInFuture ? (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleNextMonth}
+                  aria-label="Next month"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              ) : (
+                <div className="w-9 h-9"></div> // Empty div to maintain layout
+              )}
             </CardHeader>
             <CardContent className="p-3">
               {hasValidData && (
