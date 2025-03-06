@@ -13,15 +13,13 @@ import {
 import { Form } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Routes } from "@/lib/routes";
-import { useAuthActions } from "@convex-dev/auth/react";
+import { Month, Routes } from "@/lib/routes";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { useSignIn } from "./hooks/use-sign-in";
 
 type Flow = "signUp" | "signIn";
 
@@ -34,12 +32,10 @@ const formSchema = z.object({
 });
 
 export default function SignInPage() {
-  const { signIn } = useAuthActions();
   const [step, setStep] = useState<Flow>("signIn");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
-  const { getErrorTitle } = useSignIn();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -52,27 +48,28 @@ export default function SignInPage() {
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     setIsLoading(true);
-    const formData = new FormData();
-    formData.append("email", values.email);
-    formData.append("password", values.password);
-    formData.append("flow", values.flow);
 
-    signIn("password", formData)
-      .then(() => {
-        router.push(Routes.auctionsList(new Date().getFullYear()));
-      })
-      .catch((error) => {
-        console.error(error);
-        const errorTitle = getErrorTitle(error as { message: string });
-        console.error(errorTitle);
+    // Simulate authentication - replace with your actual auth logic
+    setTimeout(() => {
+      // For demo purposes, any login succeeds
+      if (values.flow === "signIn") {
+        // In a real app, you would validate credentials here
+        localStorage.setItem("isAuthenticated", "true");
+        localStorage.setItem("userEmail", values.email);
+        router.push(
+          Routes.recordsByMonth((new Date().getMonth() + 1) as Month)
+        );
+      } else {
+        // In a real app, you would create a user here
         toast({
-          title: "Invalid Email or Password",
-          variant: "destructive",
+          title: "Account created successfully",
+          description: "You can now sign in with your credentials",
         });
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
+        setStep("signIn");
+        form.setValue("flow", "signIn");
+      }
+      setIsLoading(false);
+    }, 1000);
   };
 
   return (

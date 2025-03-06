@@ -5,8 +5,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useAuthActions } from "@convex-dev/auth/react";
 import { LogOut } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface Props {
   email: string | null | undefined;
@@ -14,7 +14,7 @@ interface Props {
 }
 
 export const AvatarDropdown = ({ email, imageUrl }: Props) => {
-  const { signOut } = useAuthActions();
+  const router = useRouter();
   const nameAcronym =
     email
       ?.split("@")
@@ -32,6 +32,15 @@ export const AvatarDropdown = ({ email, imageUrl }: Props) => {
     );
   };
 
+  const handleSignOut = () => {
+    // Clear authentication data
+    localStorage.removeItem("isAuthenticated");
+    localStorage.removeItem("userEmail");
+
+    // Redirect to sign-in page
+    router.push("/sign-in");
+  };
+
   return (
     <>
       <DropdownMenu modal={false}>
@@ -42,7 +51,7 @@ export const AvatarDropdown = ({ email, imageUrl }: Props) => {
             <div className="text-sm flex items-center">{email}</div>
           </div>
           <DropdownMenuItem
-            onClick={() => signOut()}
+            onClick={handleSignOut}
             className="px-8 py-3 cursor-pointer"
           >
             <LogOut className="mr-2 h-4 w-4" />

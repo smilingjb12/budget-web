@@ -25,7 +25,7 @@ import type { GenericId } from "convex/values";
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
 
 export interface DataTableMeta<
-  TData extends { id: GenericId<string> },
+  TData extends { id: GenericId<string> } | { id: number | string },
   TEditableFields extends keyof TData = never,
   TId = TData["id"],
 > {
@@ -35,7 +35,7 @@ export interface DataTableMeta<
 }
 
 export interface DataTableProps<
-  TData extends { id: GenericId<string> },
+  TData extends { id: GenericId<string> } | { id: number | string },
   TEditableFields extends keyof TData = never,
   TId = TData["id"],
 > {
@@ -50,7 +50,7 @@ export interface DataTableProps<
 }
 
 export function DataTable<
-  TData extends { id: GenericId<string> },
+  TData extends { id: GenericId<string> } | { id: number | string },
   TEditableFields extends keyof TData = never,
   TId = TData["id"],
 >({

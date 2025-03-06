@@ -1,28 +1,16 @@
-export const LIST_SEGMENT = "list";
-export const CALENDAR_SEGMENT = "calendar";
-export const AUCTIONS_SEGMENT = "auctions";
-export const DETAILS_SEGMENT = "details";
-export const PROGRESS_SEGMENT = "progress";
-export const BILLINGS_SEGMENT = "billings";
-export const LOTS_SEGMENT = "lots";
+export const APP_SEGMENT = "app";
+
+export type Month = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
+
+export const ApiRoutes = {
+  recordsByMonth: (month: Month) => `/api/records/months/${month}`,
+  categories: () => `/api/categories`,
+  allTimeSummary: () => `/api/records/summary`,
+} as const;
 
 export const Routes = {
-  auctionsList(year: number) {
-    return `/${AUCTIONS_SEGMENT}/${year}/${LIST_SEGMENT}`;
-  },
-  auctionDetailsProgress(auctionId: string) {
-    return `/${AUCTIONS_SEGMENT}/${DETAILS_SEGMENT}/${auctionId}/${PROGRESS_SEGMENT}`;
-  },
-  auctionDetailsBillings(auctionId: string) {
-    return `/${AUCTIONS_SEGMENT}/${DETAILS_SEGMENT}/${auctionId}/${BILLINGS_SEGMENT}`;
-  },
-  auctionDetailsLots(auctionId: string) {
-    return `/${AUCTIONS_SEGMENT}/${DETAILS_SEGMENT}/${auctionId}/${LOTS_SEGMENT}`;
-  },
-  auctionsCalendar(year: number) {
-    return `/${AUCTIONS_SEGMENT}/${year}/${CALENDAR_SEGMENT}`;
-  },
+  recordsByMonth: (month: Month) => `/app/months/${month}`,
   signIn() {
     return "/sign-in";
   },
-};
+} as const;

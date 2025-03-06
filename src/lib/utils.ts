@@ -15,6 +15,13 @@ export function formatEuro(money: number): string {
   return `€ ${value}`;
 }
 
+export function formatUSD(amount: number): string {
+  return `$${amount.toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
+}
+
 export function unixToDate(timestamp: number): Date {
   return fromUnixTime(timestamp / 1000);
 }

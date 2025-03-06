@@ -1,25 +1,24 @@
 "use client";
 
 import { ThemeProvider } from "@/components/theme-provider";
-import { nextEnv } from "@/nextEnv";
-import { ConvexAuthNextjsProvider } from "@convex-dev/auth/nextjs";
-import { ConvexReactClient } from "convex/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Provider as JotaiProvider } from "jotai";
-
-const convex = new ConvexReactClient(nextEnv.NEXT_PUBLIC_CONVEX_URL);
+import { useState } from "react";
 
 export const Providers = ({ children }: { children: React.ReactNode }) => {
+  const [queryClient] = useState(() => new QueryClient());
+
   return (
-    <ConvexAuthNextjsProvider client={convex}>
+    <QueryClientProvider client={queryClient}>
       <JotaiProvider>
         <ThemeProvider
           attribute="class"
-          defaultTheme="light"
+          defaultTheme="dark"
           disableTransitionOnChange
         >
           {children}
         </ThemeProvider>
       </JotaiProvider>
-    </ConvexAuthNextjsProvider>
+    </QueryClientProvider>
   );
 };
