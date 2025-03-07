@@ -17,6 +17,7 @@ export const ApiRoutes = {
   allTimeSummary: () => `/api/records/summary`,
   expensesByCategory: (categoryId: number) =>
     `/api/charts/expenses-by-category/${categoryId}`,
+  expensesVsIncome: () => `/api/charts/expenses-vs-income`,
   exchangeRate: () => `/api/exchange-rate`,
 } as const;
 

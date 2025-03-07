@@ -7,6 +7,12 @@ export type MonthlyTotalsDto = {
   total: number;
 };
 
+export type MonthlyExpensesVsIncomeDto = {
+  monthDate: string; // Format: YYYY-MM
+  expenses: number;
+  income: number;
+};
+
 export const getExpensesByCategorySchema = z.object({
   categoryId: z.number(),
 });
@@ -39,6 +45,52 @@ export const ChartsService = {
     return result.map((item) => ({
       monthDate: `${item.year}-${item.month.toString().padStart(2, "0")}`,
       total: parseFloat(String(item.total)),
+    }));
+  },
+
+  async getMonthlyExpensesVsIncome(): Promise<MonthlyExpensesVsIncomeDto[]> {
+    const result = await db
+      .select({
+        year: sql<number>`EXTRACT(YEAR FROM ${records.date})`,
+        month: sql<number>`EXTRACT(MONTH FROM ${records.date})`,
+        isExpense: records.isExpense,
+        total: sql<number>`SUM(${records.value})`,
+      })
+      .from(records)
+      .groupBy(
+        sql`EXTRACT(YEAR FROM ${records.date})`,
+        sql`EXTRACT(MONTH FROM ${records.date})`,
+        records.isExpense
+      )
+      .orderBy(
+        sql`EXTRACT(YEAR FROM ${records.date})`,
+        sql`EXTRACT(MONTH FROM ${records.date})`
+      );
+
+    // Transform the result into the required format
+    const monthlyData: Record<string, { expenses: number; income: number }> =
+      {};
+
+    result.forEach((item) => {
+      const monthDate = `${item.year}-${item.month
+        .toString()
+        .padStart(2, "0")}`;
+
+      if (!monthlyData[monthDate]) {
+        monthlyData[monthDate] = { expenses: 0, income: 0 };
+      }
+
+      if (item.isExpense) {
+        monthlyData[monthDate].expenses = parseFloat(String(item.total));
+      } else {
+        monthlyData[monthDate].income = parseFloat(String(item.total));
+      }
+    });
+
+    return Object.entries(monthlyData).map(([monthDate, data]) => ({
+      monthDate,
+      expenses: data.expenses,
+      income: data.income,
     }));
   },
 };

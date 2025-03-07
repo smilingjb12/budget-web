@@ -1,7 +1,10 @@
 "use client";
 
 import { CategoryDto } from "@/app/api/(services)/category-service";
-import { MonthlyTotalsDto } from "@/app/api/(services)/charts-service";
+import {
+  MonthlyExpensesVsIncomeDto,
+  MonthlyTotalsDto,
+} from "@/app/api/(services)/charts-service";
 import {
   AllTimeSummaryDto,
   MonthSummaryDto,
@@ -104,6 +107,37 @@ export function useCategoryExpensesQuery(categoryId: number) {
       });
     },
     enabled: !!categoryId,
+  });
+}
+
+// Expenses vs Income query
+export function useExpensesVsIncomeQuery() {
+  return useQuery({
+    queryKey: QueryKeys.expensesVsIncome(),
+    queryFn: async () => {
+      const response = await fetch(ApiRoutes.expensesVsIncome());
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch expenses vs income data");
+      }
+
+      const data = (await response.json()) as MonthlyExpensesVsIncomeDto[];
+
+      // Transform the data for the chart - include year information
+      return data.map((item) => {
+        const date = parse(item.monthDate + "-01", "yyyy-MM-dd", new Date());
+        return {
+          name: format(date, "MMM"),
+          month: format(date, "MMM"),
+          year: format(date, "yyyy"),
+          yearMonth: item.monthDate,
+          expenses: item.expenses,
+          income: item.income,
+          // Add a flag for the first month of the year
+          isFirstMonthOfYear: item.monthDate.endsWith("-01"),
+        };
+      });
+    },
   });
 }
 
