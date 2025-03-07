@@ -5,6 +5,7 @@ import {
   AllTimeSummaryDto,
   MonthSummaryDto,
 } from "@/app/api/(services)/record-service";
+import LoadingIndicator from "@/components/loading-indicator";
 import { MonthYearPicker } from "@/components/month-year-picker";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -60,7 +61,7 @@ export default function MonthYearPage() {
   const yearString = format(date, "yyyy");
 
   // Fetch data for both expenses and income
-  const { data, error } = useMonthSummaryQuery(year, month);
+  const { data, error, isLoading } = useMonthSummaryQuery(year, month);
 
   // Fetch previous month data
   const { data: prevMonthData } = useQuery<MonthSummaryDto>({
@@ -365,9 +366,18 @@ export default function MonthYearPage() {
       ) : (
         <Card>
           <CardContent className="p-6">
-            <p className="text-center text-muted-foreground">
-              No {viewType} data available for {monthName} {yearString}.
-            </p>
+            {isLoading ? (
+              <div className="py-8">
+                <LoadingIndicator className="h-24" />
+                <p className="text-center text-muted-foreground mt-4">
+                  Loading {viewType} data for {monthName} {yearString}...
+                </p>
+              </div>
+            ) : (
+              <p className="text-center text-muted-foreground py-8">
+                No {viewType} data available for {monthName} {yearString}.
+              </p>
+            )}
           </CardContent>
         </Card>
       )}
