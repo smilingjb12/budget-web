@@ -3,6 +3,7 @@ import { APP_SEGMENT, Month, Routes } from "./lib/routes";
 
 const SIGNIN_ROUTE = Routes.signIn();
 const APP_WILDCARD = `/${APP_SEGMENT}(.*)`;
+const API_WILDCARD = `/api/(.*)`;
 
 // Helper function to check if a route matches a pattern
 const createRouteMatcher = (patterns: string[]) => {
@@ -18,7 +19,8 @@ const createRouteMatcher = (patterns: string[]) => {
 };
 
 const isSignInPage = createRouteMatcher([SIGNIN_ROUTE]);
-const isProtectedRoute = createRouteMatcher([APP_WILDCARD]);
+const isProtectedRoute = createRouteMatcher([APP_WILDCARD, API_WILDCARD]);
+const isApiRoute = createRouteMatcher([API_WILDCARD]);
 
 export function middleware(request: NextRequest) {
   const currentDate = new Date();
@@ -40,8 +42,13 @@ export function middleware(request: NextRequest) {
   }
 
   if (isProtectedRoute(request)) {
-    // If not authenticated and trying to access protected route, redirect to sign-in
+    // If not authenticated
     if (!isAuthenticated) {
+      // For API routes, return 401 Unauthorized instead of redirecting
+      if (isApiRoute(request)) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      }
+      // For app routes, redirect to sign-in
       return NextResponse.redirect(new URL(SIGNIN_ROUTE, request.url));
     }
     return NextResponse.next();
