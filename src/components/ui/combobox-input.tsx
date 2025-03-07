@@ -21,7 +21,6 @@ interface ComboboxInputProps
   suggestions: string[];
   placeholder?: string;
   className?: string;
-  emptyMessage?: string;
 }
 
 export const ComboboxInput = React.forwardRef<
@@ -36,7 +35,6 @@ export const ComboboxInput = React.forwardRef<
       suggestions,
       placeholder = "",
       className = "",
-      emptyMessage = "No suggestions found.",
       ...props
     },
     ref

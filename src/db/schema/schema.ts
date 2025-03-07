@@ -47,3 +47,13 @@ export const exchangeRates = pgTable("exchangeRates", {
   }).notNull(),
   lastUpdatedAt: timestamp({ withTimezone: true }).notNull(),
 });
+
+export const regularPayments = pgTable("regularPayments", {
+  id: serial().primaryKey(),
+  name: text().notNull(),
+  amount: decimal({
+    precision: 10,
+    scale: 2,
+  }).notNull(),
+  date: timestamp({ withTimezone: true }).notNull(),
+});

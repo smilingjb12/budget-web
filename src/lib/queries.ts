@@ -11,8 +11,9 @@ import {
   RecordDto,
 } from "@/app/api/(services)/record-service";
 import { ExchangeRateDto } from "@/app/api/exchange-rate/route";
+import { RegularPaymentDto } from "@/app/api/regular-payments/route";
 import { ApiRoutes, Month } from "@/lib/routes";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format, parse } from "date-fns";
 import { QueryKeys } from "./query-keys";
 
@@ -255,5 +256,49 @@ export function useRecordCommentsQuery(comment: string) {
       return response.json() as Promise<string[]>;
     },
     enabled: comment.trim().length > 0,
+  });
+}
+
+// Regular payments query
+export function useRegularPaymentsQuery() {
+  return useQuery({
+    queryKey: QueryKeys.regularPayments(),
+    queryFn: async () => {
+      const response = await fetch(ApiRoutes.regularPayments());
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch regular payments");
+      }
+
+      return (await response.json()) as RegularPaymentDto[];
+    },
+  });
+}
+
+// Regular payments mutation
+export function useUpdateRegularPaymentsMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (payments: RegularPaymentDto[]) => {
+      const response = await fetch(ApiRoutes.regularPayments(), {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payments),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update regular payments");
+      }
+
+      return (await response.json()) as RegularPaymentDto[];
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: QueryKeys.regularPayments(),
+      });
+    },
   });
 }

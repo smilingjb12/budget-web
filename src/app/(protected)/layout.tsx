@@ -5,10 +5,10 @@ import {
   CHARTS_SEGMENT,
   Month,
   Routes,
-  STATS_SEGMENT,
+  SETTINGS_SEGMENT,
 } from "@/lib/routes";
 import { cn } from "@/lib/utils";
-import { BarChart2, History, LineChart } from "lucide-react";
+import { History, LineChart, Settings2 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 
 interface BottomNavItemProps {
@@ -40,10 +40,10 @@ function MobileBottomNav() {
   const isHistory =
     pathname.includes(`/${APP_SEGMENT}/`) &&
     !pathname.includes(`/${APP_SEGMENT}/${CHARTS_SEGMENT}`) &&
-    !pathname.includes(`/${APP_SEGMENT}/${STATS_SEGMENT}`);
+    !pathname.includes(`/${APP_SEGMENT}/${SETTINGS_SEGMENT}`);
 
   const isCharts = pathname.includes(`/${APP_SEGMENT}/${CHARTS_SEGMENT}`);
-  const isStats = pathname.includes(`/${APP_SEGMENT}/${STATS_SEGMENT}`);
+  const isStats = pathname.includes(`/${APP_SEGMENT}/${SETTINGS_SEGMENT}`);
 
   return (
     <div className="fixed bottom-0 left-0 right-0 border-t bg-background">
@@ -67,10 +67,10 @@ function MobileBottomNav() {
           onClick={() => router.push(Routes.charts())}
         />
         <BottomNavItem
-          icon={<BarChart2 size={24} />}
-          label="Stats"
+          icon={<Settings2 size={24} />}
+          label="Settings"
           isActive={isStats}
-          onClick={() => router.push(Routes.stats())}
+          onClick={() => router.push(Routes.settings())}
         />
       </nav>
     </div>

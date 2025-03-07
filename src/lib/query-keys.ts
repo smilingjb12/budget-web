@@ -11,4 +11,5 @@ export const QueryKeys = {
   exchangeRate: () => ["exchange-rate"],
   expensesVsIncome: () => ["expenses-vs-income"],
   recordComments: (comment: string) => ["record-comments", comment],
+  regularPayments: () => ["regular-payments"],
 } as const;

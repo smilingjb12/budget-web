@@ -1,6 +1,6 @@
 export const APP_SEGMENT = "app";
 export const CHARTS_SEGMENT = "charts";
-export const STATS_SEGMENT = "stats";
+export const SETTINGS_SEGMENT = "settings";
 
 export type Month = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
 
@@ -21,6 +21,7 @@ export const ApiRoutes = {
   exchangeRate: () => `/api/exchange-rate`,
   recordComments: (comment: string) =>
     `/api/records/comments?comment=${encodeURIComponent(comment)}`,
+  regularPayments: () => `/api/regular-payments`,
 } as const;
 
 export const Routes = {
@@ -32,7 +33,7 @@ export const Routes = {
   charts() {
     return `/${APP_SEGMENT}/${CHARTS_SEGMENT}`;
   },
-  stats() {
-    return `/${APP_SEGMENT}/${STATS_SEGMENT}`;
+  settings() {
+    return `/${APP_SEGMENT}/${SETTINGS_SEGMENT}`;
   },
 } as const;
