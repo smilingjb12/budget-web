@@ -14,21 +14,22 @@ import { ExchangeRateDto } from "@/app/api/exchange-rate/route";
 import { RegularPaymentDto } from "@/app/api/regular-payments/route";
 import { ApiRoutes, Month } from "@/lib/routes";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { format, parse } from "date-fns";
 import { QueryKeys } from "./query-keys";
+import {
+  createJsonPostOptions,
+  fetchWithErrorHandling,
+  transformMonthlyDataForChart,
+} from "./utils";
 
 // Exchange rate query
 export function useExchangeRateQuery() {
   return useQuery({
     queryKey: QueryKeys.exchangeRate(),
     queryFn: async () => {
-      const response = await fetch(ApiRoutes.exchangeRate());
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch exchange rate");
-      }
-
-      const data = (await response.json()) as ExchangeRateDto;
+      const data = await fetchWithErrorHandling<ExchangeRateDto>(
+        ApiRoutes.exchangeRate(),
+        "Failed to fetch exchange rate"
+      );
       return data.rate;
     },
   });
@@ -38,45 +39,33 @@ export function useExchangeRateQuery() {
 export function useCategoriesQuery() {
   return useQuery({
     queryKey: QueryKeys.categories(),
-    queryFn: async () => {
-      const response = await fetch(ApiRoutes.categories());
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch categories");
-      }
-
-      return response.json() as Promise<CategoryDto[]>;
-    },
+    queryFn: () =>
+      fetchWithErrorHandling<CategoryDto[]>(
+        ApiRoutes.categories(),
+        "Failed to fetch categories"
+      ),
   });
 }
 
 export function useExpenseCategoriesQuery() {
   return useQuery({
     queryKey: QueryKeys.expenseCategories(),
-    queryFn: async () => {
-      const response = await fetch(ApiRoutes.expenseCategories());
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch expense categories");
-      }
-
-      return response.json() as Promise<CategoryDto[]>;
-    },
+    queryFn: () =>
+      fetchWithErrorHandling<CategoryDto[]>(
+        ApiRoutes.expenseCategories(),
+        "Failed to fetch expense categories"
+      ),
   });
 }
 
 export function useIncomeCategoriesQuery() {
   return useQuery({
     queryKey: QueryKeys.incomeCategories(),
-    queryFn: async () => {
-      const response = await fetch(ApiRoutes.incomeCategories());
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch income categories");
-      }
-
-      return response.json() as Promise<CategoryDto[]>;
-    },
+    queryFn: () =>
+      fetchWithErrorHandling<CategoryDto[]>(
+        ApiRoutes.incomeCategories(),
+        "Failed to fetch income categories"
+      ),
   });
 }
 
@@ -85,27 +74,13 @@ export function useCategoryExpensesQuery(categoryId: number) {
   return useQuery({
     queryKey: ["category-expenses", categoryId],
     queryFn: async () => {
-      const response = await fetch(ApiRoutes.expensesByCategory(categoryId));
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch category expenses");
-      }
-
-      const data = (await response.json()) as MonthlyTotalsDto[];
+      const data = await fetchWithErrorHandling<MonthlyTotalsDto[]>(
+        ApiRoutes.expensesByCategory(categoryId),
+        "Failed to fetch category expenses"
+      );
 
       // Transform the data for the chart - include year information
-      return data.map((item) => {
-        const date = parse(item.monthDate + "-01", "yyyy-MM-dd", new Date());
-        return {
-          name: format(date, "MMM"),
-          month: format(date, "MMM"),
-          year: format(date, "yyyy"),
-          yearMonth: item.monthDate,
-          total: item.total,
-          // Add a flag for the first month of the year
-          isFirstMonthOfYear: item.monthDate.endsWith("-01"),
-        };
-      });
+      return transformMonthlyDataForChart(data);
     },
     enabled: !!categoryId,
   });
@@ -116,28 +91,13 @@ export function useExpensesVsIncomeQuery() {
   return useQuery({
     queryKey: QueryKeys.expensesVsIncome(),
     queryFn: async () => {
-      const response = await fetch(ApiRoutes.expensesVsIncome());
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch expenses vs income data");
-      }
-
-      const data = (await response.json()) as MonthlyExpensesVsIncomeDto[];
+      const data = await fetchWithErrorHandling<MonthlyExpensesVsIncomeDto[]>(
+        ApiRoutes.expensesVsIncome(),
+        "Failed to fetch expenses vs income data"
+      );
 
       // Transform the data for the chart - include year information
-      return data.map((item) => {
-        const date = parse(item.monthDate + "-01", "yyyy-MM-dd", new Date());
-        return {
-          name: format(date, "MMM"),
-          month: format(date, "MMM"),
-          year: format(date, "yyyy"),
-          yearMonth: item.monthDate,
-          expenses: item.expenses,
-          income: item.income,
-          // Add a flag for the first month of the year
-          isFirstMonthOfYear: item.monthDate.endsWith("-01"),
-        };
-      });
+      return transformMonthlyDataForChart(data);
     },
   });
 }
@@ -146,17 +106,11 @@ export function useExpensesVsIncomeQuery() {
 export function useMonthSummaryQuery(year: number, month: Month) {
   return useQuery<MonthSummaryDto>({
     queryKey: QueryKeys.monthSummary(year, month),
-    queryFn: async () => {
-      const response = await fetch(
-        ApiRoutes.monthlyExpensesSummary(year, month)
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch month summary");
-      }
-
-      return response.json() as Promise<MonthSummaryDto>;
-    },
+    queryFn: () =>
+      fetchWithErrorHandling<MonthSummaryDto>(
+        ApiRoutes.monthlyExpensesSummary(year, month),
+        "Failed to fetch month summary"
+      ),
   });
 }
 
@@ -168,15 +122,11 @@ export function useMonthRecordsQuery(
 ) {
   return useQuery<RecordDto[]>({
     queryKey: QueryKeys.monthRecords(year, month),
-    queryFn: async () => {
-      const response = await fetch(ApiRoutes.allRecordsByMonth(year, month));
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch records");
-      }
-
-      return response.json() as Promise<RecordDto[]>;
-    },
+    queryFn: () =>
+      fetchWithErrorHandling<RecordDto[]>(
+        ApiRoutes.allRecordsByMonth(year, month),
+        "Failed to fetch records"
+      ),
     enabled,
   });
 }
@@ -185,17 +135,11 @@ export function useMonthRecordsQuery(
 export function usePrevMonthSummaryQuery(prevYear: number, prevMonth: Month) {
   return useQuery<MonthSummaryDto>({
     queryKey: ["month-summary", prevYear, prevMonth],
-    queryFn: async () => {
-      const response = await fetch(
-        ApiRoutes.monthlyExpensesSummary(prevYear, prevMonth)
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch previous month summary");
-      }
-
-      return response.json() as Promise<MonthSummaryDto>;
-    },
+    queryFn: () =>
+      fetchWithErrorHandling<MonthSummaryDto>(
+        ApiRoutes.monthlyExpensesSummary(prevYear, prevMonth),
+        "Failed to fetch previous month summary"
+      ),
   });
 }
 
@@ -203,15 +147,11 @@ export function usePrevMonthSummaryQuery(prevYear: number, prevMonth: Month) {
 export function useAllTimeSummaryQuery() {
   return useQuery({
     queryKey: QueryKeys.allTimeSummary(),
-    queryFn: async () => {
-      const response = await fetch(ApiRoutes.allTimeSummary());
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch all time summary");
-      }
-
-      return response.json() as Promise<AllTimeSummaryDto>;
-    },
+    queryFn: () =>
+      fetchWithErrorHandling<AllTimeSummaryDto>(
+        ApiRoutes.allTimeSummary(),
+        "Failed to fetch all time summary"
+      ),
   });
 }
 
@@ -227,13 +167,10 @@ export function useRecordQuery(
         throw new Error("Record ID is required");
       }
 
-      const response = await fetch(ApiRoutes.recordById(id));
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch record");
-      }
-
-      return response.json() as Promise<RecordDto>;
+      return fetchWithErrorHandling<RecordDto>(
+        ApiRoutes.recordById(id),
+        "Failed to fetch record"
+      );
     },
     enabled,
   });
@@ -247,13 +184,10 @@ export function useRecordCommentsQuery(comment: string) {
         return [] as string[];
       }
 
-      const response = await fetch(ApiRoutes.recordComments(comment));
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch record comments");
-      }
-
-      return response.json() as Promise<string[]>;
+      return fetchWithErrorHandling<string[]>(
+        ApiRoutes.recordComments(comment),
+        "Failed to fetch record comments"
+      );
     },
     enabled: comment.trim().length > 0,
   });
@@ -263,15 +197,11 @@ export function useRecordCommentsQuery(comment: string) {
 export function useRegularPaymentsQuery() {
   return useQuery({
     queryKey: QueryKeys.regularPayments(),
-    queryFn: async () => {
-      const response = await fetch(ApiRoutes.regularPayments());
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch regular payments");
-      }
-
-      return (await response.json()) as RegularPaymentDto[];
-    },
+    queryFn: () =>
+      fetchWithErrorHandling<RegularPaymentDto[]>(
+        ApiRoutes.regularPayments(),
+        "Failed to fetch regular payments"
+      ),
   });
 }
 
@@ -281,19 +211,11 @@ export function useUpdateRegularPaymentsMutation() {
 
   return useMutation({
     mutationFn: async (payments: RegularPaymentDto[]) => {
-      const response = await fetch(ApiRoutes.regularPayments(), {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payments),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to update regular payments");
-      }
-
-      return (await response.json()) as RegularPaymentDto[];
+      return fetchWithErrorHandling<RegularPaymentDto[]>(
+        ApiRoutes.regularPayments(),
+        "Failed to update regular payments",
+        createJsonPostOptions(payments)
+      );
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({
