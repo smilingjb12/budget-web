@@ -1,8 +1,9 @@
+import { nextEnv } from "@/nextEnv";
 import { NextRequest, NextResponse } from "next/server";
 
 // Store the password in an environment variable in a real app
 // For now, we'll hardcode it here, but this is server-side code that won't be exposed to the client
-const ADMIN_PASSWORD = "your-secure-password";
+const ADMIN_PASSWORD = nextEnv.ADMIN_PASSWORD;
 
 export async function POST(request: NextRequest) {
   try {
