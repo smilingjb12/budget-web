@@ -8,7 +8,7 @@ import {
   useRegularPaymentsQuery,
   useUpdateRegularPaymentsMutation,
 } from "@/lib/queries";
-import { Edit, Plus, Save, Trash2, X } from "lucide-react";
+import { Edit, Plus, Save, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export function RegularPaymentsList() {
@@ -99,30 +99,32 @@ export function RegularPaymentsList() {
       <CardContent>
         <div className="space-y-4">
           {payments.map((payment, index) => (
-            <div key={index} className="flex items-center space-x-2">
+            <div key={index} className="flex items-start space-x-2">
               {isEditMode ? (
                 <>
-                  <Input
-                    placeholder="Name"
-                    value={payment.name}
-                    onChange={(e) => handleNameChange(index, e.target.value)}
-                    className="flex-1"
-                  />
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2">
-                      $
-                    </span>
+                  <div className="flex-1 space-y-2">
                     <Input
-                      type="number"
-                      placeholder="0.00"
-                      value={payment.amount}
-                      onChange={(e) =>
-                        handleAmountChange(index, e.target.value)
-                      }
-                      className="pl-7 w-32"
-                      step="0.01"
-                      min="0"
+                      placeholder="Name"
+                      value={payment.name}
+                      onChange={(e) => handleNameChange(index, e.target.value)}
+                      className="w-full"
                     />
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 transform -translate-y-1/2">
+                        $
+                      </span>
+                      <Input
+                        type="number"
+                        placeholder="0.00"
+                        value={payment.amount}
+                        onChange={(e) =>
+                          handleAmountChange(index, e.target.value)
+                        }
+                        className="pl-7 w-full"
+                        step="0.01"
+                        min="0"
+                      />
+                    </div>
                   </div>
                   <Button
                     variant="ghost"
@@ -161,7 +163,7 @@ export function RegularPaymentsList() {
             <div></div>
             <div className="space-x-2">
               <Button variant="outline" onClick={handleCancelEdit}>
-                <X className="h-4 w-4 mr-2" /> Cancel
+                Cancel
               </Button>
               <Button onClick={handleSave} disabled={updateMutation.isPending}>
                 {updateMutation.isPending ? (

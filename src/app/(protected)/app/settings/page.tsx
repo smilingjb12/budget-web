@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { RegularPaymentsList } from "./regular-payments-list";
 
 export default function SettingsPage() {
@@ -15,7 +10,6 @@ export default function SettingsPage() {
       <Card>
         <CardHeader>
           <CardTitle>Regular Payments</CardTitle>
-          <CardDescription>Manage your regular payments</CardDescription>
         </CardHeader>
         <RegularPaymentsList />
       </Card>
