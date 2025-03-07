@@ -8,7 +8,7 @@ import {
   useRegularPaymentsQuery,
   useUpdateRegularPaymentsMutation,
 } from "@/lib/queries";
-import { Edit, Plus, Save, Trash2 } from "lucide-react";
+import { Edit, Plus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export function RegularPaymentsList() {
@@ -24,9 +24,13 @@ export function RegularPaymentsList() {
 
   useEffect(() => {
     if (regularPayments) {
-      setPayments(regularPayments);
-      setOriginalPayments(regularPayments.map((payment) => ({ ...payment })));
-      calculateTotal(regularPayments);
+      // Sort payments by amount in descending order
+      const sortedPayments = [...regularPayments].sort(
+        (a, b) => b.amount - a.amount
+      );
+      setPayments(sortedPayments);
+      setOriginalPayments(sortedPayments.map((payment) => ({ ...payment })));
+      calculateTotal(sortedPayments);
     }
   }, [regularPayments]);
 
@@ -166,13 +170,7 @@ export function RegularPaymentsList() {
                 Cancel
               </Button>
               <Button onClick={handleSave} disabled={updateMutation.isPending}>
-                {updateMutation.isPending ? (
-                  "Saving..."
-                ) : (
-                  <>
-                    <Save className="h-4 w-4 mr-2" /> Save Changes
-                  </>
-                )}
+                {updateMutation.isPending ? "Saving..." : <>Save Changes</>}
               </Button>
             </div>
           </>
