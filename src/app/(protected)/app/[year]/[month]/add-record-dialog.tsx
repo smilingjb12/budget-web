@@ -21,7 +21,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useCategoryIcon } from "@/lib/hooks/use-category-icon";
 import { useDebounce } from "@/lib/hooks/use-debounce";
 import { usePreviousMonth } from "@/lib/hooks/use-previous-month";
@@ -455,30 +454,34 @@ export function AddRecordDialog({
                         {selectedCategory ? `(${selectedCategory.name})` : ""}
                       </FormLabel>
                       <FormControl>
-                        <ToggleGroup
-                          type="single"
-                          variant="outline"
-                          className="grid grid-cols-3 gap-2 mt-2 mx-auto"
-                          onValueChange={field.onChange}
-                          value={field.value}
-                        >
+                        <div className="grid grid-cols-3 gap-1 mt-2 mx-auto w-fit">
                           {categories?.map((category) => {
                             const IconComponent = getCategoryIcon(
                               category.icon
                             );
+                            const isSelected =
+                              category.id.toString() === field.value;
 
                             return (
-                              <ToggleGroupItem
+                              <button
                                 key={category.id}
-                                value={category.id.toString()}
-                                className="flex items-center justify-center aspect-square h-20 w-20 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+                                type="button"
+                                onClick={() =>
+                                  field.onChange(category.id.toString())
+                                }
+                                className={`flex items-center justify-center aspect-square h-20 w-20 border border-input rounded-md transition-colors ${
+                                  isSelected
+                                    ? "bg-primary text-primary-foreground"
+                                    : "bg-background hover:bg-accent hover:text-accent-foreground"
+                                }`}
                                 title={category.name}
+                                disabled={isSelected} // Disable button if already selected to prevent untoggling
                               >
                                 <IconComponent className="h-8 w-8" />
-                              </ToggleGroupItem>
+                              </button>
                             );
                           })}
-                        </ToggleGroup>
+                        </div>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
