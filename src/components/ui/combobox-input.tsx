@@ -43,11 +43,15 @@ export const ComboboxInput = React.forwardRef<
   ) => {
     // Track whether a suggestion has been selected
     const [isSelected, setIsSelected] = React.useState(false);
+    // Track whether the dropdown should be open
+    const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
+    // Ref for the component container to detect clicks outside
+    const containerRef = React.useRef<HTMLDivElement>(null);
 
-    // We'll always keep the popover open when there are suggestions
-    // and the input has some text, except when there's only one suggestion
-    // that exactly matches the input value or when a suggestion has been selected
+    // We'll show suggestions when the dropdown is open,
+    // there are suggestions available, and the input has some text
     const showSuggestions =
+      isDropdownOpen &&
       !isSelected &&
       suggestions.length > 0 &&
       value.trim().length > 0 &&
@@ -60,19 +64,46 @@ export const ComboboxInput = React.forwardRef<
       setInputValue(value || "");
     }, [value]);
 
+    // Handle clicks outside the component to close the dropdown
+    React.useEffect(() => {
+      const handleClickOutside = (event: Event) => {
+        if (
+          containerRef.current &&
+          !containerRef.current.contains(event.target as Node)
+        ) {
+          setIsDropdownOpen(false);
+        }
+      };
+
+      // Add event listener for mousedown
+      document.addEventListener("mousedown", handleClickOutside);
+
+      // Add event listener for tab/focus changes
+      document.addEventListener("focusin", handleClickOutside);
+
+      // Cleanup
+      return () => {
+        document.removeEventListener("mousedown", handleClickOutside);
+        document.removeEventListener("focusin", handleClickOutside);
+      };
+    }, []);
+
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       const newValue = e.target.value;
       setInputValue(newValue);
       onChange(newValue);
       // Reset the selected state when the user types
       setIsSelected(false);
+      // Open the dropdown when the user starts typing
+      setIsDropdownOpen(true);
+
       if (onInputChange) {
         onInputChange(newValue);
       }
     };
 
     return (
-      <div className="relative w-full">
+      <div className="relative w-full" ref={containerRef}>
         <FormControl>
           <Input
             ref={ref}
@@ -99,6 +130,8 @@ export const ComboboxInput = React.forwardRef<
                         setInputValue(value);
                         // Mark as selected to hide the dropdown
                         setIsSelected(true);
+                        // Close the dropdown
+                        setIsDropdownOpen(false);
                         if (onInputChange) {
                           onInputChange(value);
                         }
