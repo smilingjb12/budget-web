@@ -41,10 +41,14 @@ export const ComboboxInput = React.forwardRef<
     },
     ref
   ) => {
+    // Track whether a suggestion has been selected
+    const [isSelected, setIsSelected] = React.useState(false);
+
     // We'll always keep the popover open when there are suggestions
     // and the input has some text, except when there's only one suggestion
-    // that exactly matches the input value
+    // that exactly matches the input value or when a suggestion has been selected
     const showSuggestions =
+      !isSelected &&
       suggestions.length > 0 &&
       value.trim().length > 0 &&
       !(suggestions.length === 1 && suggestions[0] === value.trim());
@@ -60,6 +64,8 @@ export const ComboboxInput = React.forwardRef<
       const newValue = e.target.value;
       setInputValue(newValue);
       onChange(newValue);
+      // Reset the selected state when the user types
+      setIsSelected(false);
       if (onInputChange) {
         onInputChange(newValue);
       }
@@ -91,6 +97,8 @@ export const ComboboxInput = React.forwardRef<
                       onSelect={(value) => {
                         onChange(value);
                         setInputValue(value);
+                        // Mark as selected to hide the dropdown
+                        setIsSelected(true);
                         if (onInputChange) {
                           onInputChange(value);
                         }
