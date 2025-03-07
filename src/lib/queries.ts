@@ -214,15 +214,17 @@ export function useAllTimeSummaryQuery() {
   });
 }
 
-// Record by ID query
+// Record queries
 export function useRecordQuery(
   id: number | undefined,
   enabled: boolean = true
 ) {
   return useQuery({
-    queryKey: id ? QueryKeys.record(id) : [],
+    queryKey: id ? QueryKeys.record(id) : ["record"],
     queryFn: async () => {
-      if (!id) throw new Error("Record ID is required");
+      if (!id) {
+        throw new Error("Record ID is required");
+      }
 
       const response = await fetch(ApiRoutes.recordById(id));
 
@@ -232,6 +234,26 @@ export function useRecordQuery(
 
       return response.json() as Promise<RecordDto>;
     },
-    enabled: enabled && !!id,
+    enabled,
+  });
+}
+
+export function useRecordCommentsQuery(comment: string) {
+  return useQuery({
+    queryKey: QueryKeys.recordComments(comment),
+    queryFn: async () => {
+      if (!comment.trim()) {
+        return [] as string[];
+      }
+
+      const response = await fetch(ApiRoutes.recordComments(comment));
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch record comments");
+      }
+
+      return response.json() as Promise<string[]>;
+    },
+    enabled: comment.trim().length > 0,
   });
 }

@@ -10,4 +10,5 @@ export const QueryKeys = {
   monthRecords: (year: number, month: Month) => ["month-records", year, month],
   exchangeRate: () => ["exchange-rate"],
   expensesVsIncome: () => ["expenses-vs-income"],
+  recordComments: (comment: string) => ["record-comments", comment],
 } as const;

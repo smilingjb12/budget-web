@@ -4,6 +4,7 @@ import {
 } from "@/app/api/(services)/record-service";
 import { ActionButton } from "@/components/action-button";
 import { Button } from "@/components/ui/button";
+import { ComboboxInput } from "@/components/ui/combobox-input";
 import {
   Dialog,
   DialogContent,
@@ -22,10 +23,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useCategoryIcon } from "@/lib/hooks/use-category-icon";
+import { useDebounce } from "@/lib/hooks/use-debounce";
 import { usePreviousMonth } from "@/lib/hooks/use-previous-month";
 import {
   useCategoriesQuery,
   useExchangeRateQuery,
+  useRecordCommentsQuery,
   useRecordQuery,
 } from "@/lib/queries";
 import { QueryKeys } from "@/lib/query-keys";
@@ -188,6 +191,29 @@ export function AddRecordDialog({
     exchangeRate,
     convertUsdToPln,
   ]);
+
+  // Add state for comment input
+  const [commentInput, setCommentInput] = useState("");
+
+  // Debounce the comment input with a 200ms delay
+  const debouncedCommentInput = useDebounce(commentInput, 200);
+
+  // Fetch comment suggestions based on the debounced input
+  const { data: commentSuggestions = [] } = useRecordCommentsQuery(
+    debouncedCommentInput
+  );
+
+  // Update commentInput when form value changes
+  const handleCommentInputChange = useCallback((value: string) => {
+    setCommentInput(value);
+  }, []);
+
+  // Initialize commentInput with form value when in edit mode
+  useEffect(() => {
+    if (recordData && recordData.comment) {
+      setCommentInput(recordData.comment);
+    }
+  }, [recordData]);
 
   const recordMutation = useMutation({
     mutationFn: async (values: FormValues) => {
@@ -402,7 +428,13 @@ export function AddRecordDialog({
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <Input type="text" placeholder="Note" {...field} />
+                      <ComboboxInput
+                        value={field.value || ""}
+                        onChange={field.onChange}
+                        onInputChange={handleCommentInputChange}
+                        suggestions={commentSuggestions}
+                        placeholder="Note"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

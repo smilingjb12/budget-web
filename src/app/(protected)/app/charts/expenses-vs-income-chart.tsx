@@ -8,6 +8,7 @@ import {
   Bar,
   BarChart,
   CartesianGrid,
+  Cell,
   Legend,
   ReferenceLine,
   ResponsiveContainer,
@@ -17,18 +18,28 @@ import {
   YAxis,
 } from "recharts";
 
-// Define interfaces for our data
 interface ExpenseIncomeDataPoint {
   name: string;
   yearMonth: string;
   year: string;
   expenses: number;
   income: number;
+  difference: number;
   isFirstMonthOfYear: boolean;
+  absoluteDifference: number;
 }
 
 export function ExpensesVsIncomeChart() {
-  const { data: expensesVsIncome, isLoading } = useExpensesVsIncomeQuery();
+  const { data: rawExpensesVsIncome, isLoading } = useExpensesVsIncomeQuery();
+  const [hasInitiallyScrolled, setHasInitiallyScrolled] = useState(false);
+
+  // Add difference calculation to the data
+  const expensesVsIncome = rawExpensesVsIncome?.map((item) => ({
+    ...item,
+    difference: item.income - item.expenses,
+    // Add absolute difference for display purposes
+    absoluteDifference: Math.abs(item.income - item.expenses),
+  }));
 
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const [, setVisibleData] = useState<typeof expensesVsIncome>([]);
@@ -72,19 +83,25 @@ export function ExpensesVsIncomeChart() {
     }
   }, [expensesVsIncome]);
 
-  // Scroll to the right (most recent data) when data changes
+  // Scroll to the right (most recent data) only on initial load
   useEffect(() => {
-    if (chartContainerRef.current && expensesVsIncome?.length && !isLoading) {
+    if (
+      chartContainerRef.current &&
+      expensesVsIncome?.length &&
+      !isLoading &&
+      !hasInitiallyScrolled
+    ) {
       // Small delay to ensure the chart is rendered
       setTimeout(() => {
         if (chartContainerRef.current) {
           chartContainerRef.current.scrollLeft =
             chartContainerRef.current.scrollWidth;
           updateVisibleData();
+          setHasInitiallyScrolled(true);
         }
       }, 100);
     }
-  }, [expensesVsIncome, isLoading, updateVisibleData]);
+  }, [expensesVsIncome, isLoading, updateVisibleData, hasInitiallyScrolled]);
 
   // Update visible data when scrolling
   useEffect(() => {
@@ -116,18 +133,18 @@ export function ExpensesVsIncomeChart() {
 
   const yearDividers = getYearDividers();
 
-  // Custom tooltip to show both expenses and income
+  // Custom tooltip to show the difference and its components
   const CustomTooltip = ({
     active,
     payload,
     label,
   }: TooltipProps<number, string>) => {
     if (active && payload && payload.length > 0) {
-      const expensePayload = payload[0];
-      const incomePayload = payload[1];
-      const expenseValue = expensePayload.value;
-      const incomeValue = incomePayload.value;
-      const year = (expensePayload.payload as ExpenseIncomeDataPoint)?.year;
+      const dataPoint = payload[0].payload as ExpenseIncomeDataPoint;
+      const differenceValue = dataPoint.difference;
+      const expenseValue = dataPoint.expenses;
+      const incomeValue = dataPoint.income;
+      const year = dataPoint.year;
 
       return (
         <div className="bg-background/90 p-2 border border-border rounded-md shadow-md text-xs">
@@ -138,9 +155,13 @@ export function ExpensesVsIncomeChart() {
           <p className="text-green-500">{`Income: ${formatCurrency(
             incomeValue || 0
           )}`}</p>
-          <p className="text-primary font-medium">{`Balance: ${formatCurrency(
-            (incomeValue || 0) - (expenseValue || 0)
-          )}`}</p>
+          <p
+            className={`font-medium ${
+              differenceValue >= 0 ? "text-green-500" : "text-red-500"
+            }`}
+          >
+            {`Balance: ${formatCurrency(differenceValue || 0)}`}
+          </p>
         </div>
       );
     }
@@ -150,7 +171,7 @@ export function ExpensesVsIncomeChart() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Expenses vs Income</CardTitle>
+        <CardTitle>Income vs Expenses</CardTitle>
       </CardHeader>
       <CardContent>
         <div
@@ -208,28 +229,29 @@ export function ExpensesVsIncomeChart() {
                   ))}
 
                   <Bar
-                    name="Expenses"
-                    dataKey="expenses"
-                    fill="hsl(35, 92%, 58%)" // Orange-ish color
+                    name="Balance"
+                    dataKey="absoluteDifference"
                     radius={[4, 4, 0, 0]}
                     maxBarSize={40}
-                    stackId="a"
-                  />
-                  <Bar
-                    name="Income"
-                    dataKey="income"
-                    fill="hsl(142, 76%, 36%)" // Green
-                    radius={[4, 4, 0, 0]}
-                    maxBarSize={40}
-                    stackId="b"
-                  />
+                  >
+                    {expensesVsIncome?.map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={
+                          entry.difference >= 0
+                            ? "hsl(142, 76%, 36%)"
+                            : "hsl(0, 84%, 60%)"
+                        }
+                      />
+                    ))}
+                  </Bar>
                 </BarChart>
               </ResponsiveContainer>
             </div>
           ) : (
             <div className="h-full flex items-center justify-center">
               <p className="text-muted-foreground">
-                No expenses vs income data available
+                No income vs expenses data available
               </p>
             </div>
           )}
