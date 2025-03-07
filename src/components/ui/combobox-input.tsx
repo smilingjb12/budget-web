@@ -42,8 +42,12 @@ export const ComboboxInput = React.forwardRef<
     ref
   ) => {
     // We'll always keep the popover open when there are suggestions
-    // and the input has some text
-    const showSuggestions = suggestions.length > 0 && value.trim().length > 0;
+    // and the input has some text, except when there's only one suggestion
+    // that exactly matches the input value
+    const showSuggestions =
+      suggestions.length > 0 &&
+      value.trim().length > 0 &&
+      !(suggestions.length === 1 && suggestions[0] === value.trim());
 
     const [inputValue, setInputValue] = React.useState(value || "");
 
