@@ -1,6 +1,7 @@
 export const nextEnv = {
   // Database connection info - prefer DATABASE_URL if available
   DATABASE_URL: process.env.DATABASE_URL,
+  ADMIN_PASSWORD: process.env.ADMIN_PASSWORD,
 
   // Fallback individual connection parameters
   POSTGRES_HOST: process.env.POSTGRES_HOST!,

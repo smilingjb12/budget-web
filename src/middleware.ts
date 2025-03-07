@@ -27,20 +27,23 @@ export function middleware(request: NextRequest) {
     (currentDate.getMonth() + 1) as Month
   );
 
-  // For API routes, we'll need a different authentication mechanism
-  // This is a simplified version that doesn't actually check authentication
-  // In a real app, you would use cookies or JWT tokens
+  // Check for authentication cookie
+  const authCookie = request.cookies.get("auth-token");
+  const isAuthenticated = !!authCookie?.value;
 
   if (isSignInPage(request)) {
-    // We can't check localStorage here since this is server-side
-    // In a real app, you would check for authentication cookies or tokens
+    // If already authenticated and trying to access sign-in page, redirect to app
+    if (isAuthenticated) {
+      return NextResponse.redirect(new URL(defaultRoute, request.url));
+    }
     return NextResponse.next();
   }
 
   if (isProtectedRoute(request)) {
-    // We can't check localStorage here since this is server-side
-    // In a real app, you would check for authentication cookies or tokens
-    // For now, we'll just allow access to protected routes
+    // If not authenticated and trying to access protected route, redirect to sign-in
+    if (!isAuthenticated) {
+      return NextResponse.redirect(new URL(SIGNIN_ROUTE, request.url));
+    }
     return NextResponse.next();
   }
 
