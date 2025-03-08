@@ -206,6 +206,7 @@ export function IncomeByYearChart() {
               <BarChart
                 data={stackedData}
                 margin={{ top: 30, right: 5, left: 5, bottom: 20 }}
+                barGap={10}
               >
                 <CartesianGrid
                   strokeDasharray="3 3"
