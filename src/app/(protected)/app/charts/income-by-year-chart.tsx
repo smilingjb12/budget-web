@@ -8,6 +8,7 @@ import {
   Bar,
   BarChart,
   CartesianGrid,
+  LabelList,
   Legend,
   ResponsiveContainer,
   Tooltip,
@@ -45,6 +46,42 @@ interface TooltipPayloadItem {
   color: string;
   payload: YearlyDataItem;
 }
+
+// Format currency without decimal places
+const formatCurrencyNoDecimals = (value: number): string => {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(value);
+};
+
+// Custom label formatter for the total amount
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const renderCustomizedLabel = (props: any) => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const { x, y, width, value } = props;
+
+  // Convert values to numbers to ensure proper calculations
+  const xPos = Number(x || 0);
+  const yPos = Number(y || 0);
+  const widthVal = Number(width || 0);
+  const numValue = Number(value || 0);
+
+  return (
+    <text
+      x={xPos + widthVal / 2}
+      y={yPos - 10}
+      textAnchor="middle"
+      dominantBaseline="middle"
+      className="fill-white text-sm font-bold"
+      filter="drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.5))"
+    >
+      {formatCurrencyNoDecimals(numValue)}
+    </text>
+  );
+};
 
 export function IncomeByYearChart() {
   const { data: incomeTrendsData, isLoading } = useIncomeTrendsQuery();
@@ -146,6 +183,13 @@ export function IncomeByYearChart() {
     return null;
   };
 
+  // Calculate the maximum value for the Y-axis with some padding
+  const maxValue = useMemo(() => {
+    if (!yearlyData.length) return 0;
+    const max = Math.max(...yearlyData.map((item) => item.total));
+    return max * 1.2; // Add 20% padding for the labels
+  }, [yearlyData]);
+
   return (
     <Card>
       <CardHeader>
@@ -161,7 +205,7 @@ export function IncomeByYearChart() {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={stackedData}
-                margin={{ top: 20, right: 5, left: 5, bottom: 20 }}
+                margin={{ top: 30, right: 5, left: 5, bottom: 20 }}
               >
                 <CartesianGrid
                   strokeDasharray="3 3"
@@ -173,7 +217,10 @@ export function IncomeByYearChart() {
                 <YAxis
                   tickLine={false}
                   axisLine={false}
-                  tickFormatter={(value: number) => formatCurrency(value)}
+                  tickFormatter={(value: number) =>
+                    formatCurrencyNoDecimals(value)
+                  }
+                  domain={[0, maxValue]}
                 />
                 <Tooltip
                   content={<CustomTooltip />}
@@ -194,7 +241,16 @@ export function IncomeByYearChart() {
                         : [0, 0, 0, 0]
                     }
                     maxBarSize={80}
-                  />
+                  >
+                    {/* Only add the label to the last (top) bar in the stack */}
+                    {index === incomeTrendsData.categories.length - 1 && (
+                      <LabelList
+                        dataKey="total"
+                        position="top"
+                        content={renderCustomizedLabel}
+                      />
+                    )}
+                  </Bar>
                 ))}
               </BarChart>
             </ResponsiveContainer>
