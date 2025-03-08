@@ -2,6 +2,7 @@
 
 import { ExpenseTrendsChart } from "./expense-trends-chart";
 import { ExpensesVsIncomeChart } from "./expenses-vs-income-chart";
+import { IncomeByYearChart } from "./income-by-year-chart";
 import { IncomeTrendsChart } from "./income-trends-chart";
 
 export default function ChartsPage() {
@@ -11,6 +12,7 @@ export default function ChartsPage() {
       <ExpenseTrendsChart />
       <ExpensesVsIncomeChart />
       <IncomeTrendsChart />
+      <IncomeByYearChart />
     </div>
   );
 }
