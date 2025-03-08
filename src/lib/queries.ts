@@ -2,6 +2,7 @@
 
 import { CategoryDto } from "@/app/api/(services)/category-service";
 import {
+  IncomeTrendsDto,
   MonthlyExpensesVsIncomeDto,
   MonthlyTotalsDto,
 } from "@/app/api/(services)/charts-service";
@@ -221,6 +222,48 @@ export function useUpdateRegularPaymentsMutation() {
       await queryClient.invalidateQueries({
         queryKey: QueryKeys.regularPayments(),
       });
+    },
+  });
+}
+
+// Income trends query
+export function useIncomeTrendsQuery() {
+  return useQuery({
+    queryKey: ["income-trends"],
+    queryFn: async () => {
+      const data = await fetchWithErrorHandling<IncomeTrendsDto[]>(
+        ApiRoutes.incomeTrends(),
+        "Failed to fetch income trends"
+      );
+
+      // Group data by month
+      const monthlyData: Record<
+        string,
+        { monthDate: string; categories: Record<string, number>; total: number }
+      > = {};
+
+      // Process the data to group by month and collect category totals
+      data.forEach((item) => {
+        if (!monthlyData[item.monthDate]) {
+          monthlyData[item.monthDate] = {
+            monthDate: item.monthDate,
+            categories: {},
+            total: 0,
+          };
+        }
+
+        monthlyData[item.monthDate].categories[item.categoryName] = item.total;
+        monthlyData[item.monthDate].total += item.total;
+      });
+
+      // Convert to array and transform for chart
+      const monthlyArray = Object.values(monthlyData);
+      const transformedData = transformMonthlyDataForChart(monthlyArray);
+
+      return {
+        data: transformedData,
+        categories: [...new Set(data.map((item) => item.categoryName))],
+      };
     },
   });
 }

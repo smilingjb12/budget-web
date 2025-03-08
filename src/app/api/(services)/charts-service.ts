@@ -13,6 +13,13 @@ export type MonthlyExpensesVsIncomeDto = {
   income: number;
 };
 
+export type IncomeTrendsDto = {
+  monthDate: string;
+  categoryId: number;
+  categoryName: string;
+  total: number;
+};
+
 export const getExpensesByCategorySchema = z.object({
   categoryId: z.number(),
 });
@@ -91,6 +98,45 @@ export const ChartsService = {
       monthDate,
       expenses: data.expenses,
       income: data.income,
+    }));
+  },
+
+  async getMonthlyIncomeByCategories(): Promise<
+    {
+      monthDate: string;
+      categoryId: number;
+      categoryName: string;
+      total: number;
+    }[]
+  > {
+    const result = await db
+      .select({
+        year: sql<number>`EXTRACT(YEAR FROM ${records.date})`,
+        month: sql<number>`EXTRACT(MONTH FROM ${records.date})`,
+        categoryId: records.categoryId,
+        categoryName: sql<string>`c.name`,
+        total: sql<number>`SUM(${records.value})`,
+      })
+      .from(records)
+      .innerJoin(sql`categories c`, sql`${records.categoryId} = c.id`)
+      .where(sql`${records.isExpense} = false`)
+      .groupBy(
+        sql`EXTRACT(YEAR FROM ${records.date})`,
+        sql`EXTRACT(MONTH FROM ${records.date})`,
+        records.categoryId,
+        sql`c.name`
+      )
+      .orderBy(
+        sql`EXTRACT(YEAR FROM ${records.date})`,
+        sql`EXTRACT(MONTH FROM ${records.date})`,
+        records.categoryId
+      );
+
+    return result.map((item) => ({
+      monthDate: `${item.year}-${item.month.toString().padStart(2, "0")}`,
+      categoryId: item.categoryId,
+      categoryName: item.categoryName,
+      total: parseFloat(String(item.total)),
     }));
   },
 };

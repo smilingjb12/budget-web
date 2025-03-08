@@ -18,6 +18,7 @@ export const ApiRoutes = {
   expensesByCategory: (categoryId: number) =>
     `/api/charts/expenses-by-category/${categoryId}`,
   expensesVsIncome: () => `/api/charts/expenses-vs-income`,
+  incomeTrends: () => `/api/charts/income-trends`,
   exchangeRate: () => `/api/exchange-rate`,
   recordComments: (comment: string) =>
     `/api/records/comments?comment=${encodeURIComponent(comment)}`,
