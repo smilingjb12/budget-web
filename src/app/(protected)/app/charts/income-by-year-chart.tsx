@@ -205,7 +205,7 @@ export function IncomeByYearChart() {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={stackedData}
-                margin={{ top: 30, right: 5, left: 5, bottom: 20 }}
+                margin={{ top: 30, right: 5, left: 0, bottom: 20 }}
                 barGap={10}
               >
                 <CartesianGrid
@@ -218,10 +218,9 @@ export function IncomeByYearChart() {
                 <YAxis
                   tickLine={false}
                   axisLine={false}
-                  tickFormatter={(value: number) =>
-                    formatCurrencyNoDecimals(value)
-                  }
+                  tick={false}
                   domain={[0, maxValue]}
+                  hide
                 />
                 <Tooltip
                   content={<CustomTooltip />}
