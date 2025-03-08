@@ -1,0 +1,14 @@
+---
+description: app-general
+globs: *.tsx
+alwaysApply: false
+---
+
+# General
+- App uses Tailwind for styling. Prefer using tailwind color variables instead of hardcoding values when possible.
+- App uses TanStack query with all queries located in [queries.ts](mdc:src/lib/queries.ts).
+- App doesn't use server components, instead it uses API routes located at src/app/api folder.
+- App uses DrizzleORM with PostgreSQL for data access. All data access queries are located in respective service class e.g. [record-service.ts](mdc:src/app/api/(services)/record-service.ts).
+- All data transfer objects accepted or returned from API endpoints should reside in the respective service file.
+- Database schema is defined in the [schema.ts](mdc:src/db/schema/schema.ts) file. When making changes to the database prefer using existing [package.json](mdc:package.json) commands like `npm run db:generate` and `npm run db:migrate`.
+- App is designed to be run on mobile viewports only.

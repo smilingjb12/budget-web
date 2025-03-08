@@ -1,10 +1,15 @@
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useCategoryIcon } from "@/lib/hooks/use-category-icon";
 import { useMonthRecordsQuery } from "@/lib/queries";
 import { Month } from "@/lib/routes";
 import { formatUSD } from "@/lib/utils";
 import { format, parseISO } from "date-fns";
+import { CalendarDays, DollarSign } from "lucide-react";
 import { useState } from "react";
 import { AddRecordDialog } from "./add-record-dialog";
+
+// Define sort type
+type SortType = "date" | "value";
 
 interface CategoryRecordsProps {
   categoryName: string;
@@ -32,6 +37,7 @@ export function CategoryRecords({
   isExpense = true,
 }: CategoryRecordsProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [sortType, setSortType] = useState<SortType>("date"); // Default sort by date
   const { getCategoryIcon } = useCategoryIcon();
   const IconComponent = getCategoryIcon(icon);
 
@@ -48,6 +54,17 @@ export function CategoryRecords({
       (record) =>
         record.categoryId === categoryId && record.isExpense === isExpense
     ) || [];
+
+  // Sort records based on selected sort type
+  const sortedCategoryRecords = [...categoryRecords].sort((a, b) => {
+    if (sortType === "date") {
+      // Sort by date (newest first)
+      return new Date(b.dateUtc).getTime() - new Date(a.dateUtc).getTime();
+    } else {
+      // Sort by value (highest first)
+      return b.value - a.value;
+    }
+  });
 
   const toggleExpand = () => {
     setIsExpanded(!isExpanded);
@@ -86,7 +103,38 @@ export function CategoryRecords({
             </div>
           ) : (
             <div className="space-y-2">
-              {categoryRecords.map((record) => (
+              {/* Sort toggle buttons */}
+              <div className="w-full mb-2">
+                <ToggleGroup
+                  type="single"
+                  value={sortType}
+                  onValueChange={(value) => {
+                    if (value) setSortType(value as SortType);
+                  }}
+                  variant="outline"
+                  size="sm"
+                  className="w-full grid grid-cols-2 gap-0"
+                >
+                  <ToggleGroupItem
+                    value="date"
+                    aria-label="Sort by date"
+                    className="flex justify-center"
+                  >
+                    <CalendarDays className="h-4 w-4 mr-2" />
+                    Date
+                  </ToggleGroupItem>
+                  <ToggleGroupItem
+                    value="value"
+                    aria-label="Sort by value"
+                    className="flex justify-center"
+                  >
+                    <DollarSign className="h-4 w-4 mr-1" />
+                    Value
+                  </ToggleGroupItem>
+                </ToggleGroup>
+              </div>
+
+              {sortedCategoryRecords.map((record) => (
                 <AddRecordDialog
                   key={record.id}
                   recordId={record.id}
