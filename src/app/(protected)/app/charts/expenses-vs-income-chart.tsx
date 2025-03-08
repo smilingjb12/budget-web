@@ -240,7 +240,7 @@ export function ExpensesVsIncomeChart() {
                         fill={
                           entry.difference >= 0
                             ? "hsl(142, 76%, 36%)"
-                            : "hsl(0, 84%, 60%)"
+                            : "hsl(35, 84%, 60%)"
                         }
                       />
                     ))}
