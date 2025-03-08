@@ -1,7 +1,6 @@
 export const nextEnv = {
   // Database connection info - prefer DATABASE_URL if available
   DATABASE_URL: process.env.DATABASE_URL,
-  ADMIN_PASSWORD: process.env.ADMIN_PASSWORD,
 
   // Fallback individual connection parameters
   POSTGRES_HOST: process.env.POSTGRES_HOST!,
@@ -12,4 +11,8 @@ export const nextEnv = {
 
   // Exchange Rate API
   EXCHANGE_RATE_API_KEY: process.env.EXCHANGE_RATE_API_KEY!,
+  NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY:
+    process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY!,
+  CLERK_SECRET_KEY: process.env.CLERK_SECRET_KEY!,
+  AUTHORIZED_USER_ID: process.env.AUTHORIZED_USER_ID!,
 };
