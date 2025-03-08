@@ -8,7 +8,7 @@ const ADMIN_PASSWORD = nextEnv.ADMIN_PASSWORD;
 export async function POST(request: NextRequest) {
   try {
     const { password } = (await request.json()) as { password: string };
-
+    console.log("password", password);
     if (!password) {
       return NextResponse.json(
         { error: "Password is required" },
