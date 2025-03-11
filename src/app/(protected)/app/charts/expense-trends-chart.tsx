@@ -142,14 +142,45 @@ export function ExpenseTrendsChart() {
     // Normalize the value to a 0-1 scale
     const normalizedValue = range === 0 ? 0.5 : (value - minValue) / range;
 
-    // Color scale: green (low) -> yellow/orange (middle) -> red (high)
-    if (normalizedValue < 0.33) {
-      return "hsl(142, 76%, 36%)"; // Green
-    } else if (normalizedValue < 0.66) {
-      return "hsl(35, 92%, 58%)"; // Orange/Yellow
-    } else {
-      return "hsl(0, 84%, 60%)"; // Red
+    // Define color stops for the gradient
+    const colorStops = [
+      { point: 0, color: { h: 142, s: 76, l: 36 } }, // Green (low)
+      { point: 0.5, color: { h: 35, s: 92, l: 58 } }, // Yellow/Orange (middle)
+      { point: 1, color: { h: 0, s: 84, l: 60 } }, // Red (high)
+    ];
+
+    // Find the two color stops to interpolate between
+    let lowerStop = colorStops[0];
+    let upperStop = colorStops[colorStops.length - 1];
+
+    for (let i = 0; i < colorStops.length - 1; i++) {
+      if (
+        normalizedValue >= colorStops[i].point &&
+        normalizedValue <= colorStops[i + 1].point
+      ) {
+        lowerStop = colorStops[i];
+        upperStop = colorStops[i + 1];
+        break;
+      }
     }
+
+    // Calculate how far between the two stops the value is (0 to 1)
+    const stopRange = upperStop.point - lowerStop.point;
+    const stopFraction =
+      stopRange === 0 ? 0 : (normalizedValue - lowerStop.point) / stopRange;
+
+    // Interpolate between the two colors
+    const h = Math.round(
+      lowerStop.color.h + stopFraction * (upperStop.color.h - lowerStop.color.h)
+    );
+    const s = Math.round(
+      lowerStop.color.s + stopFraction * (upperStop.color.s - lowerStop.color.s)
+    );
+    const l = Math.round(
+      lowerStop.color.l + stopFraction * (upperStop.color.l - lowerStop.color.l)
+    );
+
+    return `hsl(${h}, ${s}%, ${l}%)`;
   };
 
   return (
