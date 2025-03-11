@@ -2,9 +2,10 @@
 
 A personal budget tracking application built with Next.js, PostgreSQL, and Drizzle ORM.
 
-![Screenshot_20250311_225541_Chrome](https://github.com/user-attachments/assets/20160066-d5cf-4558-a6a6-a25ded3f3d2d)
-![Screenshot_20250311_225622_Chrome](https://github.com/user-attachments/assets/4605dde6-9750-4e2a-9956-ba465765bb58)
-
+<div style="display: flex; justify-content: center; gap: 10px;">
+  <img src="https://github.com/user-attachments/assets/20160066-d5cf-4558-a6a6-a25ded3f3d2d" alt="Screenshot 1" width="45%">
+  <img src="https://github.com/user-attachments/assets/4605dde6-9750-4e2a-9956-ba465765bb58" alt="Screenshot 2" width="45%">
+</div>
 
 ## Local Development
 
