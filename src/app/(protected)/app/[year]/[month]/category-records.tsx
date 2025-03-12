@@ -1,8 +1,9 @@
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { useCategoryColors } from "@/lib/hooks/use-category-colors";
 import { useCategoryIcon } from "@/lib/hooks/use-category-icon";
 import { useMonthRecordsQuery } from "@/lib/queries";
 import { Month } from "@/lib/routes";
-import { formatUSD } from "@/lib/utils";
+import { cn, formatUSD } from "@/lib/utils";
 import { format, parseISO } from "date-fns";
 import { CalendarDays, DollarSign } from "lucide-react";
 import { useState } from "react";
@@ -39,6 +40,7 @@ export function CategoryRecords({
   const [isExpanded, setIsExpanded] = useState(false);
   const [sortType, setSortType] = useState<SortType>("date"); // Default sort by date
   const { getCategoryIcon } = useCategoryIcon();
+  const { getCategoryBorderColor } = useCategoryColors();
   const IconComponent = getCategoryIcon(icon);
 
   // Only fetch records when the category is expanded
@@ -73,7 +75,10 @@ export function CategoryRecords({
   return (
     <div className="space-y-2">
       <div
-        className="flex justify-between items-center cursor-pointer hover:bg-muted/50 p-2 rounded-md transition-colors"
+        className={cn(
+          "flex justify-between items-center cursor-pointer hover:bg-muted/50 p-2 pl-3 rounded-md transition-colors border-l-4",
+          getCategoryBorderColor(categoryName)
+        )}
         onClick={toggleExpand}
       >
         <span className="flex items-center">

@@ -17,6 +17,7 @@ import {
   SelectTriggerNoChevron,
   SelectValue,
 } from "@/components/ui/select";
+import { useCategoryColors } from "@/lib/hooks/use-category-colors";
 import { useCategoryIcon } from "@/lib/hooks/use-category-icon";
 import { useMonthNavigation } from "@/lib/hooks/use-previous-month";
 import { useMonthSummaryQuery } from "@/lib/queries";
@@ -40,6 +41,7 @@ export default function MonthYearPage() {
   const month = Number(params.month) as Month;
   const year = Number(params.year);
   const { getCategoryIcon } = useCategoryIcon();
+  const { getCategoryColor } = useCategoryColors();
   const router = useRouter();
 
   const { prevMonth, prevYear, nextMonth, nextYear } = useMonthNavigation(
@@ -106,23 +108,6 @@ export default function MonthYearPage() {
       </div>
     );
   }
-
-  // Define category colors for consistent visualization
-  const categoryColors: Record<string, string> = {
-    Food: "bg-emerald-500",
-    Transportation: "bg-blue-500",
-    "Rent & Bills": "bg-purple-500",
-    Shopping: "bg-pink-500",
-    Travel: "bg-amber-500",
-    Leisure: "bg-indigo-500",
-    Education: "bg-cyan-500",
-    "Wellness and Beauty": "bg-rose-500",
-    Other: "bg-gray-500",
-    Gifts: "bg-red-500",
-    // Income categories
-    Paycheck: "bg-green-600",
-    Gift: "bg-teal-500",
-  };
 
   // Filter categories based on the selected view type
   const filteredCategories =
@@ -309,8 +294,7 @@ export default function MonthYearPage() {
                       const IconComponent = getCategoryIcon(category.icon);
                       return {
                         value: Number(category.total),
-                        color:
-                          categoryColors[category.categoryName] || undefined,
+                        color: getCategoryColor(category.categoryName),
                         tooltip: (
                           <div className="flex flex-col">
                             <div className="flex items-center gap-2">
