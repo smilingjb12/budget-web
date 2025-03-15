@@ -144,7 +144,7 @@ export function RegularPaymentsList() {
   };
 
   if (isLoading) {
-    return <LoadingIndicator />;
+    return <LoadingIndicator className="pb-4" />;
   }
 
   if (error) {
@@ -204,7 +204,7 @@ export function RegularPaymentsList() {
                   >
                     {payment.name}
                   </div>
-                  <div className="w-32 text-right font-medium">
+                  <div className="w-auto text-right font-medium">
                     ${payment.amount.toFixed(2)}
                   </div>
                 </>
