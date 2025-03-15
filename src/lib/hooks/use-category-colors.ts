@@ -16,32 +16,42 @@ const CATEGORIES = {
   GIFT: "Gift",
 } as const;
 
-const categoryColors: Record<string, string> = {
-  [CATEGORIES.FOOD]: "bg-emerald-500",
-  [CATEGORIES.TRANSPORTATION]: "bg-blue-500",
-  [CATEGORIES.RENT_BILLS]: "bg-purple-500",
-  [CATEGORIES.SHOPPING]: "bg-pink-500",
-  [CATEGORIES.TRAVEL]: "bg-amber-500",
-  [CATEGORIES.LEISURE]: "bg-indigo-500",
-  [CATEGORIES.EDUCATION]: "bg-cyan-500",
-  [CATEGORIES.WELLNESS_BEAUTY]: "bg-rose-500",
-  [CATEGORIES.OTHER]: "bg-gray-500",
-  [CATEGORIES.GIFTS]: "bg-red-500",
-  [CATEGORIES.PAYCHECK]: "bg-green-600",
-  [CATEGORIES.GIFT]: "bg-teal-500",
+type ColorConfig = {
+  bg: string;
+  border: string;
 };
 
-// Default color for unknown categories
-const DEFAULT_COLOR = "bg-gray-500";
+const categoryColors: Record<string, ColorConfig> = {
+  [CATEGORIES.FOOD]: { bg: "bg-emerald-500", border: "border-emerald-500" },
+  [CATEGORIES.TRANSPORTATION]: { bg: "bg-blue-500", border: "border-blue-500" },
+  [CATEGORIES.RENT_BILLS]: { bg: "bg-purple-500", border: "border-purple-500" },
+  [CATEGORIES.SHOPPING]: { bg: "bg-pink-500", border: "border-pink-500" },
+  [CATEGORIES.TRAVEL]: { bg: "bg-amber-500", border: "border-amber-500" },
+  [CATEGORIES.LEISURE]: { bg: "bg-indigo-500", border: "border-indigo-500" },
+  [CATEGORIES.EDUCATION]: { bg: "bg-cyan-500", border: "border-cyan-500" },
+  [CATEGORIES.WELLNESS_BEAUTY]: {
+    bg: "bg-rose-500",
+    border: "border-rose-500",
+  },
+  [CATEGORIES.OTHER]: { bg: "bg-gray-500", border: "border-gray-500" },
+  [CATEGORIES.GIFTS]: { bg: "bg-red-500", border: "border-red-500" },
+  [CATEGORIES.PAYCHECK]: { bg: "bg-green-600", border: "border-green-600" },
+  [CATEGORIES.GIFT]: { bg: "bg-teal-500", border: "border-teal-500" },
+};
+
+// Default colors for unknown categories
+const DEFAULT_COLORS: ColorConfig = {
+  bg: "bg-gray-500",
+  border: "border-gray-500",
+};
 
 export function useCategoryColors() {
   const getCategoryColor = (categoryName: string): string => {
-    return categoryColors[categoryName] || DEFAULT_COLOR;
+    return categoryColors[categoryName]?.bg || DEFAULT_COLORS.bg;
   };
 
   const getCategoryBorderColor = (categoryName: string): string => {
-    const bgColor = getCategoryColor(categoryName);
-    return bgColor.replace("bg-", "border-");
+    return categoryColors[categoryName]?.border || DEFAULT_COLORS.border;
   };
 
   return {
