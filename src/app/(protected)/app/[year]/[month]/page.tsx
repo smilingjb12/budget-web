@@ -10,13 +10,6 @@ import { MonthYearPicker } from "@/components/month-year-picker";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SegmentedProgress } from "@/components/ui/segmented-progress";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTriggerNoChevron,
-  SelectValue,
-} from "@/components/ui/select";
 import { useCategoryColors } from "@/lib/hooks/use-category-colors";
 import { useCategoryIcon } from "@/lib/hooks/use-category-icon";
 import { useMonthNavigation } from "@/lib/hooks/use-previous-month";
@@ -48,6 +41,10 @@ export default function MonthYearPage() {
     month,
     year
   );
+
+  const handleToggleViewType = () => {
+    setViewType((prev) => (prev === "expenses" ? "income" : "expenses"));
+  };
 
   // Check if next month is in the future
   const currentDate = new Date();
@@ -211,18 +208,14 @@ export default function MonthYearPage() {
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-2">
           <MonthYearPicker initialMonth={month} initialYear={year} />
-          <Select
-            value={viewType}
-            onValueChange={(value) => setViewType(value as ViewType)}
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-[40px]"
+            onClick={handleToggleViewType}
           >
-            <SelectTriggerNoChevron className="w-auto">
-              <SelectValue placeholder="View" />
-            </SelectTriggerNoChevron>
-            <SelectContent>
-              <SelectItem value="expenses">E</SelectItem>
-              <SelectItem value="income">I</SelectItem>
-            </SelectContent>
-          </Select>
+            {viewType === "expenses" ? "E" : "I"}
+          </Button>
         </div>
         {!isLoadingAllTime && allTimeSummary && (
           <div
