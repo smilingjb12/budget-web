@@ -381,8 +381,11 @@ export function AddRecordDialog({
                       placeholder="PLN"
                       value={plnValue}
                       onChange={(e) => handlePlnChange(e.target.value)}
-                      className="pr-16"
+                      className="pr-10"
                     />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none select-none text-lg font-medium">
+                      zł
+                    </span>
                   </div>
                 </FormItem>
                 <FormItem>
@@ -393,9 +396,12 @@ export function AddRecordDialog({
                       placeholder="USD"
                       value={usdValue}
                       onChange={(e) => handleUsdChange(e.target.value)}
-                      className="pr-16"
+                      className="pr-10"
                       disabled={isLoadingExchangeRate || isExchangeRateError}
                     />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none select-none text-lg font-medium">
+                      $
+                    </span>
                   </div>
                 </FormItem>
               </div>
@@ -502,7 +508,9 @@ export function AddRecordDialog({
                   }
                   isLoading={recordMutation.isPending}
                 >
-                  {isEditMode ? "Update" : "Add"}
+                  {isEditMode
+                    ? `Update${usdValue ? ` ($${usdValue})` : ""}`
+                    : `Add${usdValue ? ` ($${usdValue})` : ""}`}
                 </ActionButton>
               </div>
             </form>

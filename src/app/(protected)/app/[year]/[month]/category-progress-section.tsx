@@ -7,7 +7,7 @@ import { formatUSD } from "@/lib/utils";
 
 type Category = {
   categoryName: string;
-  total: number;
+  totalValue: number;
   icon: string;
 };
 
@@ -30,7 +30,7 @@ export function CategoryProgressSection({
         segments={sortedCategories.map((category) => {
           const IconComponent = getCategoryIcon(category.icon);
           return {
-            value: Number(category.total),
+            value: Number(category.totalValue),
             color: getCategoryColor(category.categoryName),
             tooltip: (
               <div className="flex flex-col">
@@ -39,9 +39,9 @@ export function CategoryProgressSection({
                   <span>{category.categoryName}</span>
                 </div>
                 <div className="text-xs mt-1">
-                  {formatUSD(Number(category.total))} (
+                  {formatUSD(Number(category.totalValue))} (
                   {(
-                    (Number(category.total) / totalMonthlyAmount) *
+                    (Number(category.totalValue) / totalMonthlyAmount) *
                     100
                   ).toFixed(1)}
                   %)
