@@ -113,6 +113,7 @@ export function MonthlySummaryCard({ viewType }: { viewType: ViewType }) {
       ...category,
       previousMonthExpenses,
       difference,
+      totalValue: Number(category.total),
     };
   });
 
