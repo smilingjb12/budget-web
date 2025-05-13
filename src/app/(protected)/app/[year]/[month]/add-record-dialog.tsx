@@ -411,7 +411,6 @@ export function AddRecordDialog({
                 </div>
               )}
 
-              {/* Hidden form field to store the value */}
               <div className="hidden">
                 <FormField
                   control={form.control}
@@ -427,24 +426,43 @@ export function AddRecordDialog({
                 />
               </div>
 
-              <FormField
-                control={form.control}
-                name="comment"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormControl>
-                      <ComboboxInput
-                        value={field.value || ""}
-                        onChange={field.onChange}
-                        onInputChange={handleCommentInputChange}
-                        suggestions={commentSuggestions}
-                        placeholder="Note"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="comment"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <ComboboxInput
+                          value={field.value || ""}
+                          onChange={field.onChange}
+                          onInputChange={handleCommentInputChange}
+                          suggestions={commentSuggestions}
+                          placeholder="Note"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <ActionButton
+                  variant="default"
+                  className="h-10"
+                  type="submit"
+                  disabled={
+                    recordMutation.isPending ||
+                    isExchangeRateError ||
+                    isLoadingExchangeRate ||
+                    !exchangeRate
+                  }
+                  isLoading={recordMutation.isPending}
+                >
+                  {isEditMode
+                    ? `Update${usdValue ? ` ($${usdValue})` : ""}`
+                    : `Add${usdValue ? ` ($${usdValue})` : ""}`}
+                </ActionButton>
+              </div>
+
               <FormField
                 control={form.control}
                 name="categoryId"
@@ -494,25 +512,6 @@ export function AddRecordDialog({
                   );
                 }}
               />
-
-              <div className="flex justify-end">
-                <ActionButton
-                  variant="default"
-                  className="w-full"
-                  type="submit"
-                  disabled={
-                    recordMutation.isPending ||
-                    isExchangeRateError ||
-                    isLoadingExchangeRate ||
-                    !exchangeRate
-                  }
-                  isLoading={recordMutation.isPending}
-                >
-                  {isEditMode
-                    ? `Update${usdValue ? ` ($${usdValue})` : ""}`
-                    : `Add${usdValue ? ` ($${usdValue})` : ""}`}
-                </ActionButton>
-              </div>
             </form>
           </Form>
         )}
