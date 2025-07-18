@@ -6,8 +6,9 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { useExpensesVsIncomeQuery } from "@/lib/queries";
 import { Month, Routes } from "@/lib/routes";
-import { cn } from "@/lib/utils";
+import { cn, formatCurrency } from "@/lib/utils";
 import { format } from "date-fns";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -56,6 +57,18 @@ export function MonthYearPicker({
 
   const [open, setOpen] = useState(false);
 
+  // Fetch monthly income data
+  const { data: monthlyData, isLoading } = useExpensesVsIncomeQuery();
+
+  // Helper function to get income for a specific month
+  const getIncomeForMonth = (year: number, monthIndex: number) => {
+    if (!monthlyData) return 0;
+    
+    const monthString = `${year}-${(monthIndex + 1).toString().padStart(2, "0")}`;
+    const monthData = monthlyData.find(item => item.yearMonth === monthString);
+    return monthData?.income || 0;
+  };
+
   const handlePreviousYear = () => {
     setViewDate((prev) => new Date(prev.getFullYear() - 1, prev.getMonth()));
   };
@@ -90,7 +103,7 @@ export function MonthYearPicker({
           {formatSelectedDate()}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[280px] p-3" align="start">
+      <PopoverContent className="w-[320px] p-3" align="start">
         <div className="flex items-center justify-between mb-2">
           <Button variant="outline" size="icon" onClick={handlePreviousYear}>
             <ChevronLeft className="h-4 w-4" />
@@ -113,22 +126,31 @@ export function MonthYearPicker({
               currentDate.getMonth() === index &&
               currentDate.getFullYear() === viewDate.getFullYear();
 
+            const income = getIncomeForMonth(viewDate.getFullYear(), index);
+
             return (
               <Button
                 key={monthName}
                 variant={isSelected ? "default" : "outline"}
                 className={cn(
-                  "h-9 py-7",
+                  "h-16 py-2 flex flex-col justify-center",
                   isCurrentMonth &&
                     !isSelected &&
                     "border-2 border-blue-500 font-bold"
                 )}
                 onClick={() => handleSelectMonth(index)}
               >
-                {monthName}
-                {isCurrentMonth && (
-                  <span className="absolute top-0 right-1 text-xs text-blue-500">
-                    •
+                <div className="relative w-full">
+                  <span className="text-sm font-medium">{monthName}</span>
+                  {isCurrentMonth && (
+                    <span className="absolute -top-1 -right-1 text-xs text-blue-500">
+                      •
+                    </span>
+                  )}
+                </div>
+                {!isLoading && (
+                  <span className="text-xs text-green-500 mt-1 font-medium">
+                    {income > 0 ? formatCurrency(Math.round(income)) : "–"}
                   </span>
                 )}
               </Button>
