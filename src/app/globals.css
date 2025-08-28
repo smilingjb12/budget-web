@@ -84,6 +84,16 @@
   body {
     font-family: Arial, Helvetica, sans-serif;
   }
+  /* Reusable glass effect */
+  .glass {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    background: hsl(var(--card) / 0.55);
+    border: 1px solid hsl(var(--border) / 0.40);
+    box-shadow:
+      0 10px 30px hsl(var(--foreground) / 0.06),
+      inset 0 1px 0 hsl(var(--foreground) / 0.08);
+  }
 }
 
 @layer base {
@@ -149,6 +159,12 @@
   }
   body {
     @apply bg-background text-foreground;
+    /* Subtle, fixed gradient layers for depth */
+    background-image:
+      radial-gradient(1200px 600px at 10% -10%, hsl(var(--primary) / 0.10), transparent 60%),
+      radial-gradient(800px 400px at 110% 0%, hsl(var(--accent) / 0.12), transparent 55%),
+      linear-gradient(to bottom, hsl(var(--background)), hsl(var(--background)));
+    background-attachment: fixed;
   }
 }
 
