@@ -35,7 +35,7 @@ import { ApiRoutes, Month } from "@/lib/routes";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { format, parseISO, formatDistanceToNow } from "date-fns";
-import { PencilIcon, PlusIcon } from "lucide-react";
+import { PencilIcon, PlusIcon, Trash2 } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -400,7 +400,8 @@ export function AddRecordDialog({
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>
+          <div className="flex items-center justify-between">
+            <DialogTitle>
             {isEditMode
               ? recordData
                 ? `Edit Record (${format(
@@ -411,7 +412,21 @@ export function AddRecordDialog({
               : isIncome
               ? "Add Income"
               : "Add Expense"}
-          </DialogTitle>
+            </DialogTitle>
+            {isEditMode && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={handleDelete}
+                disabled={deleteMutation.isPending}
+                aria-label="Delete record"
+                title="Delete record"
+              >
+                <Trash2 className="h-4 w-4 text-destructive" />
+              </Button>
+            )}
+          </div>
         </DialogHeader>
         {isEditMode && isLoadingRecord ? (
           <div className="py-4 text-center">Loading record data...</div>
@@ -558,19 +573,7 @@ export function AddRecordDialog({
             </form>
           </Form>
         )}
-        {isEditMode && (
-          <div className="flex justify-end">
-            <ActionButton
-              type="button"
-              variant="destructive"
-              className="h-9"
-              onClick={handleDelete}
-              isLoading={deleteMutation.isPending}
-            >
-              Delete
-            </ActionButton>
-          </div>
-        )}
+        {/* Delete action moved to header as icon button when editing */}
         {/* Exchange rate last updated info */}
         {exchangeRateData?.lastUpdatedAt && (
           <div className="mt-2 text-xs text-muted-foreground">
