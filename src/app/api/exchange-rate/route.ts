@@ -5,7 +5,7 @@ import { addDays, isBefore } from "date-fns";
 import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
-export type ExchangeRateDto = { rate: number };
+export type ExchangeRateDto = { rate: number; lastUpdatedAt: string };
 
 interface ExchangeRateResponse {
   result: string;
@@ -26,7 +26,10 @@ export async function GET() {
       latestRate &&
       isBefore(new Date(), addDays(latestRate.lastUpdatedAt, 1))
     ) {
-      return NextResponse.json({ rate: latestRate.rate });
+      return NextResponse.json<ExchangeRateDto>({
+        rate: parseFloat((latestRate.rate as unknown as string) ?? "0"),
+        lastUpdatedAt: latestRate.lastUpdatedAt.toISOString(),
+      });
     }
 
     // Otherwise, fetch a new rate from the API
@@ -43,22 +46,26 @@ export async function GET() {
     const plnRate = data.conversion_rates.PLN;
 
     // Update or insert the rate in the database
+    const now = new Date();
     if (latestRate) {
       await db
         .update(exchangeRates)
         .set({
           rate: plnRate.toString(),
-          lastUpdatedAt: new Date(),
+          lastUpdatedAt: now,
         })
         .where(eq(exchangeRates.id, latestRate.id));
     } else {
       await db.insert(exchangeRates).values({
         rate: plnRate.toString(),
-        lastUpdatedAt: new Date(),
+        lastUpdatedAt: now,
       });
     }
 
-    return NextResponse.json<ExchangeRateDto>({ rate: plnRate });
+    return NextResponse.json<ExchangeRateDto>({
+      rate: plnRate,
+      lastUpdatedAt: now.toISOString(),
+    });
   } catch (error) {
     console.error("Error fetching exchange rate:", error);
     return NextResponse.json(

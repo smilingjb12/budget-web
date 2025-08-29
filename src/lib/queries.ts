@@ -31,7 +31,7 @@ export function useExchangeRateQuery() {
         ApiRoutes.exchangeRate(),
         "Failed to fetch exchange rate"
       );
-      return data.rate;
+      return data;
     },
   });
 }

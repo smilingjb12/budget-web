@@ -34,7 +34,7 @@ import { QueryKeys } from "@/lib/query-keys";
 import { ApiRoutes, Month } from "@/lib/routes";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { format, parseISO } from "date-fns";
+import { format, parseISO, formatDistanceToNow } from "date-fns";
 import { PencilIcon, PlusIcon } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -80,10 +80,11 @@ export function AddRecordDialog({
 
   // Fetch exchange rate
   const {
-    data: exchangeRate,
+    data: exchangeRateData,
     isLoading: isLoadingExchangeRate,
     isError: isExchangeRateError,
   } = useExchangeRateQuery();
+  const exchangeRate = exchangeRateData?.rate;
 
   const { data: allCategories } = useCategoriesQuery();
   const categories = useMemo(() => {
@@ -514,6 +515,12 @@ export function AddRecordDialog({
               />
             </form>
           </Form>
+        )}
+        {/* Exchange rate last updated info */}
+        {exchangeRateData?.lastUpdatedAt && (
+          <div className="mt-2 text-xs text-muted-foreground">
+            Updated {formatDistanceToNow(parseISO(exchangeRateData.lastUpdatedAt), { addSuffix: true })}
+          </div>
         )}
       </DialogContent>
     </Dialog>
