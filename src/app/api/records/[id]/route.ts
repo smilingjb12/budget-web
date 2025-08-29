@@ -66,3 +66,27 @@ export async function PUT(
     );
   }
 }
+
+export async function DELETE(
+  _request: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
+  const params = await context.params;
+  const { id } = params;
+  const recordId = parseInt(id);
+
+  if (isNaN(recordId)) {
+    return NextResponse.json({ error: "Invalid record ID" }, { status: 400 });
+  }
+
+  try {
+    await RecordService.deleteRecord(recordId);
+    return NextResponse.json({ success: true }, { status: 200 });
+  } catch (error) {
+    console.error("Error deleting record:", error);
+    return NextResponse.json(
+      { error: "Failed to delete record", details: (error as Error).message },
+      { status: 500 }
+    );
+  }
+}

@@ -166,6 +166,10 @@ export const RecordService = {
     return await db.update(records).set(row).where(eq(records.id, request.id));
   },
 
+  async deleteRecord(id: number) {
+    return await db.delete(records).where(eq(records.id, id));
+  },
+
   async searchRecordComments(comment: string): Promise<string[]> {
     const result = await db
       .select({

@@ -321,6 +321,51 @@ export function AddRecordDialog({
     recordMutation.mutate(values);
   };
 
+  const deleteMutation = useMutation({
+    mutationFn: async () => {
+      if (!recordId) throw new Error("Record ID is required to delete");
+      const response = await fetch(ApiRoutes.recordById(recordId), {
+        method: "DELETE",
+      });
+      if (!response.ok) {
+        throw new Error("Failed to delete record");
+      }
+      // Consume response to avoid unhandled promise, but do not return data
+      await response.json().catch(() => undefined);
+      return;
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: QueryKeys.monthSummary(year, month),
+      });
+      await queryClient.invalidateQueries({
+        queryKey: QueryKeys.monthSummary(prevYear, prevMonth),
+      });
+      await queryClient.invalidateQueries({
+        queryKey: QueryKeys.allTimeSummary(),
+      });
+      await queryClient.invalidateQueries({
+        queryKey: QueryKeys.monthRecords(year, month),
+      });
+      if (recordId) {
+        await queryClient.invalidateQueries({
+          queryKey: QueryKeys.record(recordId),
+        });
+      }
+      setIsDialogOpen(false);
+      if (onSuccess) onSuccess();
+    },
+  });
+
+  const handleDelete = () => {
+    if (!recordId) return;
+    if (typeof window !== "undefined") {
+      const confirmed = window.confirm("Delete this entry permanently?");
+      if (!confirmed) return;
+    }
+    deleteMutation.mutate();
+  };
+
   return (
     <Dialog
       open={isDialogOpen}
@@ -411,7 +456,6 @@ export function AddRecordDialog({
                   Exchange rate unavailable. Cannot save record.
                 </div>
               )}
-
               <div className="hidden">
                 <FormField
                   control={form.control}
@@ -426,7 +470,6 @@ export function AddRecordDialog({
                   )}
                 />
               </div>
-
               <div className="grid grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
@@ -463,7 +506,6 @@ export function AddRecordDialog({
                     : `Add${usdValue ? ` ($${usdValue})` : ""}`}
                 </ActionButton>
               </div>
-
               <FormField
                 control={form.control}
                 name="categoryId"
@@ -516,10 +558,26 @@ export function AddRecordDialog({
             </form>
           </Form>
         )}
+        {isEditMode && (
+          <div className="flex justify-end">
+            <ActionButton
+              type="button"
+              variant="destructive"
+              className="h-9"
+              onClick={handleDelete}
+              isLoading={deleteMutation.isPending}
+            >
+              Delete
+            </ActionButton>
+          </div>
+        )}
         {/* Exchange rate last updated info */}
         {exchangeRateData?.lastUpdatedAt && (
           <div className="mt-2 text-xs text-muted-foreground">
-            Updated {formatDistanceToNow(parseISO(exchangeRateData.lastUpdatedAt), { addSuffix: true })}
+            Updated{" "}
+            {formatDistanceToNow(parseISO(exchangeRateData.lastUpdatedAt), {
+              addSuffix: true,
+            })}
           </div>
         )}
       </DialogContent>
